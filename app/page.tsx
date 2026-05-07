@@ -66,7 +66,7 @@ export default function LandingPage() {
         <div className="lp-nav-inner">
           <Link className="lp-nav-logo" href="/">Skill<span>Mark</span></Link>
           <div className="lp-nav-right">
-            <Link href="/login" className="lp-btn lp-btn-ghost lp-nav-ghost-hide">Log In</Link>
+            <Link href="/login" className="lp-btn lp-btn-ghost">Log In</Link>
             <Link href="/signup" className="lp-btn lp-btn-navy">Join Free →</Link>
           </div>
         </div>
