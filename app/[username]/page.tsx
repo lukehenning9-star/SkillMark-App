@@ -202,8 +202,8 @@ export default async function PublicProfilePage({
             <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Verified</p>
           </div>
           <div className="p-4 text-center">
-            <p className="text-xl font-bold text-navy">{profile.profile_views}</p>
-            <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Profile Views</p>
+            <p className="text-xl font-bold text-navy">0</p>
+            <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Connections</p>
           </div>
         </div>
 
