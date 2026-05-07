@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import AppNav from "@/components/AppNav";
+import { ensureProfile } from "@/app/actions/profile";
 import type { Profile, WorkExperience, Project } from "@/lib/types";
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
@@ -54,7 +55,10 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single<Profile>();
 
-  if (!profile) redirect("/login");
+  if (!profile) {
+    await ensureProfile();
+    redirect("/onboarding");
+  }
   if (!profile.onboarding_complete) redirect("/onboarding");
 
   const [{ data: workExp }, { data: projects }] = await Promise.all([
