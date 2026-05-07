@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import AppNav from "@/components/AppNav";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
 function VerifiedBadge() {
@@ -81,6 +82,8 @@ export default async function PublicProfilePage({
   };
 
   return (
+    <>
+      <AppNav />
     <main className="min-h-screen bg-sm-bg">
       {/* Banner */}
       <div className="h-32 sm:h-48 bg-navy relative">
@@ -348,5 +351,6 @@ export default async function PublicProfilePage({
         </div>
       </div>
     </main>
+    </>
   );
 }

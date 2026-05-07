@@ -7,7 +7,9 @@
       "PowerShell(Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\" | ForEach-Object { \\($_ -split '='\\)[0] })",
       "PowerShell($content = Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\"; $content | ForEach-Object { $parts = $_ -split '=', 2; Write-Host \"$\\($parts[0]\\) = $\\($parts[1].Length\\) chars\" })",
       "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\supabase\" -Force)",
-      "Bash(Remove-Item \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\app\\\\profile\\\\page.tsx\" -Force)"
+      "Bash(Remove-Item \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\app\\\\profile\\\\page.tsx\" -Force)",
+      "Bash(grep -o '\"text\":\".*landing page.*\"' \"C:\\\\Users\\\\lukeh\\\\.claude\\\\projects\\\\c--Users-lukeh-skillmark-app\\\\665cbff8-46a2-46dd-94e6-363a5e0d7ee8.jsonl\" 2>/dev/null | head -5)",
+      "Read(//c/Users/lukeh/.claude/projects/c--Users-lukeh-skillmark-app/**)"
     ]
   }
 }

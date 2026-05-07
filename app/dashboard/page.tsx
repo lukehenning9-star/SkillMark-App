@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import AppNav from "@/components/AppNav";
 import type { Profile, WorkExperience, Project } from "@/lib/types";
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
@@ -94,6 +95,8 @@ export default async function DashboardPage() {
   );
 
   return (
+    <>
+      <AppNav />
     <main className="min-h-screen bg-sm-bg">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
 
@@ -311,5 +314,6 @@ export default async function DashboardPage() {
         )}
       </div>
     </main>
+    </>
   );
 }
