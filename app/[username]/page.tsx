@@ -192,14 +192,10 @@ export default async function PublicProfilePage({
         </div>
 
         {/* Stats strip */}
-        <div className="grid grid-cols-3 border border-border rounded-xl bg-white mb-6 divide-x divide-border overflow-hidden">
+        <div className="grid grid-cols-2 border border-border rounded-xl bg-white mb-6 divide-x divide-border overflow-hidden">
           <div className="p-4 text-center">
             <p className="text-xl font-bold text-navy">{typedProjects.length}</p>
             <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Projects</p>
-          </div>
-          <div className="p-4 text-center">
-            <p className="text-xl font-bold text-emerald-600">{verifiedProjects.length}</p>
-            <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Verified</p>
           </div>
           <div className="p-4 text-center">
             <p className="text-xl font-bold text-navy">0</p>
