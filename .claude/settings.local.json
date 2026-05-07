@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\app\\\\favicon.ico\")",
+      "PowerShell(Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\" | ForEach-Object { $_.Split\\('='\\)[0] })",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\" -Raw\\).Length)",
+      "PowerShell(Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\" | ForEach-Object { \\($_ -split '='\\)[0] })",
+      "PowerShell($content = Get-Content \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\.env.local\"; $content | ForEach-Object { $parts = $_ -split '=', 2; Write-Host \"$\\($parts[0]\\) = $\\($parts[1].Length\\) chars\" })",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\supabase\" -Force)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\lukeh\\\\skillmark-app\\\\app\\\\profile\\\\page.tsx\" -Force)"
+    ]
+  }
+}
