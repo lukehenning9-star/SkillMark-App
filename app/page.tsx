@@ -78,7 +78,7 @@ export default function LandingPage() {
           <div className="lp-eyebrow-dot" />
           Now accepting early members
         </div>
-        <h1>The verified skills network<br />for <em>the trades.</em></h1>
+        <h1>The verified skills network<br /><em>for the trades.</em></h1>
         <p className="lp-hero-sub">
           SkillMark connects skilled tradespeople with the contractors who need them —
           through <strong>real job photos verified by real supervisors</strong>, not resumes.
