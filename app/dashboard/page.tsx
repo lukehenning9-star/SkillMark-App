@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import AppNav from "@/components/AppNav";
 import { ensureProfile } from "@/app/actions/profile";
 import type { Profile, Project } from "@/lib/types";
@@ -251,9 +252,9 @@ export default async function DashboardPage() {
                     href={`/projects/${project.id}`}
                     className="bg-white border border-border rounded-xl overflow-hidden hover:shadow-sm hover:border-border2 transition-all group"
                   >
-                    <div className="aspect-video bg-sm-bg flex items-center justify-center">
+                    <div className="aspect-video bg-sm-bg flex items-center justify-center relative">
                       {project.cover_photo_url ? (
-                        <img src={project.cover_photo_url} alt={project.title} className="w-full h-full object-cover" />
+                        <Image src={project.cover_photo_url} alt={project.title} fill className="object-cover" />
                       ) : (
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>

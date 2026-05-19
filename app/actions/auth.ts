@@ -1,11 +1,24 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 type State = { error?: string; message?: string } | undefined;
 
+function getIp(): Promise<string> {
+  return headers().then((h) =>
+    h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown"
+  );
+}
+
 export async function signup(state: State, formData: FormData): Promise<State> {
+  const ip = await getIp();
+  if (!checkRateLimit(`signup:${ip}`, 5, 60_000)) {
+    return { error: "Too many signup attempts. Please try again in a minute." };
+  }
+
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
@@ -43,6 +56,11 @@ export async function signup(state: State, formData: FormData): Promise<State> {
 }
 
 export async function login(state: State, formData: FormData): Promise<State> {
+  const ip = await getIp();
+  if (!checkRateLimit(`login:${ip}`, 10, 60_000)) {
+    return { error: "Too many login attempts. Please try again in a minute." };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({

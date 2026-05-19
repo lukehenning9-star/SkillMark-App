@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import AppNav from "@/components/AppNav";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
@@ -39,7 +40,7 @@ export default async function PublicProfilePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select("id, username, full_name, bio, avatar_url, banner_url, trade, experience_level, years_experience, city, state, is_available")
     .eq("username", username.toLowerCase())
     .single<Profile>();
 
@@ -53,7 +54,7 @@ export default async function PublicProfilePage({
   ] = await Promise.all([
     supabase
       .from("work_experience")
-      .select("*")
+      .select("id, job_title, company_name, start_date, end_date, is_current, description, supervisor_name")
       .eq("profile_id", profile.id)
       .order("start_date", { ascending: false }),
     supabase
@@ -63,7 +64,7 @@ export default async function PublicProfilePage({
       .order("created_at", { ascending: false }),
     supabase
       .from("certifications")
-      .select("*")
+      .select("id, name, issuing_org, date_earned, expiry_date")
       .eq("profile_id", profile.id)
       .order("date_earned", { ascending: false }),
     supabase.auth.getUser(),
@@ -88,10 +89,11 @@ export default async function PublicProfilePage({
       {/* Banner */}
       <div className="h-32 sm:h-48 bg-navy relative">
         {profile.banner_url && (
-          <img
+          <Image
             src={profile.banner_url}
             alt="Profile banner"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         )}
         {isOwner && (
@@ -107,12 +109,13 @@ export default async function PublicProfilePage({
         {/* Avatar + identity row */}
         <div className="relative -mt-12 sm:-mt-16 mb-6 flex items-end justify-between gap-4">
           <div className="relative">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-sm-bg bg-white overflow-hidden flex items-center justify-center">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-sm-bg bg-white overflow-hidden flex items-center justify-center relative">
               {profile.avatar_url ? (
-                <img
+                <Image
                   src={profile.avatar_url}
                   alt={profile.full_name ?? profile.username}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               ) : (
                 <span className="text-3xl sm:text-4xl font-bold text-navy-mid select-none">
@@ -255,12 +258,13 @@ export default async function PublicProfilePage({
                       key={project.id}
                       className="border border-border rounded-lg overflow-hidden hover:border-border2 hover:shadow-sm transition-all"
                     >
-                      <div className="aspect-video bg-sm-bg flex items-center justify-center">
+                      <div className="aspect-video bg-sm-bg flex items-center justify-center relative">
                         {project.cover_photo_url ? (
-                          <img
+                          <Image
                             src={project.cover_photo_url}
                             alt={project.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

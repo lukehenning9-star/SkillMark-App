@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { logout } from "@/app/actions/auth";
 
 type Props = {
@@ -31,7 +32,7 @@ export default function UserMenuDropdown({ username, displayName, avatarUrl }: P
         className="w-9 h-9 rounded-full bg-navy-mid border-2 border-border overflow-hidden flex items-center justify-center hover:border-accent transition-colors cursor-pointer"
       >
         {avatarUrl ? (
-          <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={displayName} width={36} height={36} className="w-full h-full object-cover" />
         ) : (
           <span className="text-sm font-bold text-white select-none">{initial}</span>
         )}

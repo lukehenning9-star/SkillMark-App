@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import AppNav from "@/components/AppNav";
 import { deleteProject } from "@/app/actions/projects";
 import type { Project, Profile } from "@/lib/types";
@@ -75,11 +76,14 @@ export default async function ProjectDetailPage({
           {/* Cover photo placeholder */}
           <div className="bg-white border border-border rounded-xl overflow-hidden mb-6">
             {project.cover_photo_url ? (
-              <img
-                src={project.cover_photo_url}
-                alt={project.title}
-                className="w-full aspect-video object-cover"
-              />
+              <div className="aspect-video relative">
+                <Image
+                  src={project.cover_photo_url}
+                  alt={project.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             ) : (
               <div className="aspect-video bg-sm-bg flex flex-col items-center justify-center gap-3">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -135,9 +139,9 @@ export default async function ProjectDetailPage({
                 <div className="bg-white border border-border rounded-xl p-4">
                   <p className="text-[11px] font-semibold text-text-dim uppercase tracking-wide mb-3">Worker</p>
                   <Link href={`/${profile.username}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <div className="w-10 h-10 bg-navy-mid rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-10 h-10 bg-navy-mid rounded-full flex items-center justify-center overflow-hidden shrink-0 relative">
                       {profile.avatar_url ? (
-                        <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                        <Image src={profile.avatar_url} alt="" fill className="object-cover" />
                       ) : (
                         <span className="text-sm font-bold text-white">
                           {(profile.full_name ?? profile.username).charAt(0).toUpperCase()}

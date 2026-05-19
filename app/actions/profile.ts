@@ -18,6 +18,13 @@ export async function saveProfileStep(data: ProfileUpdate) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  if (data.full_name !== undefined && data.full_name.length > 100) return { error: "Full name must be 100 characters or less." };
+  if (data.city !== undefined && data.city.length > 100) return { error: "City must be 100 characters or less." };
+  if (data.bio !== undefined && data.bio.length > 300) return { error: "Bio must be 300 characters or less." };
+  if (data.years_experience !== undefined && (data.years_experience < 0 || data.years_experience > 60)) {
+    return { error: "Years of experience must be between 0 and 60." };
+  }
+
   const { error } = await supabase
     .from("profiles")
     .update(data)
