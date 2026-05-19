@@ -1,7 +1,10 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { PROJECT_SKILLS } from "@/lib/constants";
 import { randomUUID } from "crypto";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function createProject(formData: FormData) {
   const supabase = await createClient();
@@ -10,10 +13,28 @@ export async function createProject(formData: FormData) {
 
   const title = (formData.get("title") as string).trim();
   if (!title) return { error: "Project title is required." };
+  if (title.length > 200) return { error: "Title must be 200 characters or less." };
 
-  const supervisorEmail = (formData.get("supervisor_email") as string | null)?.trim() || null;
+  const description = (formData.get("description") as string | null)?.trim() || null;
+  if (description && description.length > 5000) return { error: "Description must be 5000 characters or less." };
+
+  const location = (formData.get("location") as string | null)?.trim() || null;
+  if (location && location.length > 200) return { error: "Location must be 200 characters or less." };
+
   const supervisorName = (formData.get("supervisor_name") as string | null)?.trim() || null;
-  const specificSkills = formData.getAll("specific_skills") as string[];
+  if (supervisorName && supervisorName.length > 200) return { error: "Supervisor name must be 200 characters or less." };
+
+  const supervisorEmailRaw = (formData.get("supervisor_email") as string | null)?.trim() || null;
+  if (supervisorEmailRaw && !EMAIL_RE.test(supervisorEmailRaw)) {
+    return { error: "Supervisor email is not a valid email address." };
+  }
+  const supervisorEmail = supervisorEmailRaw;
+
+  const rawSkills = formData.getAll("specific_skills") as string[];
+  const validSkillSet = new Set<string>(PROJECT_SKILLS);
+  const specificSkills = rawSkills
+    .filter((s) => validSkillSet.has(s))
+    .slice(0, 20);
 
   const verificationToken = randomUUID();
 
@@ -22,9 +43,9 @@ export async function createProject(formData: FormData) {
     .insert({
       profile_id: user.id,
       title,
-      description: (formData.get("description") as string | null)?.trim() || null,
+      description,
       trade_category: (formData.get("trade_category") as string | null) || null,
-      location: (formData.get("location") as string | null)?.trim() || null,
+      location,
       completed_date: (formData.get("completed_date") as string | null) || null,
       specific_skills: specificSkills,
       supervisor_name: supervisorName,

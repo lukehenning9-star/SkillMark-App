@@ -12,7 +12,8 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   const username = (formData.get("username") as string).toLowerCase().trim();
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirm_password") as string;
-  const role = (formData.get("role") as string) || "worker";
+  const rawRole = formData.get("role") as string;
+  const role = rawRole === "worker" || rawRole === "contractor" ? rawRole : "worker";
 
   if (password !== confirmPassword) {
     return { error: "Passwords do not match." };
@@ -23,6 +24,13 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   if (!/^[a-z0-9_]+$/.test(username)) {
     return { error: "Username can only contain letters, numbers, and underscores." };
   }
+
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("username", username)
+    .maybeSingle();
+  if (existing) return { error: "Username is already taken." };
 
   const { error } = await supabase.auth.signUp({
     email,

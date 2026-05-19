@@ -65,7 +65,7 @@ export default async function DashboardPage() {
       .eq("profile_id", user.id),
     supabase
       .from("projects")
-      .select("*")
+      .select("id, title, trade_category, cover_photo_url, verification_status")
       .eq("profile_id", user.id)
       .order("created_at", { ascending: false })
       .limit(6),

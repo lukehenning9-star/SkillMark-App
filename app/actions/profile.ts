@@ -11,7 +11,6 @@ type ProfileUpdate = {
   state?: string;
   bio?: string;
   is_available?: boolean;
-  onboarding_complete?: boolean;
 };
 
 export async function saveProfileStep(data: ProfileUpdate) {
@@ -28,6 +27,8 @@ export async function saveProfileStep(data: ProfileUpdate) {
   return { success: true };
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function addWorkExperience(data: {
   job_title: string;
   company_name: string;
@@ -41,6 +42,14 @@ export async function addWorkExperience(data: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
+
+  if (data.job_title.length > 200) return { error: "Job title must be 200 characters or less." };
+  if (data.company_name.length > 200) return { error: "Company name must be 200 characters or less." };
+  if (data.description && data.description.length > 2000) return { error: "Description must be 2000 characters or less." };
+  if (data.supervisor_name && data.supervisor_name.length > 200) return { error: "Supervisor name must be 200 characters or less." };
+  if (data.supervisor_email && !EMAIL_RE.test(data.supervisor_email)) {
+    return { error: "Supervisor email is not a valid email address." };
+  }
 
   const { error } = await supabase
     .from("work_experience")

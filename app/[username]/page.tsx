@@ -58,7 +58,7 @@ export default async function PublicProfilePage({
       .order("start_date", { ascending: false }),
     supabase
       .from("projects")
-      .select("*")
+      .select("id, title, description, trade_category, specific_skills, cover_photo_url, verification_status")
       .eq("profile_id", profile.id)
       .order("created_at", { ascending: false }),
     supabase
