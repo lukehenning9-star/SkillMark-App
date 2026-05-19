@@ -167,7 +167,7 @@ export default function LandingPage() {
               </div>
               <div className="lp-why-compare-row"><span className="lp-why-compare-key">Debt at graduation</span><span className="lp-why-compare-val bad">$39,000+</span></div>
               <div className="lp-why-compare-row"><span className="lp-why-compare-key">Earnings during training</span><span className="lp-why-compare-val bad">$0</span></div>
-              <div className="lp-why-compare-row"><span className="lp-why-compare-key">Starting salary</span><span className="lp-why-compare-val">~$65,000</span></div>
+              <div className="lp-why-compare-row"><span className="lp-why-compare-key">Starting salary</span><span className="lp-why-compare-val bad">~$65,000</span></div>
               <div className="lp-why-compare-row"><span className="lp-why-compare-key">Monthly loan payment</span><span className="lp-why-compare-val bad">$300–$400/mo</span></div>
             </div>
             <div className="lp-why-compare-card highlight">
