@@ -1,3 +1,12 @@
+export type Message = {
+  id: string
+  sender_id: string
+  recipient_id: string
+  content: string
+  read_at: string | null
+  created_at: string
+}
+
 export type Profile = {
   id: string
   username: string
