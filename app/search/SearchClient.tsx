@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { TRADES, US_STATES } from "@/lib/constants";
+import { TRADES, US_STATES, UNION_STATUS_OPTIONS } from "@/lib/constants";
 import type { Profile } from "@/lib/types";
 
 type SearchProfile = Pick<
   Profile,
-  "id" | "username" | "full_name" | "avatar_url" | "trade" | "experience_level" | "years_experience" | "city" | "state" | "is_available"
+  "id" | "username" | "full_name" | "avatar_url" | "trade" | "experience_level" | "years_experience" | "city" | "state" | "is_available" | "union_status"
 >;
 
 const selectClass =
@@ -26,6 +26,7 @@ export default function SearchClient() {
   const [trade, setTrade] = useState("");
   const [level, setLevel] = useState("");
   const [state, setState] = useState("");
+  const [unionStatus, setUnionStatus] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
   const [results, setResults] = useState<SearchProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export default function SearchClient() {
     const supabase = createClient();
     let q = supabase
       .from("profiles")
-      .select("id, username, full_name, avatar_url, trade, experience_level, years_experience, city, state, is_available")
+      .select("id, username, full_name, avatar_url, trade, experience_level, years_experience, city, state, is_available, union_status")
       .eq("onboarding_complete", true)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -44,12 +45,13 @@ export default function SearchClient() {
     if (trade) q = q.eq("trade", trade);
     if (level) q = q.eq("experience_level", level);
     if (state) q = q.eq("state", state);
+    if (unionStatus) q = q.eq("union_status", unionStatus);
     if (availableOnly) q = q.eq("is_available", true);
 
     const { data } = await q;
     setResults((data ?? []) as SearchProfile[]);
     setLoading(false);
-  }, [query, trade, level, state, availableOnly]);
+  }, [query, trade, level, state, unionStatus, availableOnly]);
 
   useEffect(() => {
     const t = setTimeout(runSearch, 300);
@@ -65,14 +67,9 @@ export default function SearchClient() {
         </p>
       </div>
 
-      {/* Search + filters */}
       <div className="bg-white border border-border rounded-xl p-4 mb-6 space-y-3">
         <div className="relative">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim pointer-events-none"
-            width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          >
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim pointer-events-none" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input
@@ -84,7 +81,7 @@ export default function SearchClient() {
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           <select value={trade} onChange={(e) => setTrade(e.target.value)} className={selectClass}>
             <option value="">All trades</option>
             {TRADES.map((t) => <option key={t}>{t}</option>)}
@@ -100,6 +97,11 @@ export default function SearchClient() {
           <select value={state} onChange={(e) => setState(e.target.value)} className={selectClass}>
             <option value="">All states</option>
             {US_STATES.map((s) => <option key={s}>{s}</option>)}
+          </select>
+
+          <select value={unionStatus} onChange={(e) => setUnionStatus(e.target.value)} className={selectClass}>
+            <option value="">Union status</option>
+            {UNION_STATUS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
           </select>
 
           <label className="flex items-center gap-2 bg-sm-bg border border-border rounded-md px-3 py-2 cursor-pointer hover:border-border2 transition-colors">
@@ -179,6 +181,11 @@ export default function SearchClient() {
                         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                           <span className="w-1 h-1 bg-emerald-500 rounded-full" />
                           Available
+                        </span>
+                      )}
+                      {profile.union_status && (
+                        <span className="text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                          {profile.union_status}
                         </span>
                       )}
                     </div>

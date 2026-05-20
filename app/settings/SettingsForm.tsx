@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
-import { US_STATES, TRADES } from "@/lib/constants";
+import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
+import AvatarCropModal from "@/components/AvatarCropModal";
 import type { Profile } from "@/lib/types";
 
 const inputClass =
@@ -19,80 +20,77 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [error, setError] = useState<string | null>(null);
   const [bio, setBio] = useState(profile.bio ?? "");
 
+  const [tradeVal, setTradeVal] = useState(
+    profile.trade
+      ? (TRADES as readonly string[]).includes(profile.trade)
+        ? profile.trade
+        : "Other"
+      : ""
+  );
+  const [tradeCustom, setTradeCustom] = useState(
+    profile.trade && !(TRADES as readonly string[]).includes(profile.trade)
+      ? profile.trade
+      : ""
+  );
+
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
   const [bannerUrl, setBannerUrl] = useState<string | null>(profile.banner_url);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [bannerError, setBannerError] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
-  async function handlePhotoUpload(
-    type: "avatar" | "banner",
-    file: File
-  ) {
-    if (!file.type.startsWith("image/")) {
-      if (type === "avatar") setAvatarError("Please select an image file.");
-      else setBannerError("Please select an image file.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      if (type === "avatar") setAvatarError("Image must be 5MB or smaller.");
-      else setBannerError("Image must be 5MB or smaller.");
-      return;
-    }
-
-    if (type === "avatar") { setAvatarError(null); setAvatarUploading(true); }
-    else { setBannerError(null); setBannerUploading(true); }
-
+  async function handleCropApply(blob: Blob) {
+    setCropSrc(null);
+    setAvatarUploading(true);
+    setAvatarError(null);
     try {
-      const urlResult = type === "avatar"
-        ? await getAvatarUploadUrl()
-        : await getBannerUploadUrl();
-
+      const urlResult = await getAvatarUploadUrl();
       if (!urlResult || "error" in urlResult) {
-        const msg = urlResult?.error ?? "Could not get upload URL.";
-        if (type === "avatar") setAvatarError(msg);
-        else setBannerError(msg);
+        setAvatarError(urlResult?.error ?? "Could not get upload URL.");
         return;
       }
+      const uploadRes = await fetch(urlResult.signedUrl, {
+        method: "PUT",
+        body: blob,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+      if (!uploadRes.ok) { setAvatarError("Upload failed. Please try again."); return; }
+      const saveResult = await saveAvatarUrl(urlResult.publicUrl);
+      if (saveResult?.error) { setAvatarError(saveResult.error); return; }
+      setAvatarUrl(urlResult.publicUrl);
+    } catch {
+      setAvatarError("Upload failed. Please try again.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
 
+  async function handleBannerUpload(file: File) {
+    if (!file.type.startsWith("image/")) { setBannerError("Please select an image file."); return; }
+    if (file.size > 5 * 1024 * 1024) { setBannerError("Image must be 5MB or smaller."); return; }
+    setBannerError(null);
+    setBannerUploading(true);
+    try {
+      const urlResult = await getBannerUploadUrl();
+      if (!urlResult || "error" in urlResult) { setBannerError(urlResult?.error ?? "Could not get upload URL."); return; }
       const uploadRes = await fetch(urlResult.signedUrl, {
         method: "PUT",
         body: file,
         headers: { "Content-Type": file.type },
       });
-
-      if (!uploadRes.ok) {
-        if (type === "avatar") setAvatarError("Upload failed. Please try again.");
-        else setBannerError("Upload failed. Please try again.");
-        return;
-      }
-
-      const saveResult = type === "avatar"
-        ? await saveAvatarUrl(urlResult.publicUrl)
-        : await saveBannerUrl(urlResult.publicUrl);
-
-      if (saveResult?.error) {
-        if (type === "avatar") setAvatarError(saveResult.error);
-        else setBannerError(saveResult.error);
-        return;
-      }
-
-      if (type === "avatar") setAvatarUrl(urlResult.publicUrl);
-      else setBannerUrl(urlResult.publicUrl);
+      if (!uploadRes.ok) { setBannerError("Upload failed. Please try again."); return; }
+      const saveResult = await saveBannerUrl(urlResult.publicUrl);
+      if (saveResult?.error) { setBannerError(saveResult.error); return; }
+      setBannerUrl(urlResult.publicUrl);
     } catch {
-      if (type === "avatar") setAvatarError("Upload failed. Please try again.");
-      else setBannerError("Upload failed. Please try again.");
+      setBannerError("Upload failed. Please try again.");
     } finally {
-      if (type === "avatar") {
-        setAvatarUploading(false);
-        if (avatarInputRef.current) avatarInputRef.current.value = "";
-      } else {
-        setBannerUploading(false);
-        if (bannerInputRef.current) bannerInputRef.current.value = "";
-      }
+      setBannerUploading(false);
+      if (bannerInputRef.current) bannerInputRef.current.value = "";
     }
   }
 
@@ -102,15 +100,19 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
     setError(null);
     setSaved(false);
     startTransition(async () => {
+      const effectiveTrade =
+        tradeVal === "Other" ? (tradeCustom.trim() || "Other") : tradeVal || undefined;
       const result = await saveProfileStep({
         full_name: (fd.get("full_name") as string).trim(),
-        trade: (fd.get("trade") as string) || undefined,
+        headline: (fd.get("headline") as string).trim() || undefined,
+        trade: effectiveTrade,
         experience_level: (fd.get("experience_level") as Profile["experience_level"]) || undefined,
         years_experience: Number(fd.get("years_experience")) || 0,
         city: (fd.get("city") as string).trim() || undefined,
         state: (fd.get("state") as string) || undefined,
-        bio: (fd.get("bio") as string).trim() || undefined,
+        bio: bio.trim() || undefined,
         is_available: fd.get("is_available") === "on",
+        union_status: (fd.get("union_status") as string) || undefined,
       });
       if (result?.error) setError(result.error);
       else setSaved(true);
@@ -120,11 +122,11 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link href="/dashboard" className="text-sm text-text-dim hover:text-navy flex items-center gap-1.5 mb-3">
+        <Link href={`/${profile.username}`} className="text-sm text-text-dim hover:text-navy flex items-center gap-1.5 mb-3">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
-          Back to Dashboard
+          Back to Profile
         </Link>
         <h1 className="font-serif text-2xl font-bold text-navy">Profile Settings</h1>
         <p className="text-text-dim text-sm mt-1">Update your public profile information.</p>
@@ -134,7 +136,6 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       <div className="bg-white border border-border rounded-xl p-6 space-y-5 mb-5">
         <h2 className="font-semibold text-navy text-sm">Photos</h2>
 
-        {/* Avatar */}
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-navy-mid border border-border flex items-center justify-center overflow-hidden shrink-0 relative">
             {avatarUrl ? (
@@ -161,13 +162,18 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
               ref={avatarInputRef}
               type="file"
               accept="image/*"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload("avatar", f); }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setCropSrc(URL.createObjectURL(file));
+                  if (avatarInputRef.current) avatarInputRef.current.value = "";
+                }
+              }}
               className="hidden"
             />
           </div>
         </div>
 
-        {/* Banner */}
         <div>
           <p className="text-sm font-semibold text-navy mb-1">Banner Image</p>
           <div className="h-20 bg-sm-bg border border-border rounded-lg overflow-hidden relative mb-2">
@@ -195,7 +201,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
             ref={bannerInputRef}
             type="file"
             accept="image/*"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload("banner", f); }}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBannerUpload(f); }}
             className="hidden"
           />
         </div>
@@ -210,13 +216,28 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
             <input name="full_name" type="text" defaultValue={profile.full_name ?? ""} placeholder="Marcus Rivera" required className={inputClass} />
           </div>
 
+          <div>
+            <label className={labelClass}>Headline</label>
+            <input name="headline" type="text" defaultValue={profile.headline ?? ""} placeholder="Master Electrician · 12 years commercial" maxLength={120} className={inputClass} />
+            <p className="text-[11px] text-text-dim mt-1">Shows below your name on your profile · 120 chars max</p>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade</label>
-              <select name="trade" defaultValue={profile.trade ?? ""} className={inputClass}>
+              <select value={tradeVal} onChange={(e) => setTradeVal(e.target.value)} className={inputClass}>
                 <option value="">Select trade...</option>
                 {TRADES.map((t) => <option key={t}>{t}</option>)}
               </select>
+              {tradeVal === "Other" && (
+                <input
+                  type="text"
+                  value={tradeCustom}
+                  onChange={(e) => setTradeCustom(e.target.value)}
+                  placeholder="e.g. Ironworker"
+                  className={`${inputClass} mt-2`}
+                />
+              )}
             </div>
             <div>
               <label className={labelClass}>Experience Level</label>
@@ -246,6 +267,14 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
                 {US_STATES.map((s) => <option key={s}>{s}</option>)}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Union Status</label>
+            <select name="union_status" defaultValue={profile.union_status ?? ""} className={inputClass}>
+              <option value="">Not specified</option>
+              {UNION_STATUS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+            </select>
           </div>
         </div>
 
@@ -292,6 +321,14 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           {pending ? "Saving…" : "Save Changes"}
         </button>
       </form>
+
+      {cropSrc && (
+        <AvatarCropModal
+          src={cropSrc}
+          onApply={handleCropApply}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
     </div>
   );
 }
