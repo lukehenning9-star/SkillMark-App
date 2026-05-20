@@ -82,8 +82,6 @@ export default function OnboardingPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isCurrent, setIsCurrent] = useState(false);
-  const [supervisorName, setSupervisorName] = useState("");
-  const [supervisorEmail, setSupervisorEmail] = useState("");
 
   const progress = ((step - 1) / TOTAL_STEPS) * 100;
 
@@ -128,8 +126,6 @@ export default function OnboardingPage() {
             start_date: startDate,
             end_date: isCurrent ? undefined : endDate || undefined,
             is_current: isCurrent,
-            supervisor_name: supervisorName || undefined,
-            supervisor_email: supervisorEmail || undefined,
           });
           if (result?.error) { handleError(result.error); return; }
         }
@@ -373,21 +369,6 @@ export default function OnboardingPage() {
                 <span className="text-sm text-navy">I currently work here</span>
               </label>
 
-              <div className="pt-2 border-t border-border">
-                <p className="text-xs text-text-dim mb-3">
-                  Adding a supervisor lets them verify your work later with one click — this makes your profile significantly more credible to contractors.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>Supervisor Name</label>
-                    <input type="text" value={supervisorName} onChange={(e) => setSupervisorName(e.target.value)} placeholder="Bob Johnson" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Supervisor Email</label>
-                    <input type="email" value={supervisorEmail} onChange={(e) => setSupervisorEmail(e.target.value)} placeholder="bob@company.com" className={inputClass} />
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 

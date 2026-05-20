@@ -32,9 +32,9 @@ export default function NewProjectForm() {
     setError(null);
     startTransition(async () => {
       const result = await createProject(data);
-      if (result?.error) {
-        setError(result.error);
-      } else if (result?.id) {
+      if (result && "error" in result) {
+        setError(result.error ?? null);
+      } else if (result && "id" in result) {
         router.push(`/projects/${result.id}`);
       }
     });
@@ -50,7 +50,7 @@ export default function NewProjectForm() {
           Back to Dashboard
         </Link>
         <h1 className="font-serif text-2xl font-bold text-navy">Add a Project</h1>
-        <p className="text-text-dim text-sm mt-1">Document your work and get it verified by a supervisor.</p>
+        <p className="text-text-dim text-sm mt-1">Document your work and build your verified portfolio.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -110,22 +110,6 @@ export default function NewProjectForm() {
                 {skill}
               </button>
             ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-border rounded-xl p-6 space-y-4">
-          <div>
-            <h2 className="font-semibold text-navy text-sm">Supervisor Verification (optional)</h2>
-            <p className="text-xs text-text-dim mt-0.5">Add your supervisor&apos;s info and we&apos;ll send them a verification email.</p>
-          </div>
-
-          <div>
-            <label className={labelClass}>Supervisor Name</label>
-            <input name="supervisor_name" type="text" placeholder="James Kowalski" className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Supervisor Email</label>
-            <input name="supervisor_email" type="email" placeholder="james@wacoelectric.com" className={inputClass} />
           </div>
         </div>
 

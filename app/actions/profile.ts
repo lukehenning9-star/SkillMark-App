@@ -34,8 +34,6 @@ export async function saveProfileStep(data: ProfileUpdate) {
   return { success: true };
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export async function addWorkExperience(data: {
   job_title: string;
   company_name: string;
@@ -43,8 +41,6 @@ export async function addWorkExperience(data: {
   end_date?: string;
   is_current: boolean;
   description?: string;
-  supervisor_name?: string;
-  supervisor_email?: string;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -53,15 +49,31 @@ export async function addWorkExperience(data: {
   if (data.job_title.length > 200) return { error: "Job title must be 200 characters or less." };
   if (data.company_name.length > 200) return { error: "Company name must be 200 characters or less." };
   if (data.description && data.description.length > 2000) return { error: "Description must be 2000 characters or less." };
-  if (data.supervisor_name && data.supervisor_name.length > 200) return { error: "Supervisor name must be 200 characters or less." };
-  if (data.supervisor_email && !EMAIL_RE.test(data.supervisor_email)) {
-    return { error: "Supervisor email is not a valid email address." };
-  }
 
   const { error } = await supabase
     .from("work_experience")
     .insert({ ...data, profile_id: user.id });
 
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function saveAvatarUrl(url: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function saveBannerUrl(url: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  const { error } = await supabase.from("profiles").update({ banner_url: url }).eq("id", user.id);
   if (error) return { error: error.message };
   return { success: true };
 }

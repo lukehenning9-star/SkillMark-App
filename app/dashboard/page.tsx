@@ -66,16 +66,13 @@ export default async function DashboardPage() {
       .eq("profile_id", user.id),
     supabase
       .from("projects")
-      .select("id, title, trade_category, cover_photo_url, verification_status")
+      .select("id, title, trade_category, cover_photo_url")
       .eq("profile_id", user.id)
       .order("created_at", { ascending: false })
       .limit(6),
   ]);
 
   const typedProjects = (projects ?? []) as Project[];
-  const pendingVerifications = typedProjects.filter(
-    (p) => p.verification_status === "pending"
-  );
 
   const displayName = profile.full_name || profile.username;
   const firstName = displayName.split(" ")[0];
@@ -144,25 +141,6 @@ export default async function DashboardPage() {
             <StatCard label="Projects" value={typedProjects.length} />
             <StatCard label="Connections" value={0} />
           </div>
-
-          {/* Pending verifications alert */}
-          {pendingVerifications.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 items-start">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-              <div>
-                <p className="text-sm font-semibold text-amber-800">
-                  {pendingVerifications.length} project{pendingVerifications.length > 1 ? "s" : ""} awaiting supervisor verification
-                </p>
-                <p className="text-xs text-amber-700 mt-0.5">
-                  Verification emails have been sent. Remind your supervisors to check their inbox.
-                </p>
-              </div>
-            </div>
-          )}
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Left: Availability + quick actions */}
@@ -262,17 +240,8 @@ export default async function DashboardPage() {
                       )}
                     </div>
                     <div className="p-4">
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
                         <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
-                          project.verification_status === "verified"
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            : project.verification_status === "pending"
-                            ? "bg-amber-50 text-amber-700 border border-amber-200"
-                            : "bg-sm-bg text-text-dim border border-border"
-                        }`}>
-                          {project.verification_status === "verified" ? "Verified" : project.verification_status === "pending" ? "Pending" : "Unverified"}
-                        </span>
                       </div>
                       {project.trade_category && (
                         <p className="text-xs text-text-dim mt-1">{project.trade_category}</p>

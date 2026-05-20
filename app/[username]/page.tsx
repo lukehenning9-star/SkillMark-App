@@ -5,17 +5,6 @@ import Image from "next/image";
 import AppNav from "@/components/AppNav";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
-function VerifiedBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-      Verified
-    </span>
-  );
-}
-
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="font-semibold text-[11px] uppercase tracking-widest text-text-dim mb-4">
@@ -54,12 +43,12 @@ export default async function PublicProfilePage({
   ] = await Promise.all([
     supabase
       .from("work_experience")
-      .select("id, job_title, company_name, start_date, end_date, is_current, description, supervisor_name")
+      .select("id, job_title, company_name, start_date, end_date, is_current, description")
       .eq("profile_id", profile.id)
       .order("start_date", { ascending: false }),
     supabase
       .from("projects")
-      .select("id, title, description, trade_category, specific_skills, cover_photo_url, verification_status")
+      .select("id, title, description, trade_category, specific_skills, cover_photo_url")
       .eq("profile_id", profile.id)
       .order("created_at", { ascending: false }),
     supabase
@@ -74,8 +63,6 @@ export default async function PublicProfilePage({
   const typedProjects = (projects ?? []) as Project[];
   const typedWorkExp = (workExperience ?? []) as WorkExperience[];
   const typedCerts = (certifications ?? []) as Certification[];
-  const verifiedProjects = typedProjects.filter((p) => p.verification_status === "verified");
-
   const experienceLevelLabel: Record<string, string> = {
     apprentice: "Apprentice",
     journeyman: "Journeyman",
@@ -157,14 +144,6 @@ export default async function PublicProfilePage({
             <h1 className="font-serif text-2xl font-bold text-navy">
               {profile.full_name ?? profile.username}
             </h1>
-            {verifiedProjects.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                Verified Worker
-              </span>
-            )}
           </div>
           <p className="text-text-mid text-[15px] mt-0.5">
             {profile.trade && (
@@ -273,9 +252,8 @@ export default async function PublicProfilePage({
                         )}
                       </div>
                       <div className="p-3">
-                        <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2">
                           <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>
-                          {project.verification_status === "verified" && <VerifiedBadge />}
                         </div>
                         {project.trade_category && (
                           <p className="text-xs text-text-dim mt-0.5">{project.trade_category}</p>
@@ -320,11 +298,6 @@ export default async function PublicProfilePage({
                         {job.description && (
                           <p className="text-xs text-text-dim mt-1.5 leading-relaxed">{job.description}</p>
                         )}
-                        {job.supervisor_name && (
-                          <p className="text-xs text-text-dim mt-1">
-                            Supervisor: {job.supervisor_name}
-                          </p>
-                        )}
                       </div>
                     </li>
                   ))}
@@ -337,7 +310,7 @@ export default async function PublicProfilePage({
               <div className="bg-white border border-dashed border-border2 rounded-xl p-8 text-center">
                 <p className="font-semibold text-navy text-sm">Start building your portfolio</p>
                 <p className="text-xs text-text-dim mt-1 mb-4">
-                  Add projects and get them verified by supervisors to stand out.
+                  Add projects to show contractors your best work.
                 </p>
                 <Link
                   href="/projects/new"

@@ -37,8 +37,6 @@ export type WorkExperience = {
   end_date: string | null
   is_current: boolean
   description: string | null
-  supervisor_name: string | null
-  supervisor_email: string | null
   created_at: string
 }
 
@@ -52,11 +50,6 @@ export type Project = {
   location: string | null
   completed_date: string | null
   cover_photo_url: string | null
-  verification_status: "unverified" | "pending" | "verified"
-  supervisor_name: string | null
-  supervisor_email: string | null
-  verification_token: string
-  verified_at: string | null
   created_at: string
 }
 

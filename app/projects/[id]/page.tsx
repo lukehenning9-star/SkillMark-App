@@ -18,7 +18,7 @@ export default async function ProjectDetailPage({
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, verification_status, supervisor_name")
+    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url")
     .eq("id", id)
     .single<Project>();
 
@@ -100,17 +100,8 @@ export default async function ProjectDetailPage({
             {/* Main */}
             <div className="md:col-span-2 space-y-5">
               <div className="bg-white border border-border rounded-xl p-6">
-                <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="mb-3">
                   <h1 className="font-serif text-2xl font-bold text-navy leading-tight">{project.title}</h1>
-                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${
-                    project.verification_status === "verified"
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                      : project.verification_status === "pending"
-                      ? "bg-amber-50 text-amber-700 border-amber-200"
-                      : "bg-sm-bg text-text-dim border-border"
-                  }`}>
-                    {project.verification_status === "verified" ? "Verified" : project.verification_status === "pending" ? "Pending Verification" : "Unverified"}
-                  </span>
                 </div>
 
                 {project.description && (
@@ -187,28 +178,6 @@ export default async function ProjectDetailPage({
                 )}
               </div>
 
-              {/* Verification */}
-              {project.verification_status !== "verified" && project.supervisor_name && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <p className="text-xs font-semibold text-amber-800 mb-1">Awaiting verification</p>
-                  <p className="text-xs text-amber-700">
-                    Verification email sent to {project.supervisor_name}. Ask them to check their inbox.
-                  </p>
-                </div>
-              )}
-
-              {isOwner && project.verification_status === "unverified" && !project.supervisor_name && (
-                <div className="bg-white border border-dashed border-border2 rounded-xl p-4 text-center">
-                  <p className="text-xs font-semibold text-navy mb-1">Get this verified</p>
-                  <p className="text-xs text-text-dim mb-3">Add a supervisor to send a verification email.</p>
-                  <Link
-                    href={`/projects/${id}/edit`}
-                    className="text-xs font-semibold text-accent hover:underline"
-                  >
-                    Add Supervisor →
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         </div>
