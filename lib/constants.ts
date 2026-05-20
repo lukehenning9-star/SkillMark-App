@@ -13,8 +13,22 @@ export const TRADES = [
   "Carpenter",
   "Welder",
   "Pipefitter",
+  "Roofer",
+  "Painter",
+  "Concrete Worker",
+  "Heavy Equipment Operator",
   "Other",
 ] as const
+
+export type Trade = typeof TRADES[number]
+
+export const UNION_STATUS_OPTIONS = [
+  "Union Member",
+  "Non-Union",
+  "Open to Both",
+] as const
+
+export type UnionStatus = typeof UNION_STATUS_OPTIONS[number]
 
 export const PROJECT_SKILLS = [
   "Panel Work","Conduit Bending","Rough-In Wiring","Service Upgrade",

@@ -21,20 +21,20 @@ export default async function AppNav() {
     <header className="sticky top-0 z-40 bg-white border-b border-border">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/dashboard" className="font-serif text-xl font-bold text-navy shrink-0">
+        <Link href={`/${profile.username}`} className="font-serif text-xl font-bold text-navy shrink-0">
           Skill<span className="text-accent">Mark</span>
         </Link>
 
         {/* Center nav */}
         <nav className="hidden sm:flex items-center gap-1">
           <Link
-            href="/dashboard"
+            href={`/${profile.username}`}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
             </svg>
-            Dashboard
+            My Profile
           </Link>
           <Link
             href="/search"
@@ -58,17 +58,15 @@ export default async function AppNav() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {/* Messages */}
           <Link
             href="/messages"
-            className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors relative"
+            className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
           </Link>
 
-          {/* User menu */}
           <UserMenuDropdown
             username={profile.username}
             displayName={profile.full_name ?? profile.username}

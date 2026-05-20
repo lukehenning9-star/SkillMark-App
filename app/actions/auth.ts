@@ -34,8 +34,11 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   if (username.length < 3) {
     return { error: "Username must be at least 3 characters." };
   }
-  if (!/^[a-z0-9_]+$/.test(username)) {
-    return { error: "Username can only contain letters, numbers, and underscores." };
+  if (username.length > 30) {
+    return { error: "Username must be 30 characters or less." };
+  }
+  if (!/^[a-z0-9_-]+$/.test(username)) {
+    return { error: "Username can only contain letters, numbers, underscores, and hyphens." };
   }
 
   const { data: existing } = await supabase
