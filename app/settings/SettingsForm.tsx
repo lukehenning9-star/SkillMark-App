@@ -19,6 +19,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bio, setBio] = useState(profile.bio ?? "");
+  const [isAvailable, setIsAvailable] = useState(profile.is_available);
 
   const [tradeVal, setTradeVal] = useState(
     profile.trade
@@ -111,7 +112,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         city: (fd.get("city") as string).trim() || undefined,
         state: (fd.get("state") as string) || undefined,
         bio: bio.trim() || undefined,
-        is_available: fd.get("is_available") === "on",
+        is_available: isAvailable,
         union_status: (fd.get("union_status") as string) || undefined,
       });
       if (result?.error) setError(result.error);
@@ -300,10 +301,19 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
             <p className="text-sm font-semibold text-navy">Open to Work</p>
             <p className="text-xs text-text-dim mt-0.5">Show contractors you&apos;re available for new opportunities.</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input name="is_available" type="checkbox" className="sr-only peer" defaultChecked={profile.is_available} />
-            <div className="w-10 h-6 bg-border2 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent" />
-          </label>
+          <button
+            type="button"
+            onClick={() => setIsAvailable((v) => !v)}
+            className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer shrink-0 ${
+              isAvailable ? "bg-accent" : "bg-border2"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                isAvailable ? "translate-x-4" : ""
+              }`}
+            />
+          </button>
         </div>
 
         {error && (
