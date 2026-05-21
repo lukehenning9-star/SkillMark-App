@@ -10,13 +10,6 @@ export const TRADES = [
   "Electrician",
   "Plumber",
   "HVAC Technician",
-  "Carpenter",
-  "Welder",
-  "Pipefitter",
-  "Roofer",
-  "Painter",
-  "Concrete Worker",
-  "Heavy Equipment Operator",
   "Other",
 ] as const
 
