@@ -226,18 +226,25 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade</label>
-              <select value={tradeVal} onChange={(e) => setTradeVal(e.target.value)} className={inputClass}>
-                <option value="">Select trade...</option>
-                {TRADES.map((t) => <option key={t}>{t}</option>)}
-              </select>
-              {tradeVal === "Other" && (
-                <input
-                  type="text"
-                  value={tradeCustom}
-                  onChange={(e) => setTradeCustom(e.target.value)}
-                  placeholder="e.g. Ironworker"
-                  className={`${inputClass} mt-2`}
-                />
+              {tradeVal === "Other" ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={tradeCustom}
+                    onChange={(e) => setTradeCustom(e.target.value)}
+                    placeholder="e.g. Mason, Ironworker…"
+                    className={inputClass}
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => { setTradeVal(""); setTradeCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
+                    ← back
+                  </button>
+                </div>
+              ) : (
+                <select value={tradeVal} onChange={(e) => setTradeVal(e.target.value)} className={inputClass}>
+                  <option value="">Select trade...</option>
+                  {TRADES.map((t) => <option key={t}>{t}</option>)}
+                </select>
               )}
             </div>
             <div>
