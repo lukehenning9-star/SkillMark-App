@@ -9,7 +9,7 @@ create table if not exists profiles (
   id                     uuid references auth.users on delete cascade primary key,
   username               text unique not null,
   full_name              text,
-  headline               text,
+  headline               text check (char_length(headline) <= 120),
   bio                    text check (char_length(bio) <= 300),
   avatar_url             text,
   banner_url             text,
@@ -19,6 +19,7 @@ create table if not exists profiles (
   city                   text,
   state                  text,
   is_available           bool default true,
+  union_status           text check (union_status in ('Union Member', 'Non-Union', 'Open to Both')),
   profile_views          int default 0,
   verified_project_count int default 0,
   dark_mode_preference   bool default false,
@@ -36,6 +37,13 @@ create policy "Users can insert own profile"
 
 create policy "Users can update own profile"
   on profiles for update using (auth.uid() = id);
+
+
+-- ── MIGRATION: add columns to existing databases ─────────────
+alter table profiles add column if not exists union_status text
+  check (union_status in ('Union Member', 'Non-Union', 'Open to Both'));
+alter table profiles add column if not exists headline text
+  check (char_length(headline) <= 120);
 
 
 -- ── AUTO-CREATE PROFILE ON SIGNUP ─────────────────────────────
@@ -166,7 +174,6 @@ create table if not exists supervisor_verifications (
 
 alter table supervisor_verifications enable row level security;
 
--- Public read/write — supervisors verify via token without being logged in
 create policy "Anyone can read verifications"
   on supervisor_verifications for select using (true);
 

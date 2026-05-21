@@ -21,6 +21,7 @@ export type Profile = {
   city: string | null
   state: string | null
   is_available: boolean
+  union_status: "Union Member" | "Non-Union" | "Open to Both" | null
   profile_views: number
   verified_project_count: number
   dark_mode_preference: boolean

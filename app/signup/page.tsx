@@ -81,7 +81,6 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
-          {/* Role tabs */}
           <div className="grid grid-cols-2 border-b border-border">
             {(["worker", "contractor"] as const).map((r) => (
               <button
@@ -117,8 +116,16 @@ export default function SignupPage() {
                     placeholder="marcus_rivera"
                     required
                     value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
-                    className={`${inputClass} pr-8 ${usernameStatus === "taken" ? "border-red-400 focus:border-red-400" : usernameStatus === "available" ? "border-emerald-400 focus:border-emerald-400" : ""}`}
+                    onChange={(e) =>
+                      setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 30))
+                    }
+                    className={`${inputClass} pr-8 ${
+                      usernameStatus === "taken"
+                        ? "border-red-400 focus:border-red-400"
+                        : usernameStatus === "available"
+                        ? "border-emerald-400 focus:border-emerald-400"
+                        : ""
+                    }`}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {usernameStatus === "checking" && (
@@ -143,7 +150,7 @@ export default function SignupPage() {
                   <p className="text-xs text-emerald-600 mt-1">Username is available.</p>
                 )}
                 <p className="text-[11px] text-text-dim mt-1">
-                  Your profile will be at skillmark.com/<span className="font-mono">{username || "username"}</span>
+                  Your profile: joinskillmark.com/<span className="font-mono">{username || "username"}</span>
                 </p>
               </div>
 
