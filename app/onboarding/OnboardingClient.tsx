@@ -43,13 +43,6 @@ const TRADES = [
   { label: "Electrician", icon: <ZapIcon /> },
   { label: "Plumber", icon: <DropletIcon /> },
   { label: "HVAC Technician", icon: <WindIcon /> },
-  { label: "Carpenter", icon: <HammerIcon /> },
-  { label: "Welder", icon: <FlameIcon /> },
-  { label: "Pipefitter", icon: <GearIcon /> },
-  { label: "Roofer", icon: <HouseIcon /> },
-  { label: "Painter", icon: <BrushIcon /> },
-  { label: "Concrete Worker", icon: <LayersIcon /> },
-  { label: "Heavy Equipment Operator", icon: <TruckIcon /> },
   { label: "Other", icon: <WrenchIcon /> },
 ];
 
@@ -218,7 +211,7 @@ export default function OnboardingClient() {
             <div className="bg-white border border-border rounded-xl shadow-sm p-8">
               <h1 className="font-serif text-2xl font-bold text-navy mb-1">What&apos;s your trade?</h1>
               <p className="text-text-dim text-sm mb-6">Select the primary trade you work in.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {TRADES.map(({ label, icon }) => (
                   <button
                     key={label}
