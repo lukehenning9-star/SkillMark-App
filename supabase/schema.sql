@@ -101,6 +101,8 @@ create table if not exists projects (
   location            text,
   completed_date      date,
   cover_photo_url     text,
+  before_photo_url    text,
+  after_photo_url     text,
   verification_status text default 'unverified'
                         check (verification_status in ('unverified', 'pending', 'verified')),
   supervisor_name     text,

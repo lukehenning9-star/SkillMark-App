@@ -17,6 +17,13 @@ export default async function AppNav() {
 
   if (!profile) return null;
 
+  const { count: unreadCount } = await supabase
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("recipient_id", user.id)
+    .is("read_at", null);
+  const msgCount = unreadCount ?? 0;
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
@@ -58,14 +65,21 @@ export default async function AppNav() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/messages"
-            className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </Link>
+          <div className="relative">
+            <Link
+              href="/messages"
+              className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </Link>
+            {msgCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 pointer-events-none">
+                {msgCount > 9 ? "9+" : msgCount}
+              </span>
+            )}
+          </div>
 
           <UserMenuDropdown
             username={profile.username}

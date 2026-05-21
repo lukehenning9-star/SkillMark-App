@@ -17,7 +17,7 @@ export default async function EditProjectPage({
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, created_at")
+    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, before_photo_url, after_photo_url, created_at")
     .eq("id", id)
     .eq("profile_id", user.id)
     .single<Project>();

@@ -51,6 +51,8 @@ export type Project = {
   location: string | null
   completed_date: string | null
   cover_photo_url: string | null
+  before_photo_url: string | null
+  after_photo_url: string | null
   created_at: string
 }
 
