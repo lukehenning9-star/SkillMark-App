@@ -16,6 +16,8 @@ export default function NewProjectForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [tradeCat, setTradeCat] = useState("");
+  const [tradeCatCustom, setTradeCatCustom] = useState("");
 
   function toggleSkill(skill: string) {
     setSelectedSkills((prev) =>
@@ -65,10 +67,27 @@ export default function NewProjectForm() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade Category</label>
-              <select name="trade_category" className={inputClass}>
-                <option value="">Select trade...</option>
-                {TRADES.map((t) => <option key={t}>{t}</option>)}
-              </select>
+              <input type="hidden" name="trade_category" value={tradeCat === "Other" ? tradeCatCustom : tradeCat} />
+              {tradeCat === "Other" ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={tradeCatCustom}
+                    onChange={(e) => setTradeCatCustom(e.target.value)}
+                    placeholder="e.g. Mason, Ironworker…"
+                    className={inputClass}
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => { setTradeCat(""); setTradeCatCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
+                    ← back
+                  </button>
+                </div>
+              ) : (
+                <select value={tradeCat} onChange={(e) => setTradeCat(e.target.value)} className={inputClass}>
+                  <option value="">Select trade...</option>
+                  {TRADES.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              )}
             </div>
             <div>
               <label className={labelClass}>Location (optional)</label>

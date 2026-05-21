@@ -212,35 +212,34 @@ export default function OnboardingClient() {
               <h1 className="font-serif text-2xl font-bold text-navy mb-1">What&apos;s your trade?</h1>
               <p className="text-text-dim text-sm mb-6">Select the primary trade you work in.</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {TRADES.map(({ label, icon }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => setTrade(label)}
-                    className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                      trade === label
-                        ? "border-accent bg-accent/5 text-accent"
-                        : "border-border bg-sm-bg text-text-mid hover:border-border2 hover:bg-white"
-                    }`}
-                  >
-                    {icon}
-                    <span className="text-xs font-semibold text-center leading-tight">{label}</span>
-                  </button>
-                ))}
+                {TRADES.map(({ label, icon }) =>
+                  trade === "Other" && label === "Other" ? (
+                    <input
+                      key="other-input"
+                      type="text"
+                      value={tradeCustom}
+                      onChange={(e) => setTradeCustom(e.target.value)}
+                      placeholder="Your trade…"
+                      className="flex-1 bg-accent/5 border-2 border-accent rounded-xl px-3 py-4 text-sm text-navy placeholder:text-accent/50 focus:outline-none"
+                      autoFocus
+                    />
+                  ) : (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => { setTrade(label); setTradeCustom(""); }}
+                      className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                        trade === label
+                          ? "border-accent bg-accent/5 text-accent"
+                          : "border-border bg-sm-bg text-text-mid hover:border-border2 hover:bg-white"
+                      }`}
+                    >
+                      {icon}
+                      <span className="text-xs font-semibold text-center leading-tight">{label}</span>
+                    </button>
+                  )
+                )}
               </div>
-              {trade === "Other" && (
-                <div className="mt-4">
-                  <label className={labelClass}>Specify your trade</label>
-                  <input
-                    type="text"
-                    value={tradeCustom}
-                    onChange={(e) => setTradeCustom(e.target.value)}
-                    placeholder="e.g. Ironworker, Glazier, Tile Setter"
-                    className={inputClass}
-                    autoFocus
-                  />
-                </div>
-              )}
             </div>
           )}
 
