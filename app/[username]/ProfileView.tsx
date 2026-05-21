@@ -55,18 +55,10 @@ export default function ProfileView({
 
   const [bio, setBio] = useState(profile.bio ?? "");
   const [isAvailable, setIsAvailable] = useState(profile.is_available);
-  const [tradeVal, setTradeVal] = useState(
-    profile.trade
-      ? (TRADES as readonly string[]).includes(profile.trade)
-        ? profile.trade
-        : "Other"
-      : ""
-  );
-  const [tradeCustom, setTradeCustom] = useState(
-    profile.trade && !(TRADES as readonly string[]).includes(profile.trade)
-      ? profile.trade
-      : ""
-  );
+  const knownTrades = TRADES as readonly string[];
+  const savedCustomTrade = profile.trade && !knownTrades.includes(profile.trade) ? profile.trade : null;
+  const [tradeVal, setTradeVal] = useState(profile.trade ?? "");
+  const [tradeCustom, setTradeCustom] = useState("");
 
   const profileIsComplete =
     !!(avatarUrl && profile.bio && profile.trade && (profile.city || profile.state) && projects.length > 0);
@@ -556,14 +548,16 @@ export default function ProfileView({
                         className={inputClass}
                         autoFocus
                       />
-                      <button type="button" onClick={() => { setTradeVal(""); setTradeCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
+                      <button type="button" onClick={() => { setTradeVal(savedCustomTrade ?? ""); setTradeCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
                         ← back
                       </button>
                     </div>
                   ) : (
                     <select value={tradeVal} onChange={(e) => setTradeVal(e.target.value)} className={inputClass}>
                       <option value="">Select trade...</option>
-                      {TRADES.map((t) => <option key={t}>{t}</option>)}
+                      {TRADES.filter(t => t !== "Other").map((t) => <option key={t}>{t}</option>)}
+                      {savedCustomTrade && <option key={savedCustomTrade} value={savedCustomTrade}>{savedCustomTrade}</option>}
+                      <option value="Other">Other</option>
                     </select>
                   )}
                 </div>
