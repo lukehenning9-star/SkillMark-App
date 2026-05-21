@@ -58,3 +58,41 @@ export async function getProjectPhotoUploadUrl(projectId: string) {
   if (error) return { error: error.message };
   return { signedUrl: data.signedUrl, publicUrl: publicUrl("project-photos", path) };
 }
+
+export async function getProjectBeforePhotoUploadUrl(projectId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("id", projectId)
+    .eq("profile_id", user.id)
+    .single();
+  if (!project) return { error: "Project not found." };
+  const path = `${user.id}/${projectId}/before`;
+  const { data, error } = await supabase.storage
+    .from("project-photos")
+    .createSignedUploadUrl(path, { upsert: true });
+  if (error) return { error: error.message };
+  return { signedUrl: data.signedUrl, publicUrl: publicUrl("project-photos", path) };
+}
+
+export async function getProjectAfterPhotoUploadUrl(projectId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("id", projectId)
+    .eq("profile_id", user.id)
+    .single();
+  if (!project) return { error: "Project not found." };
+  const path = `${user.id}/${projectId}/after`;
+  const { data, error } = await supabase.storage
+    .from("project-photos")
+    .createSignedUploadUrl(path, { upsert: true });
+  if (error) return { error: error.message };
+  return { signedUrl: data.signedUrl, publicUrl: publicUrl("project-photos", path) };
+}

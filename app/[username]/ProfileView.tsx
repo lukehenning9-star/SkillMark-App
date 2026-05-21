@@ -159,15 +159,17 @@ export default function ProfileView({
           <Image src={bannerUrl} alt="Profile banner" fill className="object-cover" priority />
         )}
         {isOwner && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-navy/50">
-            <button
-              type="button"
-              onClick={() => bannerFileRef.current?.click()}
-              disabled={bannerUploading}
-              className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md bg-black/20 hover:bg-black/40 transition-colors"
-            >
-              {bannerUploading ? "Uploading…" : "Change Banner"}
-            </button>
+          <>
+            <div className={`absolute inset-0 flex items-center justify-center transition-opacity bg-navy/50 ${bannerUrl ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}>
+              <button
+                type="button"
+                onClick={() => bannerFileRef.current?.click()}
+                disabled={bannerUploading}
+                className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md bg-black/20 hover:bg-black/40 transition-colors"
+              >
+                {bannerUploading ? "Uploading…" : bannerUrl ? "Change Banner" : "Add Banner Photo"}
+              </button>
+            </div>
             <input
               ref={bannerFileRef}
               type="file"
@@ -175,7 +177,7 @@ export default function ProfileView({
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBannerUpload(f); }}
               className="hidden"
             />
-          </div>
+          </>
         )}
       </div>
 
@@ -183,7 +185,7 @@ export default function ProfileView({
         {/* Avatar + actions row */}
         <div className="relative -mt-14 sm:-mt-18 mb-4 flex items-end justify-between gap-4">
           <div className="relative shrink-0">
-            <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl border-4 border-sm-bg bg-white overflow-hidden flex items-center justify-center relative shadow-md">
+            <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-sm-bg bg-white overflow-hidden flex items-center justify-center relative shadow-md">
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
@@ -414,7 +416,7 @@ export default function ProfileView({
                 {projects.length > 0 ? (
                   <div className="grid grid-cols-2 gap-4">
                     {projects.map((project) => (
-                      <div key={project.id} className="border border-border rounded-lg overflow-hidden hover:border-border2 hover:shadow-sm transition-all">
+                      <Link key={project.id} href={`/projects/${project.id}`} className="border border-border rounded-lg overflow-hidden hover:border-border2 hover:shadow-sm transition-all block">
                         <div className="aspect-video bg-sm-bg flex items-center justify-center relative">
                           {project.cover_photo_url ? (
                             <Image src={project.cover_photo_url} alt={project.title} fill className="object-cover" />
@@ -436,7 +438,7 @@ export default function ProfileView({
                             </div>
                           )}
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (

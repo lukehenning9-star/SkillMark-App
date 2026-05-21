@@ -111,3 +111,31 @@ export async function deleteProject(projectId: string) {
   if (error) return { error: error.message };
   return { success: true };
 }
+
+export async function saveProjectBeforePhoto(projectId: string, url: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  const { error } = await supabase
+    .from("projects")
+    .update({ before_photo_url: url })
+    .eq("id", projectId)
+    .eq("profile_id", user.id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function saveProjectAfterPhoto(projectId: string, url: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  const { error } = await supabase
+    .from("projects")
+    .update({ after_photo_url: url })
+    .eq("id", projectId)
+    .eq("profile_id", user.id);
+  if (error) return { error: error.message };
+  return { success: true };
+}

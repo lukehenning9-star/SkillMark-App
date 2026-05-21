@@ -18,7 +18,7 @@ export default async function ProjectDetailPage({
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url")
+    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, before_photo_url, after_photo_url")
     .eq("id", id)
     .single<Project>();
 
@@ -89,12 +89,30 @@ export default async function ProjectDetailPage({
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                 </svg>
-                {isOwner && (
-                  <p className="text-xs text-text-dim">Photo upload coming soon</p>
-                )}
               </div>
             )}
           </div>
+
+          {(project.before_photo_url || project.after_photo_url) && (
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {project.before_photo_url && (
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="aspect-video relative">
+                    <Image src={project.before_photo_url} alt="Before" fill className="object-cover" />
+                  </div>
+                  <p className="text-xs font-semibold text-text-dim text-center px-3 py-2 border-t border-border bg-sm-bg">Before</p>
+                </div>
+              )}
+              {project.after_photo_url && (
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="aspect-video relative">
+                    <Image src={project.after_photo_url} alt="After" fill className="object-cover" />
+                  </div>
+                  <p className="text-xs font-semibold text-text-dim text-center px-3 py-2 border-t border-border bg-sm-bg">After</p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Main */}
