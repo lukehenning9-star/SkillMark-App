@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Wrench, Clock, Briefcase, Award, Plus, Pencil, MessageCircle, Eye, FolderOpen } from "lucide-react";
+import { MapPin, Wrench, Clock, Briefcase, Award, Plus, Pencil, Camera, X } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
@@ -212,10 +212,7 @@ export default function ProfileView({
                 className="absolute -bottom-1.5 -right-1.5 w-8 h-8 bg-white border border-border rounded-full flex items-center justify-center shadow-sm hover:border-accent transition-colors"
                 title="Change photo"
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3d4f6e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
+                <Camera size={13} className="text-text-mid" />
               </button>
             )}
             <input
@@ -240,7 +237,7 @@ export default function ProfileView({
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-navy px-4 py-2 rounded-md hover:bg-navy-mid transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-accent px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
                 >
                   <Pencil size={13} />
                   Edit Profile
@@ -249,7 +246,7 @@ export default function ProfileView({
             ) : (
               <Link
                 href={`/messages?to=${profile.username}`}
-                className="text-sm font-semibold text-white bg-navy px-4 py-2 rounded-md hover:bg-navy-mid transition-colors"
+                className="text-sm font-semibold text-white bg-accent px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
               >
                 Send Message
               </Link>
@@ -270,18 +267,14 @@ export default function ProfileView({
 
         {/* Badges */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {profile.trade && (
+          {(profile.trade || profile.years_experience > 0) && (
             <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-border text-navy px-2.5 py-1 rounded-full">
               <Wrench size={11} />
-              {profile.experience_level
-                ? `${expLabel[profile.experience_level] ?? ""} ${profile.trade}`
-                : profile.trade}
-            </span>
-          )}
-          {profile.years_experience > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-border text-navy px-2.5 py-1 rounded-full">
-              <Clock size={11} />
-              {profile.years_experience} yr{profile.years_experience !== 1 ? "s" : ""} exp
+              {[
+                profile.experience_level ? expLabel[profile.experience_level] : null,
+                profile.trade,
+                profile.years_experience > 0 ? `· ${profile.years_experience} yr${profile.years_experience !== 1 ? "s" : ""}` : null,
+              ].filter(Boolean).join(" ")}
             </span>
           )}
           {profile.is_available && (
@@ -290,69 +283,61 @@ export default function ProfileView({
               Open to Work
             </span>
           )}
-          {profile.union_status && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
-              {profile.union_status}
-            </span>
-          )}
         </div>
 
         {/* Completion nudge */}
         {isOwner && !profileIsComplete && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 flex gap-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            <div>
-              <p className="text-sm font-semibold text-amber-800">Complete your profile</p>
-              <p className="text-xs text-amber-700 mt-0.5">
-                Add{" "}
-                {[
-                  !avatarUrl && "a profile photo",
-                  !profile.bio && "a bio",
-                  !profile.trade && "your trade",
-                  !profile.city && !profile.state && "your location",
-                  projects.length === 0 && "a project",
-                ]
-                  .filter(Boolean)
-                  .join(", ")}{" "}
-                to stand out to contractors.
-              </p>
-            </div>
-          </div>
+          <p className="text-xs text-text-dim mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+            Profile incomplete —{" "}
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className="text-navy underline underline-offset-2 hover:no-underline"
+            >
+              add{" "}
+              {[
+                !avatarUrl && "a photo",
+                !profile.bio && "a bio",
+                !profile.trade && "your trade",
+                !profile.city && !profile.state && "location",
+                projects.length === 0 && "a project",
+              ]
+                .filter(Boolean)
+                .join(", ")}
+            </button>{" "}
+            to attract contractors.
+          </p>
         )}
 
         {/* Owner stats */}
         {isOwner && (
-          <div className="grid grid-cols-3 gap-3 mb-5">
-            <div className="bg-white border border-border rounded-xl p-4 text-center">
-              <div className="flex justify-center mb-1"><Eye size={16} className="text-text-dim" /></div>
-              <p className="text-xl font-bold text-navy">{profile.profile_views ?? 0}</p>
-              <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Profile Views</p>
-            </div>
-            <div className="bg-white border border-border rounded-xl p-4 text-center">
-              <div className="flex justify-center mb-1"><FolderOpen size={16} className="text-text-dim" /></div>
-              <p className="text-xl font-bold text-navy">{projects.length}</p>
-              <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">Projects</p>
-            </div>
-            <div className="bg-white border border-border rounded-xl p-4 text-center">
-              <div className="flex justify-center mb-1"><MessageCircle size={16} className="text-text-dim" /></div>
-              <p className="text-xl font-bold text-navy">{unreadCount}</p>
-              <p className="text-[11px] text-text-dim font-medium uppercase tracking-wide mt-0.5">New Messages</p>
-            </div>
-          </div>
+          <p className="text-xs text-text-dim mb-5">
+            <span className="font-semibold text-navy">{profile.profile_views ?? 0}</span> profile view{(profile.profile_views ?? 0) !== 1 ? "s" : ""}
+            {" · "}
+            <span className="font-semibold text-navy">{projects.length}</span> project{projects.length !== 1 ? "s" : ""}
+            {unreadCount > 0 && (
+              <>
+                {" · "}
+                <span className="font-semibold text-accent">{unreadCount}</span> new message{unreadCount !== 1 ? "s" : ""}
+              </>
+            )}
+          </p>
         )}
 
         <div className="grid md:grid-cols-3 gap-6 pb-12">
           {/* Sidebar */}
           <div className="md:col-span-1 space-y-5">
             {(profile.bio || profile.city || profile.state || profile.trade || isOwner) && (
-              <div className="bg-white border border-border rounded-xl p-5">
-                <h2 className="font-semibold text-[11px] uppercase tracking-widest text-text-dim mb-4">About</h2>
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">About</h2>
+                  <div className="h-px bg-border flex-1" />
+                </div>
                 {profile.bio ? (
-                  <p className="text-sm text-text-mid leading-relaxed whitespace-pre-line mb-4">{profile.bio}</p>
+                  <p className="text-sm text-text-mid leading-relaxed whitespace-pre-line mb-3">{profile.bio}</p>
                 ) : isOwner ? (
-                  <p className="text-xs text-text-dim mb-4">Add a bio to tell contractors about yourself.</p>
+                  <p className="text-xs text-text-dim mb-3">Add a bio to tell contractors about yourself.</p>
                 ) : null}
                 <div className="space-y-2.5">
                   {(profile.city || profile.state) && (
@@ -373,13 +358,22 @@ export default function ProfileView({
                       {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} of experience
                     </div>
                   )}
+                  {profile.union_status && (
+                    <div className="flex items-center gap-2 text-sm text-text-mid">
+                      <Award size={14} className="text-text-dim shrink-0" />
+                      {profile.union_status}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {certifications.length > 0 && (
               <div className="bg-white border border-border rounded-xl p-5">
-                <h2 className="font-semibold text-[11px] uppercase tracking-widest text-text-dim mb-4">Certifications</h2>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Certifications</h2>
+                  <div className="h-px bg-border flex-1" />
+                </div>
                 <ul className="space-y-3">
                   {certifications.map((cert) => (
                     <li key={cert.id} className="flex items-start gap-2">
@@ -405,10 +399,11 @@ export default function ProfileView({
           <div className="md:col-span-2 space-y-6">
             {(projects.length > 0 || isOwner) && (
               <div className="bg-white border border-border rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-[11px] uppercase tracking-widest text-text-dim">Projects</h2>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Projects</h2>
+                  <div className="h-px bg-border flex-1" />
                   {isOwner && projects.length > 0 && (
-                    <Link href="/projects/new" className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
+                    <Link href="/projects/new" className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
                       <Plus size={12} />Add
                     </Link>
                   )}
@@ -421,9 +416,7 @@ export default function ProfileView({
                           {project.cover_photo_url ? (
                             <Image src={project.cover_photo_url} alt={project.title} fill className="object-cover" />
                           ) : (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                            </svg>
+                            <Camera size={18} className="text-text-dim" />
                           )}
                         </div>
                         <div className="p-3">
@@ -444,7 +437,7 @@ export default function ProfileView({
                 ) : (
                   <div className="border border-dashed border-border2 rounded-lg p-6 text-center">
                     <p className="text-sm text-text-dim mb-3">No projects yet. Show off your work!</p>
-                    <Link href="/projects/new" className="inline-flex items-center gap-1.5 bg-navy text-white text-xs font-semibold px-4 py-2 rounded-md hover:bg-navy-mid transition-colors">
+                    <Link href="/projects/new" className="inline-flex items-center gap-1.5 bg-accent text-white text-xs font-semibold px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
                       <Plus size={13} />Add First Project
                     </Link>
                   </div>
@@ -454,7 +447,10 @@ export default function ProfileView({
 
             {workExperience.length > 0 && (
               <div className="bg-white border border-border rounded-xl p-5">
-                <h2 className="font-semibold text-[11px] uppercase tracking-widest text-text-dim mb-4">Work Experience</h2>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Work Experience</h2>
+                  <div className="h-px bg-border flex-1" />
+                </div>
                 <ul className="space-y-5">
                   {workExperience.map((job) => (
                     <li key={job.id} className="flex gap-3">
@@ -496,9 +492,7 @@ export default function ProfileView({
                 onClick={() => setEditOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-sm-bg transition-colors text-text-dim"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                <X size={16} />
               </button>
             </div>
 
@@ -651,7 +645,7 @@ export default function ProfileView({
                 <button
                   type="submit"
                   disabled={pending}
-                  className="flex-1 bg-navy text-white font-semibold text-sm py-3 rounded-lg hover:bg-navy-mid transition-colors disabled:opacity-50"
+                  className="flex-1 bg-accent text-white font-semibold text-sm py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {pending ? "Saving…" : "Save Changes"}
                 </button>

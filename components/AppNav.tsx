@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { User, Search, FolderPlus, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import UserMenuDropdown from "./UserMenuDropdown";
 import type { Profile } from "@/lib/types";
@@ -38,27 +39,21 @@ export default async function AppNav() {
             href={`/${profile.username}`}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
+            <User size={14} />
             My Profile
           </Link>
           <Link
             href="/search"
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
+            <Search size={14} />
             Search
           </Link>
           <Link
             href="/projects/new"
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
-            </svg>
+            <FolderPlus size={14} />
             Add Project
           </Link>
         </nav>
@@ -70,9 +65,7 @@ export default async function AppNav() {
               href="/messages"
               className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
+              <MessageSquare size={18} />
             </Link>
             {msgCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 pointer-events-none">
