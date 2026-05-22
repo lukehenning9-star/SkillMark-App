@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import "./landing.css";
 
 function Toast({ message, show }: { message: string; show: boolean }) {
   return (
     <div className={`lp-toast${show ? " show" : ""}`}>
       <div className="lp-toast-check">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
       <span>{message}</span>
@@ -20,7 +20,6 @@ function Toast({ message, show }: { message: string; show: boolean }) {
 const FORMSPREE_ID = "xrejekgk";
 
 export default function LandingPage() {
-  const navRef = useRef<HTMLElement>(null);
   const [toast, setToast] = useState({ show: false, message: "" });
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistError, setWaitlistError] = useState(false);
@@ -49,277 +48,314 @@ export default function LandingPage() {
     showToast("You're on the waitlist. We'll be in touch.");
   }
 
-  useEffect(() => {
-    const nav = navRef.current;
-    if (!nav) return;
-    const onScroll = () => {
-      if (window.scrollY > 40) nav.classList.add("scrolled");
-      else nav.classList.remove("scrolled");
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
     <div className="lp">
 
       {/* ── NAV ── */}
-      <nav className="lp-nav" ref={navRef}>
+      <nav className="lp-nav">
         <div className="lp-nav-inner">
-          <Link href="/" className="lp-nav-logo">Skill<span>Mark</span></Link>
+          <Link href="/" className="lp-nav-logo">
+            Skill<span>Mark</span>
+          </Link>
+          <div className="lp-nav-center">
+            <a href="#how" className="lp-nav-link">How it works</a>
+            <a href="#for-workers" className="lp-nav-link">For workers</a>
+            <a href="#for-contractors" className="lp-nav-link">For contractors</a>
+          </div>
           <div className="lp-nav-right">
-            <Link href="/login" className="lp-nav-link">Log In</Link>
-            <Link href="/signup" className="lp-nav-cta">Join Free →</Link>
+            <Link href="/login" className="lp-nav-signin">Log in</Link>
+            <Link href="/signup" className="lp-nav-cta">Join free</Link>
           </div>
         </div>
       </nav>
 
       {/* ── HERO ── */}
       <section className="lp-hero">
-        <div className="lp-hero-bg" />
         <div className="lp-hero-inner">
-          <div className="lp-hero-eyebrow">
-            <div className="lp-eyebrow-dot" />
-            Now accepting early members
+          <div className="lp-hero-text">
+            <p className="lp-hero-eyebrow">Now accepting early members</p>
+            <h1>Build a career<br />you can <em>prove.</em></h1>
+            <p className="lp-hero-sub">
+              SkillMark gives skilled tradespeople a verified photo portfolio
+              of their work — job by job, employer by employer. The career
+              record the trades have always needed.
+            </p>
+            <div className="lp-hero-actions">
+              <Link href="/signup" className="lp-btn-primary">Create your free profile</Link>
+              <Link href="/signup?role=contractor" className="lp-btn-outline">I hire trade workers →</Link>
+            </div>
+            <p className="lp-hero-legal">Free forever. No credit card required.</p>
           </div>
 
-          <h1>The verified<br />skills network<br />for the <em>trades.</em></h1>
-
-          <p className="lp-hero-sub">
-            SkillMark connects skilled tradespeople with the contractors who need them —
-            through <strong>real job photos verified by real supervisors</strong>, not resumes.
-          </p>
-
-          <div className="lp-hero-actions">
-            <Link href="/signup" className="lp-btn-primary">Build Your Profile — Free</Link>
-            <a href="#how" className="lp-btn-ghost">See How It Works ↓</a>
-          </div>
-
-          <div className="lp-hero-stats">
-            <div className="lp-hero-stat">
-              <span className="lp-hero-stat-num">499K</span>
-              <span className="lp-hero-stat-label">Unfilled trade jobs heading into 2026</span>
+          {/* CSS profile mockup — no images needed */}
+          <div className="lp-hero-mock" aria-hidden="true">
+            <div className="lp-mock">
+              <div className="lp-mock-header">
+                <div className="lp-mock-avatar">MR</div>
+                <div className="lp-mock-info">
+                  <div className="lp-mock-name">Marcus Rivera</div>
+                  <div className="lp-mock-meta">Journeyman Electrician · Denver, CO</div>
+                </div>
+              </div>
+              <div className="lp-mock-pills">
+                <span className="lp-mock-pill green">✓ Supervisor verified</span>
+                <span className="lp-mock-pill blue">IBEW Local 68</span>
+                <span className="lp-mock-pill gray">7 yrs exp.</span>
+              </div>
+              <div className="lp-mock-label">Recent work</div>
+              <div className="lp-mock-grid">
+                <div className="lp-mock-photo p1">
+                  <div className="lp-mock-tick">✓</div>
+                </div>
+                <div className="lp-mock-photo p2">
+                  <div className="lp-mock-tick">✓</div>
+                </div>
+                <div className="lp-mock-photo p3">
+                  <div className="lp-mock-tick">✓</div>
+                </div>
+                <div className="lp-mock-photo p4">
+                  <div className="lp-mock-tick">✓</div>
+                </div>
+                <div className="lp-mock-photo p5 pending">
+                  <div className="lp-mock-pending-label">Pending</div>
+                </div>
+                <div className="lp-mock-photo p6 empty">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+              </div>
+              <div className="lp-mock-stats">
+                <div className="lp-mock-stat">
+                  <strong>14</strong>
+                  <span>Projects</span>
+                </div>
+                <div className="lp-mock-stat-divider" />
+                <div className="lp-mock-stat">
+                  <strong>11</strong>
+                  <span>Verified</span>
+                </div>
+                <div className="lp-mock-stat-divider" />
+                <div className="lp-mock-stat">
+                  <strong>5</strong>
+                  <span>Employers</span>
+                </div>
+              </div>
             </div>
-            <div className="lp-hero-stat">
-              <span className="lp-hero-stat-num">92%</span>
-              <span className="lp-hero-stat-label">Of contractors can&apos;t find qualified workers</span>
-            </div>
-            <div className="lp-hero-stat">
-              <span className="lp-hero-stat-num">$67K+</span>
-              <span className="lp-hero-stat-label">Average journeyman starting salary</span>
-            </div>
-            <div className="lp-hero-stat">
-              <span className="lp-hero-stat-num">$0</span>
-              <span className="lp-hero-stat-label">Student debt after a trade apprenticeship</span>
+            <div className="lp-mock-message">
+              <div className="lp-mock-msg-avatar">JC</div>
+              <div className="lp-mock-msg-bubble">
+                <div className="lp-mock-msg-name">Jordan Chen — ABC Electric</div>
+                <div className="lp-mock-msg-text">Your panel work on that commercial job looks great. Are you available in March?</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── PROOF STRIP ── */}
-      <div className="lp-proof-strip">
-        <span className="lp-proof-item">Electricians</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">Plumbers</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">HVAC Technicians</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">Carpenters</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">Ironworkers</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">Pipefitters</span>
-        <div className="lp-proof-dot" />
-        <span className="lp-proof-item">Welders</span>
+      {/* ── STAT BAR ── */}
+      <div className="lp-stats">
+        <div className="lp-stats-inner">
+          <div className="lp-stat-item">
+            <strong>499,000+</strong>
+            <span>Unfilled trade jobs in America right now</span>
+          </div>
+          <div className="lp-stat-rule" />
+          <div className="lp-stat-item">
+            <strong>$67,000+</strong>
+            <span>Average journeyman starting salary</span>
+          </div>
+          <div className="lp-stat-rule" />
+          <div className="lp-stat-item">
+            <strong>$0</strong>
+            <span>Student debt after a trade apprenticeship</span>
+          </div>
+        </div>
       </div>
 
-      {/* ── WHY TRADES ── */}
-      <section className="lp-reasons" id="why">
+      {/* ── PROBLEM ── */}
+      <section className="lp-problem">
         <div className="lp-container">
-          <div className="lp-section-head">
-            <span className="lp-overline">Why Join a Trade</span>
-            <h2 className="lp-h2">The smartest career move<br />nobody&apos;s <em>talking about.</em></h2>
-            <p className="lp-reasons-intro">
-              Trade careers offer exceptional pay, zero student debt, and real job security — and the opportunity is bigger than ever.
+          <div className="lp-problem-inner">
+            <div className="lp-problem-tag">The problem</div>
+            <p className="lp-problem-text">
+              Right now, the best electricians, plumbers, and welders in America
+              get hired based on a phone call and a gut feeling. There&apos;s no
+              reliable way to show what you&apos;ve built — and no reliable way for
+              contractors to verify it.
             </p>
-          </div>
-
-          <div className="lp-reasons-list">
-            <article className="lp-reason">
-              <div className="lp-reason-num">01</div>
-              <div>
-                <h3>Earn while you learn</h3>
-                <p>Apprentices earn a real wage from day one — starting at 40–50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned <strong>$150,000+ in wages.</strong></p>
-              </div>
-            </article>
-
-            <article className="lp-reason">
-              <div className="lp-reason-num">02</div>
-              <div>
-                <h3>Zero student debt</h3>
-                <p>The average college graduate carries <strong>$39,000 in debt</strong> before earning their first paycheck. Trade apprentices finish training with zero debt, a licensed credential, and full journeyman wages starting immediately.</p>
-              </div>
-            </article>
-
-            <article className="lp-reason">
-              <div className="lp-reason-num">03</div>
-              <div>
-                <h3>AI-proof careers</h3>
-                <p>Electricians, plumbers, and HVAC techs can&apos;t be outsourced or automated. With <strong>499,000 unfilled trade jobs</strong> in America right now — and that number growing — qualified tradespeople are in demand everywhere.</p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* ── COMPARISON ── */}
-      <section className="lp-compare-section">
-        <div className="lp-container">
-          <span className="lp-overline-dim">By the numbers</span>
-          <h2 className="lp-h2-light">The math doesn&apos;t lie.</h2>
-          <div className="lp-compare-grid">
-            <div className="lp-compare-col">
-              <div className="lp-compare-col-label">4-Year College Degree</div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Debt at graduation</span><span className="lp-compare-val bad">$39,000+</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Earnings during training</span><span className="lp-compare-val bad">$0</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Starting salary</span><span className="lp-compare-val bad">~$65,000</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Monthly loan payment</span><span className="lp-compare-val bad">$300–$400/mo</span></div>
-            </div>
-            <div className="lp-compare-col is-trades">
-              <div className="lp-compare-col-label">Trade Apprenticeship</div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Debt at completion</span><span className="lp-compare-val good">$0</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Earnings during training</span><span className="lp-compare-val good">$150,000+</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Starting salary</span><span className="lp-compare-val good">$67,000–$76,000</span></div>
-              <div className="lp-compare-row"><span className="lp-compare-key">Monthly loan payment</span><span className="lp-compare-val good">$0</span></div>
-            </div>
+            <p className="lp-problem-text">
+              Tradespeople deserve the same thing every knowledge worker takes
+              for granted: a career record that proves exactly what they can do.
+            </p>
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="lp-how lp-section" id="how">
+      <section className="lp-how" id="how">
         <div className="lp-container">
-          <div className="lp-section-head">
-            <span className="lp-overline">How It Works</span>
-            <h2 className="lp-h2">Hire — and get hired —<br />based on <em>proof.</em></h2>
+          <h2 className="lp-how-heading">How SkillMark works</h2>
+          <div className="lp-how-grid">
+            <div className="lp-how-step">
+              <div className="lp-how-num">1</div>
+              <h3>Build your profile</h3>
+              <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Takes five minutes.</p>
+            </div>
+            <div className="lp-how-step">
+              <div className="lp-how-num">2</div>
+              <h3>Upload your work</h3>
+              <p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Each photo shows contractors what you can actually do.</p>
+            </div>
+            <div className="lp-how-step">
+              <div className="lp-how-num">3</div>
+              <h3>Get verified</h3>
+              <p>Tag your foreman or supervisor. One email, one click — they confirm the work. Your photo becomes certified proof of skill.</p>
+            </div>
+            <div className="lp-how-step">
+              <div className="lp-how-num">4</div>
+              <h3>Get found</h3>
+              <p>Contractors search by trade and location. You get contacted by employers who already know you&apos;re qualified before the first call.</p>
+            </div>
           </div>
-          <ol className="lp-steps">
-            <li className="lp-step">
-              <div className="lp-step-n">01</div>
-              <div>
-                <h3>Build Your Profile</h3>
-                <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
-              </div>
-            </li>
-            <li className="lp-step">
-              <div className="lp-step-n">02</div>
-              <div>
-                <h3>Upload Your Work</h3>
-                <p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Every photo shows contractors exactly what you can do on a job site.</p>
-              </div>
-            </li>
-            <li className="lp-step">
-              <div className="lp-step-n">03</div>
-              <div>
-                <h3>Get Supervisor Verified</h3>
-                <p>Tag the foreman or contractor you worked under. One email, one click — they confirm the work. Your photo becomes verified proof of skill.</p>
-              </div>
-            </li>
-            <li className="lp-step">
-              <div className="lp-step-n">04</div>
-              <div>
-                <h3>Connect Directly</h3>
-                <p>Contractors search verified profiles by trade and location. Workers get found by employers who already know they&apos;re qualified before the first call.</p>
-              </div>
-            </li>
-          </ol>
         </div>
       </section>
 
-      {/* ── MISSION ── */}
+      {/* ── FOR WORKERS ── */}
+      <section className="lp-split" id="for-workers">
+        <div className="lp-container">
+          <div className="lp-split-inner">
+            <div className="lp-split-text">
+              <p className="lp-split-eyebrow">For workers</p>
+              <h2 className="lp-split-h2">Your reputation.<br />Portable forever.</h2>
+              <p className="lp-split-body">
+                Every job you work builds your portfolio. Every supervisor who
+                verifies your work builds your reputation. It follows you from
+                job to job, city to city — not locked inside someone else&apos;s
+                HR system.
+              </p>
+              <ul className="lp-split-list">
+                <li>Verified photo portfolio of your actual work</li>
+                <li>Career record that moves with you</li>
+                <li>Direct messages from interested contractors</li>
+                <li>Free forever, no subscription required</li>
+              </ul>
+              <Link href="/signup" className="lp-split-cta">Create your free profile →</Link>
+            </div>
+            <div className="lp-split-callouts">
+              <div className="lp-callout">
+                <div className="lp-callout-num">$150K+</div>
+                <p>Earned by a trade apprentice during training — while college peers finish school with $39K in debt</p>
+              </div>
+              <div className="lp-callout">
+                <div className="lp-callout-num">92%</div>
+                <p>Of contractors say they can&apos;t find enough qualified workers. Your verified profile gets you seen.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOR CONTRACTORS ── */}
+      <section className="lp-split lp-split-alt" id="for-contractors">
+        <div className="lp-container">
+          <div className="lp-split-inner lp-split-flip">
+            <div className="lp-split-text">
+              <p className="lp-split-eyebrow">For contractors</p>
+              <h2 className="lp-split-h2">Hire based on<br />what they&apos;ve built.</h2>
+              <p className="lp-split-body">
+                See verified job photos before you make a call. Know who&apos;s done
+                what kind of work, where, and who can vouch for it. Replace gut-feel
+                hiring with actual evidence.
+              </p>
+              <ul className="lp-split-list">
+                <li>Search verified profiles by trade and location</li>
+                <li>View real job photos before you reach out</li>
+                <li>Message workers directly through the platform</li>
+                <li>Free to search, premium features coming</li>
+              </ul>
+              <Link href="/signup?role=contractor" className="lp-split-cta">Get early access →</Link>
+            </div>
+            <div className="lp-compare-table">
+              <div className="lp-compare-title">The math on trades vs. college</div>
+              <table className="lp-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>College grad</th>
+                    <th>Trade apprentice</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Debt at graduation</td>
+                    <td className="bad">$39,000+</td>
+                    <td className="good">$0</td>
+                  </tr>
+                  <tr>
+                    <td>Earnings in training</td>
+                    <td className="bad">$0</td>
+                    <td className="good">$150,000+</td>
+                  </tr>
+                  <tr>
+                    <td>Starting salary</td>
+                    <td className="neutral">~$65,000</td>
+                    <td className="good">$67–76,000</td>
+                  </tr>
+                  <tr>
+                    <td>Monthly loan payment</td>
+                    <td className="bad">$300–400</td>
+                    <td className="good">$0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MISSION STRIP ── */}
       <section className="lp-mission">
         <div className="lp-container">
-          <blockquote className="lp-pullquote">
-            &ldquo;The trades built this country. SkillMark is here to make sure
-            the people who build it every day get the recognition they&apos;ve always deserved.&rdquo;
-          </blockquote>
-          <div className="lp-mission-cols">
-            <div>
-              <p className="lp-mission-p">
-                There&apos;s a generation of skilled tradespeople who built careers with their hands — who never had a reliable way to show the world what they&apos;re capable of. Their reputation lived in a foreman&apos;s phone contact or a handshake that didn&apos;t transfer when they moved on.
+          <div className="lp-mission-inner">
+            <h2 className="lp-mission-h2">
+              The trades built this country. SkillMark is here to make sure
+              the people who build it every day get the recognition they&apos;ve
+              always deserved.
+            </h2>
+            <div className="lp-mission-cols">
+              <p>
+                There&apos;s a generation of skilled tradespeople who built careers
+                with their hands — who never had a reliable way to show the world
+                what they&apos;re capable of. Their reputation lived in a foreman&apos;s
+                phone contact or a handshake that didn&apos;t transfer when they moved on.
               </p>
-            </div>
-            <div>
-              <p className="lp-mission-p">
-                At the same time, contractors across America are turning down projects because they can&apos;t find qualified workers. Not because those workers don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
+              <p>
+                At the same time, contractors across America are turning down
+                projects because they can&apos;t find qualified workers. Not because
+                those workers don&apos;t exist — but because there&apos;s no modern,
+                reliable way to find and trust them quickly.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── JOIN ── */}
-      <section className="lp-join" id="signup">
+      {/* ── TRADES CASE ── */}
+      <section className="lp-trades" id="why">
         <div className="lp-container">
-          <div className="lp-join-head">
-            <span className="lp-overline">Join SkillMark</span>
-            <h2 className="lp-h2">Free for everyone.<br />Built for the <em>trades.</em></h2>
-          </div>
-          <div className="lp-join-grid">
-            <div className="lp-join-card">
-              <div className="lp-join-card-top">
-                <div className="lp-join-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}>
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </div>
-                <h3>I work in the trades</h3>
-                <p>Build a verified career profile with real job photos. Get found by contractors who care about actual skill.</p>
-              </div>
-              <div className="lp-join-card-body">
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Verified project portfolio
-                </div>
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Portable career reputation
-                </div>
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Direct contractor connections
-                </div>
-                <Link href="/signup" className="lp-join-btn worker">Create Free Profile →</Link>
-                <p className="lp-join-note">Free forever. No credit card required.</p>
-              </div>
+          <p className="lp-trades-eyebrow">Why the trades</p>
+          <h2 className="lp-trades-h2">The smartest career move nobody&apos;s talking about.</h2>
+          <div className="lp-trades-grid">
+            <div className="lp-trades-item">
+              <h3>Earn while you learn</h3>
+              <p>Apprentices earn a real wage from day one — starting at 40–50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned $150,000+ in wages.</p>
             </div>
-
-            <div className="lp-join-card">
-              <div className="lp-join-card-top">
-                <div className="lp-join-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--ink-2)" }}>
-                    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                  </svg>
-                </div>
-                <h3>I hire trade workers</h3>
-                <p>Search verified worker profiles with real job photos. Replace gut-feel hiring with actual evidence of skill.</p>
-              </div>
-              <div className="lp-join-card-body">
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Search by trade and location
-                </div>
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  View verified work photos
-                </div>
-                <div className="lp-join-feature">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Message workers directly
-                </div>
-                <Link href="/signup" className="lp-join-btn contractor">Get Early Access →</Link>
-                <p className="lp-join-note">Free to search. Premium features coming soon.</p>
-              </div>
+            <div className="lp-trades-item">
+              <h3>Zero student debt</h3>
+              <p>The average college graduate carries $39,000 in debt before their first paycheck. Trade apprentices finish with a licensed credential, full journeyman wages, and no debt to service.</p>
+            </div>
+            <div className="lp-trades-item">
+              <h3>AI-proof careers</h3>
+              <p>Electricians, plumbers, and HVAC techs can&apos;t be outsourced or automated. With 499,000 unfilled trade jobs in America right now — and the number growing — qualified tradespeople are in demand everywhere.</p>
             </div>
           </div>
         </div>
@@ -329,20 +365,26 @@ export default function LandingPage() {
       <section className="lp-waitlist">
         <div className="lp-container">
           <div className="lp-waitlist-inner">
-            <h2>Not ready yet?</h2>
-            <p className="lp-waitlist-p">Drop your email and we&apos;ll let you know when we launch in your area. No spam, ever.</p>
-            <div className={`lp-waitlist-form${waitlistError ? " error" : ""}`}>
-              <input
-                className="lp-waitlist-input"
-                type="email"
-                placeholder="your@email.com"
-                value={waitlistEmail}
-                onChange={(e) => setWaitlistEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submitWaitlist()}
-              />
-              <button className="lp-waitlist-submit" onClick={submitWaitlist}>Notify Me</button>
+            <div className="lp-waitlist-text">
+              <h2>Not ready to sign up?</h2>
+              <p>Drop your email and we&apos;ll let you know when we launch in your area. No spam, ever.</p>
             </div>
-            <p className="lp-waitlist-note">One email when we launch. That&apos;s it.</p>
+            <div className="lp-waitlist-form-wrap">
+              <div className={`lp-waitlist-form${waitlistError ? " error" : ""}`}>
+                <input
+                  className="lp-waitlist-input"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitWaitlist()}
+                />
+                <button className="lp-waitlist-submit" onClick={submitWaitlist}>
+                  Notify me
+                </button>
+              </div>
+              <p className="lp-waitlist-note">One email when we launch. That&apos;s it.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -355,10 +397,10 @@ export default function LandingPage() {
             <div className="lp-footer-copy">© 2025 SkillMark · The verified skills network for the trades.</div>
           </div>
           <ul className="lp-footer-links">
-            <li><a href="#why">Why Trades</a></li>
-            <li><a href="#how">How It Works</a></li>
-            <li><a href="#signup">For Workers</a></li>
-            <li><a href="#signup">For Contractors</a></li>
+            <li><a href="#why">Why trades</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#for-workers">For workers</a></li>
+            <li><a href="#for-contractors">For contractors</a></li>
             <li><a href="#">Privacy</a></li>
           </ul>
         </div>
