@@ -154,30 +154,18 @@ export default function ProfileView({
   return (
     <main className="min-h-screen bg-sm-bg">
       {/* Banner */}
-      <div className="h-48 sm:h-64 bg-navy relative group">
+      <div className="h-48 sm:h-64 bg-navy relative">
         {bannerUrl && (
           <Image src={bannerUrl} alt="Profile banner" fill className="object-cover" priority />
         )}
         {isOwner && (
-          <>
-            <div className={`absolute inset-0 flex items-center justify-center transition-opacity bg-navy/50 ${bannerUrl ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}>
-              <button
-                type="button"
-                onClick={() => bannerFileRef.current?.click()}
-                disabled={bannerUploading}
-                className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md bg-black/20 hover:bg-black/40 transition-colors"
-              >
-                {bannerUploading ? "Uploading…" : bannerUrl ? "Change Banner" : "Add Banner Photo"}
-              </button>
-            </div>
-            <input
-              ref={bannerFileRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBannerUpload(f); }}
-              className="hidden"
-            />
-          </>
+          <input
+            ref={bannerFileRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBannerUpload(f); }}
+            className="hidden"
+          />
         )}
       </div>
 
@@ -497,6 +485,26 @@ export default function ProfileView({
             </div>
 
             <form onSubmit={handleEditSubmit} className="p-5 space-y-5">
+              {/* Banner */}
+              <div>
+                <label className={labelClass}>Banner Photo</label>
+                <div className="relative h-24 rounded-lg overflow-hidden bg-navy border border-border">
+                  {bannerUrl && (
+                    <Image src={bannerUrl} alt="Banner" fill className="object-cover" sizes="100vw" />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <button
+                      type="button"
+                      onClick={() => bannerFileRef.current?.click()}
+                      disabled={bannerUploading}
+                      className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md bg-black/20 hover:bg-black/50 transition-colors disabled:opacity-50"
+                    >
+                      {bannerUploading ? "Uploading…" : bannerUrl ? "Change Banner" : "Add Banner Photo"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-xl bg-navy-mid border border-border flex items-center justify-center overflow-hidden shrink-0 relative">
                   {avatarUrl ? (
