@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Wrench, Clock, Briefcase, Award, Plus, Pencil, Camera, X } from "lucide-react";
+import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
@@ -154,7 +154,7 @@ export default function ProfileView({
   return (
     <main className="min-h-screen bg-sm-bg">
       {/* Banner */}
-      <div className="h-48 sm:h-64 bg-navy relative">
+      <div className="h-52 sm:h-80 bg-navy relative">
         {bannerUrl && (
           <Image src={bannerUrl} alt="Profile banner" fill className="object-cover" priority />
         )}
@@ -171,7 +171,7 @@ export default function ProfileView({
 
       <div className="max-w-4xl mx-auto px-4">
         {/* Avatar + actions row */}
-        <div className="relative -mt-14 sm:-mt-18 mb-4 flex items-end justify-between gap-4">
+        <div className="relative -mt-16 sm:-mt-24 mb-4 flex items-end justify-between gap-4">
           <div className="relative shrink-0">
             <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-sm-bg bg-white overflow-hidden flex items-center justify-center relative shadow-md">
               {avatarUrl ? (
@@ -244,7 +244,7 @@ export default function ProfileView({
 
         {/* Identity */}
         <div className="mb-4">
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-navy leading-tight">
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold text-navy leading-tight tracking-tight">
             {profile.full_name ?? profile.username}
           </h1>
           <p className="text-text-dim text-sm mt-0.5">@{profile.username}</p>
@@ -397,27 +397,26 @@ export default function ProfileView({
                   )}
                 </div>
                 {projects.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     {projects.map((project) => (
-                      <Link key={project.id} href={`/projects/${project.id}`} className="border border-border rounded-lg overflow-hidden hover:border-border2 hover:shadow-sm transition-all block">
-                        <div className="aspect-video bg-sm-bg flex items-center justify-center relative">
+                      <Link key={project.id} href={`/projects/${project.id}`} className="group border border-border rounded-xl overflow-hidden hover:shadow-md hover:border-border2 transition-all block">
+                        <div className="aspect-[4/3] bg-sm-bg flex items-center justify-center relative">
                           {project.cover_photo_url ? (
-                            <Image src={project.cover_photo_url} alt={project.title} fill className="object-cover" />
+                            <Image src={project.cover_photo_url} alt={project.title} fill className="object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                           ) : (
-                            <Camera size={18} className="text-text-dim" />
+                            <Camera size={20} className="text-text-dim" />
                           )}
-                        </div>
-                        <div className="p-3">
-                          <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>
-                          {project.trade_category && <p className="text-xs text-text-dim mt-0.5">{project.trade_category}</p>}
-                          {project.description && <p className="text-xs text-text-dim mt-1.5 line-clamp-2">{project.description}</p>}
                           {project.specific_skills?.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {project.specific_skills.slice(0, 3).map((skill) => (
-                                <span key={skill} className="text-[10px] bg-sm-bg border border-border text-text-dim px-1.5 py-0.5 rounded">{skill}</span>
+                            <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                              {project.specific_skills.slice(0, 2).map((skill) => (
+                                <span key={skill} className="text-[9px] font-semibold bg-black/50 text-white px-1.5 py-0.5 rounded backdrop-blur-sm">{skill}</span>
                               ))}
                             </div>
                           )}
+                        </div>
+                        <div className="px-3 py-2.5 border-t border-border">
+                          <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>
+                          {project.trade_category && <p className="text-xs text-text-dim mt-0.5">{project.trade_category}</p>}
                         </div>
                       </Link>
                     ))}
@@ -439,18 +438,23 @@ export default function ProfileView({
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Work Experience</h2>
                   <div className="h-px bg-border flex-1" />
                 </div>
-                <ul className="space-y-5">
+                <ul className="relative border-l-2 border-border ml-2 space-y-0">
                   {workExperience.map((job) => (
-                    <li key={job.id} className="flex gap-3">
-                      <div className="w-9 h-9 bg-sm-bg border border-border rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                        <Briefcase size={14} className="text-text-dim" />
+                    <li key={job.id} className="relative pl-6 pb-6 last:pb-0">
+                      <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${job.is_current ? "border-accent" : "border-border2"}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${job.is_current ? "bg-accent" : "bg-border2"}`} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-navy leading-tight">{job.job_title}</p>
-                        <p className="text-sm text-text-mid">{job.company_name}</p>
-                        <p className="text-xs text-text-dim mt-0.5">{formatDateRange(job.start_date, job.end_date, job.is_current)}</p>
-                        {job.description && <p className="text-xs text-text-dim mt-1.5 leading-relaxed">{job.description}</p>}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-navy leading-tight">{job.job_title}</p>
+                          <p className="text-sm text-text-mid">{job.company_name}</p>
+                        </div>
+                        {job.is_current && (
+                          <span className="text-[10px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0 mt-0.5">Current</span>
+                        )}
                       </div>
+                      <p className="text-xs text-text-dim mt-0.5">{formatDateRange(job.start_date, job.end_date, job.is_current)}</p>
+                      {job.description && <p className="text-xs text-text-dim mt-1.5 leading-relaxed">{job.description}</p>}
                     </li>
                   ))}
                 </ul>

@@ -73,18 +73,18 @@ export default function LandingPage() {
       <section className="lp-hero">
         <div className="lp-hero-inner">
           <div className="lp-hero-text">
-            <p className="lp-hero-eyebrow">Now accepting early members</p>
-            <h1>Build a career<br />you can <em>prove.</em></h1>
-            <p className="lp-hero-sub">
+            <p className="lp-hero-eyebrow lp-fade-1">Now accepting early members</p>
+            <h1 className="lp-fade-2">Build a career<br />you can <em>prove.</em></h1>
+            <p className="lp-hero-sub lp-fade-3">
               SkillMark gives skilled tradespeople a verified photo portfolio
               of their work — job by job, employer by employer. The career
               record the trades have always needed.
             </p>
-            <div className="lp-hero-actions">
+            <div className="lp-hero-actions lp-fade-4">
               <Link href="/signup" className="lp-btn-primary">Create your free profile</Link>
               <Link href="/signup?role=contractor" className="lp-btn-outline">I hire trade workers →</Link>
             </div>
-            <p className="lp-hero-legal">Free forever. No credit card required.</p>
+            <p className="lp-hero-legal lp-fade-5">Free forever. No credit card required.</p>
           </div>
 
           {/* CSS profile mockup — no images needed */}
@@ -164,7 +164,7 @@ export default function LandingPage() {
             <span>Average journeyman starting salary</span>
           </div>
           <div className="lp-stat-rule" />
-          <div className="lp-stat-item">
+          <div className="lp-stat-item stat-zero">
             <strong>$0</strong>
             <span>Student debt after a trade apprenticeship</span>
           </div>
@@ -194,26 +194,27 @@ export default function LandingPage() {
       <section className="lp-how" id="how">
         <div className="lp-container">
           <h2 className="lp-how-heading">How SkillMark works</h2>
-          <div className="lp-how-grid">
-            <div className="lp-how-step">
-              <div className="lp-how-num">1</div>
-              <h3>Build your profile</h3>
-              <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Takes five minutes.</p>
+          <p className="lp-how-subhead">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
+          <div className="lp-how-editorial">
+            <div className="lp-how-step-row">
+              <div className="lp-how-step-n">01</div>
+              <div className="lp-how-step-title"><h3>Build your profile</h3></div>
+              <div className="lp-how-step-body"><p>Sign up free as a worker or contractor. Add your trade, location, and experience. Takes five minutes.</p></div>
             </div>
-            <div className="lp-how-step">
-              <div className="lp-how-num">2</div>
-              <h3>Upload your work</h3>
-              <p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Each photo shows contractors what you can actually do.</p>
+            <div className="lp-how-step-row">
+              <div className="lp-how-step-n">02</div>
+              <div className="lp-how-step-title"><h3>Upload your work</h3></div>
+              <div className="lp-how-step-body"><p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Each photo shows contractors what you can actually do.</p></div>
             </div>
-            <div className="lp-how-step">
-              <div className="lp-how-num">3</div>
-              <h3>Get verified</h3>
-              <p>Tag your foreman or supervisor. One email, one click — they confirm the work. Your photo becomes certified proof of skill.</p>
+            <div className="lp-how-step-row">
+              <div className="lp-how-step-n">03</div>
+              <div className="lp-how-step-title"><h3>Get verified</h3></div>
+              <div className="lp-how-step-body"><p>Tag your foreman or supervisor. One email, one click — they confirm the work. Your photo becomes certified proof of skill.</p></div>
             </div>
-            <div className="lp-how-step">
-              <div className="lp-how-num">4</div>
-              <h3>Get found</h3>
-              <p>Contractors search by trade and location. You get contacted by employers who already know you&apos;re qualified before the first call.</p>
+            <div className="lp-how-step-row">
+              <div className="lp-how-step-n">04</div>
+              <div className="lp-how-step-title"><h3>Get found</h3></div>
+              <div className="lp-how-step-body"><p>Contractors search by trade and location. You get contacted by employers who already know you&apos;re qualified before the first call.</p></div>
             </div>
           </div>
         </div>
