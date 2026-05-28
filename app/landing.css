@@ -186,26 +186,37 @@
 .lp-mock-photo {
   aspect-ratio: 1; border-radius: 5px; position: relative; overflow: hidden;
 }
-.lp-mock-photo.p1 { background: linear-gradient(145deg, #c3d4e8 0%, #96b3cc 100%); }
-.lp-mock-photo.p2 { background: linear-gradient(145deg, #b8cfc8 0%, #8eb0a5 100%); }
-.lp-mock-photo.p3 { background: linear-gradient(145deg, #cec9be 0%, #b0a992 100%); }
-.lp-mock-photo.p4 { background: linear-gradient(145deg, #c8c3d4 0%, #a89ec0 100%); }
-.lp-mock-photo.pending { background: #fef9ec; border: 1px solid #fde68a; }
+.lp-mock-photo.p1 { background: linear-gradient(160deg, #2c4a6e 0%, #1a3050 100%); }
+.lp-mock-photo.p2 { background: linear-gradient(160deg, #1e4038 0%, #0f2820 100%); }
+.lp-mock-photo.p3 { background: linear-gradient(160deg, #3d3020 0%, #261e12 100%); }
+.lp-mock-photo.p4 { background: linear-gradient(160deg, #2d2540 0%, #1a1528 100%); }
+.lp-mock-photo.pending { background: #fef3c7; border: 1px solid #fde68a; }
 .lp-mock-photo.empty {
   background: var(--bg-2); border: 1px dashed var(--border-2);
   display: flex; align-items: center; justify-content: center; color: var(--ink-3);
 }
+.lp-mock-photo-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+}
+.lp-mock-photo-inner span {
+  font-size: 7.5px; font-weight: 600; color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.lp-mock-photo-inner.pending-inner span { color: rgba(146,64,14,0.65); }
 .lp-mock-tick {
   position: absolute; bottom: 4px; right: 4px;
-  width: 14px; height: 14px; border-radius: 50%;
+  width: 15px; height: 15px; border-radius: 50%;
   background: var(--accent); color: white;
   font-size: 7px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 .lp-mock-pending-label {
   position: absolute; bottom: 4px; right: 4px;
   font-size: 8px; font-weight: 600; color: #92400e;
-  background: #fde68a; padding: 1px 4px; border-radius: 3px;
+  background: #fde68a; padding: 1px 5px; border-radius: 3px;
 }
 .lp-mock-stats {
   display: flex; border-top: 1px solid var(--border); padding-top: 12px; gap: 0;

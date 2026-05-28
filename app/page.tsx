@@ -98,25 +98,44 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="lp-mock-pills">
-                <span className="lp-mock-pill green">✓ Supervisor verified</span>
                 <span className="lp-mock-pill blue">IBEW Local 68</span>
                 <span className="lp-mock-pill gray">7 yrs exp.</span>
               </div>
               <div className="lp-mock-label">Recent work</div>
               <div className="lp-mock-grid">
                 <div className="lp-mock-photo p1">
+                  <div className="lp-mock-photo-inner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h.01M6 12h12"/></svg>
+                    <span>Panel Install</span>
+                  </div>
                   <div className="lp-mock-tick">✓</div>
                 </div>
                 <div className="lp-mock-photo p2">
+                  <div className="lp-mock-photo-inner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l9-6 9 6"/></svg>
+                    <span>Conduit Run</span>
+                  </div>
                   <div className="lp-mock-tick">✓</div>
                 </div>
                 <div className="lp-mock-photo p3">
+                  <div className="lp-mock-photo-inner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                    <span>Service Work</span>
+                  </div>
                   <div className="lp-mock-tick">✓</div>
                 </div>
                 <div className="lp-mock-photo p4">
+                  <div className="lp-mock-photo-inner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+                    <span>Rough-In</span>
+                  </div>
                   <div className="lp-mock-tick">✓</div>
                 </div>
                 <div className="lp-mock-photo p5 pending">
+                  <div className="lp-mock-photo-inner pending-inner">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(146,64,14,0.7)" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Awaiting</span>
+                  </div>
                   <div className="lp-mock-pending-label">Pending</div>
                 </div>
                 <div className="lp-mock-photo p6 empty">
