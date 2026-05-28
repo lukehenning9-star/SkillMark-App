@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "./landing.css";
 
 function Toast({ message, show }: { message: string; show: boolean }) {
@@ -47,6 +47,22 @@ export default function LandingPage() {
     setWaitlistEmail("");
     showToast("You're on the waitlist. We'll be in touch.");
   }
+
+  useEffect(() => {
+    const els = document.querySelectorAll<Element>(".reveal");
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.08, rootMargin: "0px 0px -48px 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   return (
     <div className="lp">
@@ -173,17 +189,17 @@ export default function LandingPage() {
       {/* ── STAT BAR ── */}
       <div className="lp-stats">
         <div className="lp-stats-inner">
-          <div className="lp-stat-item">
+          <div className="lp-stat-item reveal">
             <strong>499,000+</strong>
             <span>Unfilled trade jobs in America right now</span>
           </div>
           <div className="lp-stat-rule" />
-          <div className="lp-stat-item">
+          <div className="lp-stat-item reveal reveal-d1">
             <strong>$67,000+</strong>
             <span>Average journeyman starting salary</span>
           </div>
           <div className="lp-stat-rule" />
-          <div className="lp-stat-item stat-zero">
+          <div className="lp-stat-item stat-zero reveal reveal-d2">
             <strong>$0</strong>
             <span>Student debt after a trade apprenticeship</span>
           </div>
@@ -193,7 +209,7 @@ export default function LandingPage() {
       {/* ── PROBLEM ── */}
       <section className="lp-problem">
         <div className="lp-container">
-          <div className="lp-problem-inner">
+          <div className="lp-problem-inner reveal">
             <div className="lp-problem-tag">The problem</div>
             <p className="lp-problem-text">
               Right now, the best electricians, plumbers, and welders in America
@@ -212,25 +228,25 @@ export default function LandingPage() {
       {/* ── HOW IT WORKS ── */}
       <section className="lp-how" id="how">
         <div className="lp-container">
-          <h2 className="lp-how-heading">How SkillMark works</h2>
-          <p className="lp-how-subhead">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
+          <h2 className="lp-how-heading reveal">How SkillMark works</h2>
+          <p className="lp-how-subhead reveal reveal-d1">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
           <div className="lp-how-editorial">
-            <div className="lp-how-step-row">
+            <div className="lp-how-step-row reveal">
               <div className="lp-how-step-n">01</div>
               <div className="lp-how-step-title"><h3>Build your profile</h3></div>
               <div className="lp-how-step-body"><p>Sign up free as a worker or contractor. Add your trade, location, and experience. Takes five minutes.</p></div>
             </div>
-            <div className="lp-how-step-row">
+            <div className="lp-how-step-row reveal">
               <div className="lp-how-step-n">02</div>
               <div className="lp-how-step-title"><h3>Upload your work</h3></div>
               <div className="lp-how-step-body"><p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Each photo shows contractors what you can actually do.</p></div>
             </div>
-            <div className="lp-how-step-row">
+            <div className="lp-how-step-row reveal">
               <div className="lp-how-step-n">03</div>
               <div className="lp-how-step-title"><h3>Get verified</h3></div>
               <div className="lp-how-step-body"><p>Tag your foreman or supervisor. One email, one click — they confirm the work. Your photo becomes certified proof of skill.</p></div>
             </div>
-            <div className="lp-how-step-row">
+            <div className="lp-how-step-row reveal">
               <div className="lp-how-step-n">04</div>
               <div className="lp-how-step-title"><h3>Get found</h3></div>
               <div className="lp-how-step-body"><p>Contractors search by trade and location. You get contacted by employers who already know you&apos;re qualified before the first call.</p></div>
@@ -243,7 +259,7 @@ export default function LandingPage() {
       <section className="lp-split" id="for-workers">
         <div className="lp-container">
           <div className="lp-split-inner">
-            <div className="lp-split-text">
+            <div className="lp-split-text reveal">
               <p className="lp-split-eyebrow">For workers</p>
               <h2 className="lp-split-h2">Your reputation.<br />Portable forever.</h2>
               <p className="lp-split-body">
@@ -260,7 +276,7 @@ export default function LandingPage() {
               </ul>
               <Link href="/signup" className="lp-split-cta">Create your free profile →</Link>
             </div>
-            <div className="lp-split-callouts">
+            <div className="lp-split-callouts reveal reveal-d1">
               <div className="lp-callout">
                 <div className="lp-callout-num">$150K+</div>
                 <p>Earned by a trade apprentice during training — while college peers finish school with $39K in debt</p>
@@ -278,7 +294,7 @@ export default function LandingPage() {
       <section className="lp-split lp-split-alt" id="for-contractors">
         <div className="lp-container">
           <div className="lp-split-inner lp-split-flip">
-            <div className="lp-split-text">
+            <div className="lp-split-text reveal">
               <p className="lp-split-eyebrow">For contractors</p>
               <h2 className="lp-split-h2">Hire based on<br />what they&apos;ve built.</h2>
               <p className="lp-split-body">
@@ -294,7 +310,7 @@ export default function LandingPage() {
               </ul>
               <Link href="/signup?role=contractor" className="lp-split-cta">Get early access →</Link>
             </div>
-            <div className="lp-compare-table">
+            <div className="lp-compare-table reveal reveal-d1">
               <div className="lp-compare-title">The math on trades vs. college</div>
               <table className="lp-table">
                 <thead>
@@ -336,19 +352,19 @@ export default function LandingPage() {
       <section className="lp-mission">
         <div className="lp-container">
           <div className="lp-mission-inner">
-            <h2 className="lp-mission-h2">
+            <h2 className="lp-mission-h2 reveal">
               The trades built this country. SkillMark is here to make sure
               the people who build it every day get the recognition they&apos;ve
               always deserved.
             </h2>
             <div className="lp-mission-cols">
-              <p>
+              <p className="reveal">
                 There&apos;s a generation of skilled tradespeople who built careers
                 with their hands — who never had a reliable way to show the world
                 what they&apos;re capable of. Their reputation lived in a foreman&apos;s
                 phone contact or a handshake that didn&apos;t transfer when they moved on.
               </p>
-              <p>
+              <p className="reveal reveal-d1">
                 At the same time, contractors across America are turning down
                 projects because they can&apos;t find qualified workers. Not because
                 those workers don&apos;t exist — but because there&apos;s no modern,
@@ -362,18 +378,18 @@ export default function LandingPage() {
       {/* ── TRADES CASE ── */}
       <section className="lp-trades" id="why">
         <div className="lp-container">
-          <p className="lp-trades-eyebrow">Why the trades</p>
-          <h2 className="lp-trades-h2">The smartest career move nobody&apos;s talking about.</h2>
+          <p className="lp-trades-eyebrow reveal">Why the trades</p>
+          <h2 className="lp-trades-h2 reveal">The smartest career move nobody&apos;s talking about.</h2>
           <div className="lp-trades-grid">
-            <div className="lp-trades-item">
+            <div className="lp-trades-item reveal">
               <h3>Earn while you learn</h3>
               <p>Apprentices earn a real wage from day one — starting at 40–50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned $150,000+ in wages.</p>
             </div>
-            <div className="lp-trades-item">
+            <div className="lp-trades-item reveal reveal-d1">
               <h3>Zero student debt</h3>
               <p>The average college graduate carries $39,000 in debt before their first paycheck. Trade apprentices finish with a licensed credential, full journeyman wages, and no debt to service.</p>
             </div>
-            <div className="lp-trades-item">
+            <div className="lp-trades-item reveal reveal-d2">
               <h3>AI-proof careers</h3>
               <p>Electricians, plumbers, and HVAC techs can&apos;t be outsourced or automated. With 499,000 unfilled trade jobs in America right now — and the number growing — qualified tradespeople are in demand everywhere.</p>
             </div>
@@ -385,11 +401,11 @@ export default function LandingPage() {
       <section className="lp-waitlist">
         <div className="lp-container">
           <div className="lp-waitlist-inner">
-            <div className="lp-waitlist-text">
+            <div className="lp-waitlist-text reveal">
               <h2>Not ready to sign up?</h2>
               <p>Drop your email and we&apos;ll let you know when we launch in your area. No spam, ever.</p>
             </div>
-            <div className="lp-waitlist-form-wrap">
+            <div className="lp-waitlist-form-wrap reveal reveal-d1">
               <div className={`lp-waitlist-form${waitlistError ? " error" : ""}`}>
                 <input
                   className="lp-waitlist-input"
