@@ -218,8 +218,9 @@ export default function LandingPage() {
               contractors to verify it.
             </p>
             <p className="lp-problem-text">
-              Tradespeople deserve the same thing every knowledge worker takes
-              for granted: a career record that proves exactly what they can do.
+              The trades have always run on reputation. SkillMark makes that
+              reputation portable — a verified record of real work that travels
+              with you for your entire career.
             </p>
           </div>
         </div>
@@ -279,7 +280,7 @@ export default function LandingPage() {
             <div className="lp-split-callouts reveal reveal-d1">
               <div className="lp-callout">
                 <div className="lp-callout-num">$150K+</div>
-                <p>Earned by a trade apprentice during training — while college peers finish school with $39K in debt</p>
+                <p>Earned during a 4-year apprenticeship — arriving at journeyman wages with zero debt and years of real experience.</p>
               </div>
               <div className="lp-callout">
                 <div className="lp-callout-num">92%</div>
@@ -353,16 +354,15 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-mission-inner">
             <h2 className="lp-mission-h2 reveal">
-              The trades built this country. SkillMark is here to make sure
-              the people who build it every day get the recognition they&apos;ve
-              always deserved.
+              The trades built this country. SkillMark gives the people who
+              build it every day the tools to prove exactly what they&apos;ve done.
             </h2>
             <div className="lp-mission-cols">
               <p className="reveal">
                 There&apos;s a generation of skilled tradespeople who built careers
-                with their hands — who never had a reliable way to show the world
-                what they&apos;re capable of. Their reputation lived in a foreman&apos;s
-                phone contact or a handshake that didn&apos;t transfer when they moved on.
+                with their hands — with no portable record of the work they did.
+                Their reputation lived in a foreman&apos;s phone contact or a handshake
+                that didn&apos;t follow them when they moved on.
               </p>
               <p className="reveal reveal-d1">
                 At the same time, contractors across America are turning down
