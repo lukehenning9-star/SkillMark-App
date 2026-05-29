@@ -261,10 +261,10 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-signup-header reveal">
             <span className="lp-section-label">// Join SkillMark</span>
-            <h2 className="lp-section-title">Free for everyone.<br />Built for the trades.</h2>
-            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Whether you work in the trades or hire for them — SkillMark is your platform.</p>
+            <h2 className="lp-section-title">Free to join.<br />Built for the trades.</h2>
+            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Build a verified career profile and get found by contractors who care about actual skill.</p>
           </div>
-          <div className="lp-signup-grid">
+          <div className="lp-signup-grid lp-signup-grid-single">
             <div className="lp-signup-card worker reveal reveal-d1">
               <div className="lp-signup-card-head">
                 <div className="lp-signup-card-icon">
@@ -273,8 +273,8 @@ export default function LandingPage() {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
                 </div>
-                <div className="lp-signup-card-title">I work in the trades</div>
-                <div className="lp-signup-card-sub">Build a verified career profile with real job photos. Get found by contractors who care about actual skill.</div>
+                <div className="lp-signup-card-title">Build your verified profile</div>
+                <div className="lp-signup-card-sub">Upload real job photos, get supervisor verified, and carry your reputation everywhere you go.</div>
               </div>
               <div className="lp-signup-card-body">
                 <div className="lp-signup-feature">
@@ -287,38 +287,10 @@ export default function LandingPage() {
                 </div>
                 <div className="lp-signup-feature">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Direct contractor connections
+                  Get found by top contractors
                 </div>
                 <Link href="/signup" className="lp-signup-btn worker">Create Free Profile →</Link>
                 <p className="lp-signup-note">Free forever. No credit card required.</p>
-              </div>
-            </div>
-
-            <div className="lp-signup-card contractor reveal reveal-d2">
-              <div className="lp-signup-card-head">
-                <div className="lp-signup-card-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                  </svg>
-                </div>
-                <div className="lp-signup-card-title">I hire trade workers</div>
-                <div className="lp-signup-card-sub">Search verified worker profiles with real job photos. Replace gut-feel hiring with actual evidence of skill.</div>
-              </div>
-              <div className="lp-signup-card-body">
-                <div className="lp-signup-feature">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Search by trade and location
-                </div>
-                <div className="lp-signup-feature">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  View verified work photos
-                </div>
-                <div className="lp-signup-feature">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Message workers directly
-                </div>
-                <Link href="/signup" className="lp-signup-btn contractor">Get Early Access →</Link>
-                <p className="lp-signup-note">Free to search. Premium features coming soon.</p>
               </div>
             </div>
           </div>
