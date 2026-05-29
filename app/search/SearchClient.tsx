@@ -184,7 +184,7 @@ export default function SearchClient() {
                         </span>
                       )}
                       {profile.union_status && (
-                        <span className="text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                        <span className="text-[10px] font-medium text-[#0c6e74] bg-[#e6f4f4] border border-[#9dd0ce] px-1.5 py-0.5 rounded-full">
                           {profile.union_status}
                         </span>
                       )}

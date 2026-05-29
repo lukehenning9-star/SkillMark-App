@@ -157,7 +157,7 @@ export default function SignupPage() {
               <div>
                 <label className={labelClass}>Password</label>
                 <div className="relative">
-                  <input name="password" type={showPassword ? "text" : "password"} placeholder="At least 6 characters" required minLength={6} className={`${inputClass} pr-10`} />
+                  <input name="password" type={showPassword ? "text" : "password"} placeholder="At least 8 characters" required minLength={8} className={`${inputClass} pr-10`} />
                   <button type="button" onClick={() => setShowPassword((v) => !v)} tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-dim hover:text-navy transition-colors">
                     <EyeIcon open={showPassword} />
                   </button>
@@ -167,7 +167,7 @@ export default function SignupPage() {
               <div>
                 <label className={labelClass}>Confirm Password</label>
                 <div className="relative">
-                  <input name="confirm_password" type={showConfirm ? "text" : "password"} placeholder="Repeat your password" required minLength={6} className={`${inputClass} pr-10`} />
+                  <input name="confirm_password" type={showConfirm ? "text" : "password"} placeholder="Repeat your password" required minLength={8} className={`${inputClass} pr-10`} />
                   <button type="button" onClick={() => setShowConfirm((v) => !v)} tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-dim hover:text-navy transition-colors">
                     <EyeIcon open={showConfirm} />
                   </button>

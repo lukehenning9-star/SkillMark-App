@@ -28,6 +28,9 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   const rawRole = formData.get("role") as string;
   const role = rawRole === "worker" || rawRole === "contractor" ? rawRole : "worker";
 
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
   if (password !== confirmPassword) {
     return { error: "Passwords do not match." };
   }
