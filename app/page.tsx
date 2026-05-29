@@ -59,6 +59,22 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const els = document.querySelectorAll<Element>(".reveal");
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.08, rootMargin: "0px 0px -48px 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="lp">
       {/* NAV */}
@@ -101,19 +117,19 @@ export default function LandingPage() {
       {/* STATS BAR */}
       <div className="lp-stats-bar">
         <div className="lp-stats-bar-inner">
-          <div className="lp-stat-bar-item">
+          <div className="lp-stat-bar-item reveal">
             <div className="lp-stat-bar-num">499K</div>
             <div className="lp-stat-bar-label">Unfilled trade jobs heading into 2026</div>
           </div>
-          <div className="lp-stat-bar-item">
+          <div className="lp-stat-bar-item reveal reveal-d1">
             <div className="lp-stat-bar-num">92%</div>
-            <div className="lp-stat-bar-label">Of contractors can't find qualified workers</div>
+            <div className="lp-stat-bar-label">Of contractors can&apos;t find qualified workers</div>
           </div>
-          <div className="lp-stat-bar-item">
+          <div className="lp-stat-bar-item reveal reveal-d2">
             <div className="lp-stat-bar-num">$67K+</div>
             <div className="lp-stat-bar-label">Average journeyman starting salary</div>
           </div>
-          <div className="lp-stat-bar-item">
+          <div className="lp-stat-bar-item reveal reveal-d3">
             <div className="lp-stat-bar-num">$0</div>
             <div className="lp-stat-bar-label">Student debt after a trade apprenticeship</div>
           </div>
@@ -123,12 +139,12 @@ export default function LandingPage() {
       {/* WHY JOIN A TRADE */}
       <section className="lp-why-section" id="why">
         <div className="lp-container">
-          <div className="lp-why-label">// Why Join a Trade</div>
-          <h2 className="lp-why-title">The smartest career move<br />nobody&apos;s <em>talking about.</em></h2>
-          <p className="lp-why-sub">Trade careers offer exceptional pay, zero student debt, and real job security — and the opportunity is bigger than ever.</p>
+          <div className="lp-why-label reveal">// Why Join a Trade</div>
+          <h2 className="lp-why-title reveal reveal-d1">The smartest career move<br />nobody&apos;s <em>talking about.</em></h2>
+          <p className="lp-why-sub reveal reveal-d2">Trade careers offer exceptional pay, zero student debt, and real job security — and the opportunity is bigger than ever.</p>
 
           <div className="lp-why-grid">
-            <div className="lp-why-card">
+            <div className="lp-why-card reveal">
               <div className="lp-why-card-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -137,7 +153,7 @@ export default function LandingPage() {
               <h3>Earn while you learn</h3>
               <p>Apprentices earn a real wage from day one — starting at 40–50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned <strong>$150,000+ in wages.</strong></p>
             </div>
-            <div className="lp-why-card">
+            <div className="lp-why-card reveal reveal-d1">
               <div className="lp-why-card-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
@@ -146,7 +162,7 @@ export default function LandingPage() {
               <h3>Zero student debt</h3>
               <p>The average college graduate carries <strong>$39,000 in debt</strong> before earning their first paycheck. Trade apprentices finish training with zero debt, a licensed credential, and full journeyman wages starting immediately.</p>
             </div>
-            <div className="lp-why-card">
+            <div className="lp-why-card reveal reveal-d2">
               <div className="lp-why-card-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -158,7 +174,7 @@ export default function LandingPage() {
           </div>
 
           <div className="lp-why-comparison">
-            <div className="lp-why-compare-card">
+            <div className="lp-why-compare-card reveal">
               <div className="lp-why-compare-label">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
@@ -170,7 +186,7 @@ export default function LandingPage() {
               <div className="lp-why-compare-row"><span className="lp-why-compare-key">Starting salary</span><span className="lp-why-compare-val bad">~$65,000</span></div>
               <div className="lp-why-compare-row"><span className="lp-why-compare-key">Monthly loan payment</span><span className="lp-why-compare-val bad">$300–$400/mo</span></div>
             </div>
-            <div className="lp-why-compare-card highlight">
+            <div className="lp-why-compare-card highlight reveal reveal-d1">
               <div className="lp-why-compare-label">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
@@ -189,26 +205,26 @@ export default function LandingPage() {
       {/* HOW IT WORKS */}
       <section className="lp-how-section lp-section" id="how">
         <div className="lp-container">
-          <div className="lp-section-label">// How It Works</div>
-          <h2 className="lp-section-title">Hire — and get hired —<br />based on proof.</h2>
-          <p className="lp-section-sub">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
+          <div className="lp-section-label reveal">// How It Works</div>
+          <h2 className="lp-section-title reveal reveal-d1">Hire — and get hired —<br />based on proof.</h2>
+          <p className="lp-section-sub reveal reveal-d2">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
           <div className="lp-steps-grid">
-            <div className="lp-step-card">
+            <div className="lp-step-card reveal">
               <div className="lp-step-num">01</div>
               <h3>Build Your Profile</h3>
               <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
             </div>
-            <div className="lp-step-card">
+            <div className="lp-step-card reveal reveal-d1">
               <div className="lp-step-num">02</div>
               <h3>Upload Your Work</h3>
               <p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Every photo shows contractors what you can actually do.</p>
             </div>
-            <div className="lp-step-card">
+            <div className="lp-step-card reveal reveal-d2">
               <div className="lp-step-num">03</div>
               <h3>Get Supervisor Verified</h3>
               <p>Tag the foreman or contractor you worked under. One email, one click — they confirm the work. Your photo becomes verified proof.</p>
             </div>
-            <div className="lp-step-card">
+            <div className="lp-step-card reveal reveal-d3">
               <div className="lp-step-num">04</div>
               <h3>Connect Directly</h3>
               <p>Contractors search verified profiles by trade and location. Workers get found by employers who already know they&apos;re qualified.</p>
@@ -221,19 +237,19 @@ export default function LandingPage() {
       <section className="lp-mission-section lp-section">
         <div className="lp-container">
           <div className="lp-mission-grid">
-            <div>
+            <div className="reveal">
               <div className="lp-section-label">// Our Mission</div>
               <h2 className="lp-mission-title">The trades built this country. We&apos;re here to make sure they <em>keep</em> building it.</h2>
             </div>
-            <div>
+            <div className="reveal reveal-d1">
               <p className="lp-mission-body">
-                There&apos;s a generation of skilled tradespeople who built careers with their hands — who never had a reliable way to show the world what they&apos;re capable of. Their reputation lived in a foreman&apos;s phone contact or a handshake that didn&apos;t transfer when they moved on.
+                There&apos;s a generation of skilled tradespeople who built careers with their hands — with no portable record of the work they did. Their reputation lived in a foreman&apos;s phone contact or a handshake that didn&apos;t transfer when they moved on.
               </p>
               <p className="lp-mission-body">
                 At the same time, contractors across America are turning down projects because they can&apos;t find qualified workers. Not because those workers don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
               </p>
               <p className="lp-mission-closing">
-                The trades are the backbone of America. SkillMark is here to give that backbone the recognition — and the connections — it has always deserved.
+                The trades are the backbone of America. SkillMark gives that backbone a verified digital identity — portable, permanent, and entirely yours.
               </p>
             </div>
           </div>
@@ -243,13 +259,13 @@ export default function LandingPage() {
       {/* SIGNUP */}
       <section className="lp-signup-section" id="signup">
         <div className="lp-container">
-          <div className="lp-signup-header">
+          <div className="lp-signup-header reveal">
             <span className="lp-section-label">// Join SkillMark</span>
             <h2 className="lp-section-title">Free for everyone.<br />Built for the trades.</h2>
             <p className="lp-section-sub" style={{ margin: "0 auto" }}>Whether you work in the trades or hire for them — SkillMark is your platform.</p>
           </div>
           <div className="lp-signup-grid">
-            <div className="lp-signup-card worker">
+            <div className="lp-signup-card worker reveal reveal-d1">
               <div className="lp-signup-card-head">
                 <div className="lp-signup-card-icon">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -278,7 +294,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="lp-signup-card contractor">
+            <div className="lp-signup-card contractor reveal reveal-d2">
               <div className="lp-signup-card-head">
                 <div className="lp-signup-card-icon">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -311,7 +327,7 @@ export default function LandingPage() {
 
       {/* WAITLIST */}
       <section className="lp-waitlist-section">
-        <div className="lp-waitlist-box">
+        <div className="lp-waitlist-box reveal">
           <h2>Not ready yet?</h2>
           <p>Drop your email and we&apos;ll let you know when we launch in your area. No spam, ever.</p>
           <div className="lp-waitlist-row">
