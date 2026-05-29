@@ -105,7 +105,7 @@ export default function LandingPage() {
         </div>
         <div className="lp-hero-proof">
           <div className="lp-proof-avatars">
-            <div className="lp-proof-avatar" style={{ background: "#1d4ed8" }}>MR</div>
+            <div className="lp-proof-avatar" style={{ background: "#0c6e74" }}>MR</div>
             <div className="lp-proof-avatar" style={{ background: "#059669" }}>DJ</div>
             <div className="lp-proof-avatar" style={{ background: "#7c3aed" }}>TC</div>
             <div className="lp-proof-avatar" style={{ background: "#b45309" }}>RP</div>
@@ -268,7 +268,7 @@ export default function LandingPage() {
             <div className="lp-signup-card worker reveal reveal-d1">
               <div className="lp-signup-card-head">
                 <div className="lp-signup-card-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0c6e74" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
