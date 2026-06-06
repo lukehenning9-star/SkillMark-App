@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User, Search, FolderPlus, MessageSquare } from "lucide-react";
+import { Home, User, Search, FolderPlus, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import UserMenuDropdown from "./UserMenuDropdown";
 import type { Profile } from "@/lib/types";
@@ -29,12 +29,19 @@ export default async function AppNav() {
     <header className="sticky top-0 z-40 bg-white border-b border-border">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href={`/${profile.username}`} className="font-serif text-xl font-bold text-navy shrink-0">
+        <Link href="/dashboard" className="font-serif text-xl font-bold text-navy shrink-0">
           Skill<span className="text-accent">Mark</span>
         </Link>
 
         {/* Center nav */}
         <nav className="hidden sm:flex items-center gap-1">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+          >
+            <Home size={14} />
+            Feed
+          </Link>
           <Link
             href={`/${profile.username}`}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
