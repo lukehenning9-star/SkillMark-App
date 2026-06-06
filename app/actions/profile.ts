@@ -105,26 +105,42 @@ export async function completeOnboarding() {
   return { username: profile?.username ?? null };
 }
 
-export async function ensureProfile() {
+export async function deleteWorkExperience(id: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user) return { error: "Not authenticated" };
+  const { error } = await supabase
+    .from("work_experience")
+    .delete()
+    .eq("id", id)
+    .eq("profile_id", user.id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
 
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+export async function updateWorkExperience(id: string, data: {
+  job_title: string;
+  company_name: string;
+  start_date: string;
+  end_date?: string;
+  is_current: boolean;
+  description?: string;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+  if (data.job_title.length > 200) return { error: "Job title must be 200 characters or less." };
+  if (data.company_name.length > 200) return { error: "Company name must be 200 characters or less." };
+  const { error } = await supabase
+    .from("work_experience")
+    .update({ ...data, profile_id: user.id })
+    .eq("id", id)
+    .eq("profile_id", user.id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
 
-  if (existing) return existing;
-
-  const username =
-    (user.user_metadata?.username as string | undefined) ?? user.id;
-  const { data: created } = await supabase
-    .from("profiles")
-    .insert({ id: user.id, username, full_name: "" })
-    .select()
-    .single();
-
-  return created;
+export async function incrementProfileViews(profileId: string) {
+  const supabase = await createClient();
+  await supabase.rpc("increment_profile_views", { profile_id: profileId });
 }

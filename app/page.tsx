@@ -206,13 +206,13 @@ export default function LandingPage() {
       <section className="lp-how-section lp-section" id="how">
         <div className="lp-container">
           <div className="lp-section-label reveal">// How It Works</div>
-          <h2 className="lp-section-title reveal reveal-d1">Hire — and get hired —<br />based on proof.</h2>
-          <p className="lp-section-sub reveal reveal-d2">No more gut-feel hiring. Just verified evidence of what someone can actually do on a job site.</p>
+          <h2 className="lp-section-title reveal reveal-d1">Your work speaks<br />for itself.</h2>
+          <p className="lp-section-sub reveal reveal-d2">Upload real photos from real jobs. Get supervisor verified. Let your portfolio do the talking.</p>
           <div className="lp-steps-grid">
             <div className="lp-step-card reveal">
               <div className="lp-step-num">01</div>
               <h3>Build Your Profile</h3>
-              <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
+              <p>Sign up free as a tradesperson. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
             </div>
             <div className="lp-step-card reveal reveal-d1">
               <div className="lp-step-num">02</div>

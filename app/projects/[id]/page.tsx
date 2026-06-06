@@ -19,7 +19,7 @@ export default async function ProjectDetailPage({
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, before_photo_url, after_photo_url")
+    .select("id, profile_id, title, description, trade_category, specific_skills, location, completed_date, cover_photo_url, before_photo_url, after_photo_url, verification_status")
     .eq("id", id)
     .single<Project>();
 
@@ -191,6 +191,16 @@ export default async function ProjectDetailPage({
                     <Calendar size={13} className="text-text-dim shrink-0" />
                     <span className="text-navy">
                       {new Date(project.completed_date + "T00:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                    </span>
+                  </div>
+                )}
+                {project.verification_status && project.verification_status !== "unverified" && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={project.verification_status === "verified" ? "#059669" : "#d97706"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span className={project.verification_status === "verified" ? "text-emerald-700 font-semibold" : "text-amber-700"}>
+                      {project.verification_status === "verified" ? "Supervisor verified" : "Verification pending"}
                     </span>
                   </div>
                 )}

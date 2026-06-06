@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import ProfileView from "./ProfileView";
+import { incrementProfileViews } from "@/app/actions/profile";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
 export default async function PublicProfilePage({
@@ -45,6 +46,10 @@ export default async function PublicProfilePage({
   ]);
 
   const isOwner = viewer?.id === profile.id;
+
+  if (!isOwner) {
+    incrementProfileViews(profile.id).catch(() => {});
+  }
 
   let unreadCount = 0;
   if (isOwner) {

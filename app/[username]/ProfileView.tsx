@@ -413,6 +413,14 @@ export default function ProfileView({
                               ))}
                             </div>
                           )}
+                          {(project as Project & { verification_status?: string }).verification_status === "verified" && (
+                            <div className="absolute top-2 right-2">
+                              <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Verified
+                              </span>
+                            </div>
+                          )}
                         </div>
                         <div className="px-3 py-2.5 border-t border-border">
                           <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>
@@ -432,32 +440,46 @@ export default function ProfileView({
               </div>
             )}
 
-            {workExperience.length > 0 && (
+            {(workExperience.length > 0 || isOwner) && (
               <div className="bg-white border border-border rounded-xl p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Work Experience</h2>
                   <div className="h-px bg-border flex-1" />
+                  {isOwner && (
+                    <Link href="/settings" className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
+                      <Plus size={12} />Add
+                    </Link>
+                  )}
                 </div>
-                <ul className="relative border-l-2 border-border ml-2 space-y-0">
-                  {workExperience.map((job) => (
-                    <li key={job.id} className="relative pl-6 pb-6 last:pb-0">
-                      <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${job.is_current ? "border-accent" : "border-border2"}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${job.is_current ? "bg-accent" : "bg-border2"}`} />
-                      </div>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-navy leading-tight">{job.job_title}</p>
-                          <p className="text-sm text-text-mid">{job.company_name}</p>
+                {workExperience.length > 0 ? (
+                  <ul className="relative border-l-2 border-border ml-2 space-y-0">
+                    {workExperience.map((job) => (
+                      <li key={job.id} className="relative pl-6 pb-6 last:pb-0">
+                        <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${job.is_current ? "border-accent" : "border-border2"}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${job.is_current ? "bg-accent" : "bg-border2"}`} />
                         </div>
-                        {job.is_current && (
-                          <span className="text-[10px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0 mt-0.5">Current</span>
-                        )}
-                      </div>
-                      <p className="text-xs text-text-dim mt-0.5">{formatDateRange(job.start_date, job.end_date, job.is_current)}</p>
-                      {job.description && <p className="text-xs text-text-dim mt-1.5 leading-relaxed">{job.description}</p>}
-                    </li>
-                  ))}
-                </ul>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-navy leading-tight">{job.job_title}</p>
+                            <p className="text-sm text-text-mid">{job.company_name}</p>
+                          </div>
+                          {job.is_current && (
+                            <span className="text-[10px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0 mt-0.5">Current</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-text-dim mt-0.5">{formatDateRange(job.start_date, job.end_date, job.is_current)}</p>
+                        {job.description && <p className="text-xs text-text-dim mt-1.5 leading-relaxed">{job.description}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="border border-dashed border-border2 rounded-lg p-5 text-center">
+                    <p className="text-sm text-text-dim mb-3">No work history yet.</p>
+                    <Link href="/settings" className="inline-flex items-center gap-1.5 bg-accent text-white text-xs font-semibold px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
+                      <Plus size={13} />Add Experience
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>

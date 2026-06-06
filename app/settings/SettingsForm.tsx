@@ -1,20 +1,21 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
+import { saveProfileStep, saveAvatarUrl, saveBannerUrl, addWorkExperience, deleteWorkExperience } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
 import AvatarCropModal from "@/components/AvatarCropModal";
-import type { Profile } from "@/lib/types";
+import type { Profile, WorkExperience } from "@/lib/types";
 
 const inputClass =
   "w-full bg-sm-bg border border-border rounded-md px-3 py-2.5 text-sm text-navy placeholder:text-text-dim focus:outline-none focus:border-accent focus:bg-white transition-all";
 const labelClass =
   "block text-[11px] font-semibold text-text-dim uppercase tracking-wide mb-1.5";
 
-export default function SettingsForm({ profile }: { profile: Profile }) {
+export default function SettingsForm({ profile, workExperience }: { profile: Profile; workExperience: WorkExperience[] }) {
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -327,11 +328,13 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-navy text-white font-semibold text-sm py-3 rounded-md hover:bg-navy-mid transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full bg-accent text-white font-semibold text-sm py-3 rounded-md hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {pending ? "Saving…" : "Save Changes"}
         </button>
       </form>
+
+      <WorkExperienceSection initial={workExperience} />
 
       {cropSrc && (
         <AvatarCropModal
@@ -339,6 +342,123 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           onApply={handleCropApply}
           onCancel={() => setCropSrc(null)}
         />
+      )}
+    </div>
+  );
+}
+
+function WorkExperienceSection({ initial }: { initial: WorkExperience[] }) {
+  const router = useRouter();
+  const [jobs, setJobs] = useState(initial);
+  const [adding, setAdding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  // form state
+  const [jobTitle, setJobTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isCurrent, setIsCurrent] = useState(false);
+  const [description, setDescription] = useState("");
+
+  function resetForm() {
+    setJobTitle(""); setCompany(""); setStartDate(""); setEndDate(""); setIsCurrent(false); setDescription(""); setAdding(false); setErr(null);
+  }
+
+  async function handleAdd() {
+    if (!jobTitle.trim() || !company.trim() || !startDate) { setErr("Job title, company, and start date are required."); return; }
+    setSaving(true); setErr(null);
+    const result = await addWorkExperience({ job_title: jobTitle.trim(), company_name: company.trim(), start_date: startDate, end_date: isCurrent ? undefined : endDate || undefined, is_current: isCurrent, description: description.trim() || undefined });
+    setSaving(false);
+    if (result?.error) { setErr(result.error); return; }
+    resetForm();
+    router.refresh();
+  }
+
+  async function handleDelete(id: string) {
+    await deleteWorkExperience(id);
+    setJobs((prev) => prev.filter((j) => j.id !== id));
+  }
+
+  const fmt = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+  return (
+    <div className="bg-white border border-border rounded-xl p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-navy text-sm">Work Experience</h2>
+        {!adding && (
+          <button type="button" onClick={() => setAdding(true)} className="text-xs font-semibold text-accent hover:underline flex items-center gap-1">
+            + Add Job
+          </button>
+        )}
+      </div>
+
+      {jobs.length > 0 && (
+        <ul className="space-y-3">
+          {jobs.map((job) => (
+            <li key={job.id} className="flex items-start justify-between gap-3 py-2 border-b border-border last:border-0">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-navy leading-tight">{job.job_title}</p>
+                <p className="text-sm text-text-mid">{job.company_name}</p>
+                <p className="text-xs text-text-dim mt-0.5">
+                  {fmt(job.start_date)} – {job.is_current ? "Present" : job.end_date ? fmt(job.end_date) : ""}
+                </p>
+                {job.description && <p className="text-xs text-text-dim mt-1 leading-relaxed line-clamp-2">{job.description}</p>}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(job.id)}
+                className="shrink-0 text-xs text-red-500 hover:text-red-700 font-medium hover:underline mt-0.5"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {adding && (
+        <div className="border border-border rounded-lg p-4 space-y-3 bg-sm-bg">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Job Title *</label>
+              <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Journeyman Electrician" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Company *</label>
+              <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Acme Electric Co." className={inputClass} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Start Date *</label>
+              <input type="month" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputClass} />
+            </div>
+            {!isCurrent && (
+              <div>
+                <label className={labelClass}>End Date</label>
+                <input type="month" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputClass} />
+              </div>
+            )}
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={isCurrent} onChange={(e) => setIsCurrent(e.target.checked)} className="accent-[#0c6e74]" />
+            <span className="text-sm text-navy">I currently work here</span>
+          </label>
+          <div>
+            <label className={labelClass}>Description (optional)</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={500} placeholder="Brief description of your role and work..." className={`${inputClass} resize-none`} />
+          </div>
+          {err && <p className="text-xs text-red-600">{err}</p>}
+          <div className="flex gap-2">
+            <button type="button" onClick={handleAdd} disabled={saving} className="bg-accent text-white text-xs font-semibold px-4 py-2 rounded-md hover:opacity-90 disabled:opacity-50 cursor-pointer">{saving ? "Saving…" : "Save Job"}</button>
+            <button type="button" onClick={resetForm} className="text-xs font-semibold text-text-dim hover:text-navy px-4 py-2 border border-border rounded-md cursor-pointer">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {jobs.length === 0 && !adding && (
+        <p className="text-sm text-text-dim">No work experience added yet.</p>
       )}
     </div>
   );
