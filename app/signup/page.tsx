@@ -77,7 +77,7 @@ export default function SignupPage() {
           <Link href="https://joinskillmark.com" className="font-serif text-3xl font-bold text-navy">
             Skill<span className="text-accent">Mark</span>
           </Link>
-          <p className="mt-2 text-text-dim text-sm">The verified skills network for the trades</p>
+          <p className="mt-2 text-text-dim text-sm">The skills network for the trades</p>
         </div>
 
         <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">

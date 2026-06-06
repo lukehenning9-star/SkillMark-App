@@ -94,10 +94,10 @@ export default function LandingPage() {
           <div className="lp-eyebrow-dot" />
           Now accepting early members
         </div>
-        <h1>The verified skills network<br />for the <em>trades.</em></h1>
+        <h1>The skills network<br />for the <em>trades.</em></h1>
         <p className="lp-hero-sub">
           SkillMark connects skilled tradespeople with the contractors who need them —
-          through <strong>real job photos verified by real supervisors</strong>, not resumes.
+          through <strong>real job photos and proven work</strong>, not resumes.
         </p>
         <div className="lp-hero-actions">
           <Link href="/signup" className="lp-btn lp-btn-navy-lg">Build Your Profile — Free</Link>
@@ -207,7 +207,7 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-section-label reveal">// How It Works</div>
           <h2 className="lp-section-title reveal reveal-d1">Your work speaks<br />for itself.</h2>
-          <p className="lp-section-sub reveal reveal-d2">Upload real photos from real jobs. Get supervisor verified. Let your portfolio do the talking.</p>
+          <p className="lp-section-sub reveal reveal-d2">Upload real photos from real jobs. Let your portfolio do the talking.</p>
           <div className="lp-steps-grid">
             <div className="lp-step-card reveal">
               <div className="lp-step-num">01</div>
@@ -221,13 +221,13 @@ export default function LandingPage() {
             </div>
             <div className="lp-step-card reveal reveal-d2">
               <div className="lp-step-num">03</div>
-              <h3>Get Supervisor Verified</h3>
-              <p>Tag the foreman or contractor you worked under. One email, one click — they confirm the work. Your photo becomes verified proof.</p>
+              <h3>Grow Your Portfolio</h3>
+              <p>Add work history, certifications, and context to each project. The more you document, the stronger your profile becomes.</p>
             </div>
             <div className="lp-step-card reveal reveal-d3">
               <div className="lp-step-num">04</div>
               <h3>Connect Directly</h3>
-              <p>Contractors search verified profiles by trade and location. Workers get found by employers who already know they&apos;re qualified.</p>
+              <p>Contractors search profiles by trade and location. Workers get found by employers who already know they&apos;re the right fit.</p>
             </div>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 At the same time, contractors across America are turning down projects because they can&apos;t find qualified workers. Not because those workers don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
               </p>
               <p className="lp-mission-closing">
-                The trades are the backbone of America. SkillMark gives that backbone a verified digital identity — portable, permanent, and entirely yours.
+                The trades are the backbone of America. SkillMark gives that backbone a professional digital identity — portable, permanent, and entirely yours.
               </p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function LandingPage() {
           <div className="lp-signup-header reveal">
             <span className="lp-section-label">// Join SkillMark</span>
             <h2 className="lp-section-title">Free to join.<br />Built for the trades.</h2>
-            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Build a verified career profile and get found by contractors who care about actual skill.</p>
+            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Build a career profile and get found by contractors who care about actual skill.</p>
           </div>
           <div className="lp-signup-grid lp-signup-grid-single">
             <div className="lp-signup-card worker reveal reveal-d1">
@@ -273,13 +273,13 @@ export default function LandingPage() {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
                 </div>
-                <div className="lp-signup-card-title">Build your verified profile</div>
-                <div className="lp-signup-card-sub">Upload real job photos, get supervisor verified, and carry your reputation everywhere you go.</div>
+                <div className="lp-signup-card-title">Build your profile</div>
+                <div className="lp-signup-card-sub">Upload real job photos and carry your reputation everywhere you go.</div>
               </div>
               <div className="lp-signup-card-body">
                 <div className="lp-signup-feature">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Verified project portfolio
+                  Photo project portfolio
                 </div>
                 <div className="lp-signup-feature">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -322,7 +322,7 @@ export default function LandingPage() {
         <div className="lp-footer-inner">
           <div>
             <div className="lp-footer-logo">Skill<span>Mark</span></div>
-            <div className="lp-footer-copy">© 2025 SkillMark · joinskillmark.com · The verified skills network for the trades.</div>
+            <div className="lp-footer-copy">© 2025 SkillMark · joinskillmark.com · The skills network for the trades.</div>
           </div>
           <ul className="lp-footer-links">
             <li><a href="#why">Why Trades</a></li>

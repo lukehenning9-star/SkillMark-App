@@ -413,14 +413,6 @@ export default function ProfileView({
                               ))}
                             </div>
                           )}
-                          {(project as Project & { verification_status?: string }).verification_status === "verified" && (
-                            <div className="absolute top-2 right-2">
-                              <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                Verified
-                              </span>
-                            </div>
-                          )}
                         </div>
                         <div className="px-3 py-2.5 border-t border-border">
                           <p className="text-sm font-semibold text-navy leading-tight">{project.title}</p>

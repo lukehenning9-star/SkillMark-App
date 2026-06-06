@@ -54,9 +54,6 @@ export type Project = {
   before_photo_url: string | null
   after_photo_url: string | null
   created_at: string
-  verification_status: "unverified" | "pending" | "verified"
-  supervisor_name: string | null
-  supervisor_email: string | null
 }
 
 export type Certification = {

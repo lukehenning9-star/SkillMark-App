@@ -15,9 +15,9 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SkillMark — The Verified Skills Network for the Trades",
+  title: "SkillMark — The Skills Network for the Trades",
   description:
-    "SkillMark connects skilled tradespeople with contractors through verified photo portfolios confirmed by real supervisors.",
+    "SkillMark connects skilled tradespeople with contractors through real job photo portfolios. Build your portable career profile — free.",
 };
 
 export default function RootLayout({
