@@ -7,10 +7,35 @@ export const US_STATES = [
 ]
 
 export const TRADES = [
+  "Boilermaker",
+  "Bricklayer / Mason",
+  "Carpenter",
+  "Concrete Worker",
+  "Crane Operator",
+  "Demolition Worker",
+  "Drywall / Plasterer",
   "Electrician",
-  "Plumber",
+  "Elevator Mechanic",
+  "Fence Installer",
+  "Flooring Installer",
+  "Glazier",
+  "Heavy Equipment Operator",
   "HVAC Technician",
-  "Other",
+  "Industrial Mechanic",
+  "Insulation Worker",
+  "Ironworker",
+  "Landscaper / Hardscape",
+  "Millwright",
+  "Painter",
+  "Pipefitter",
+  "Plumber",
+  "Refrigeration Mechanic",
+  "Roofer",
+  "Sheet Metal Worker",
+  "Solar Installer",
+  "Sprinkler Fitter",
+  "Tile Setter",
+  "Welder",
 ] as const
 
 export type Trade = typeof TRADES[number]

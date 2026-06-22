@@ -6,6 +6,7 @@ import Image from "next/image";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
+import AutocompleteInput from "@/components/AutocompleteInput";
 import AvatarCropModal from "@/components/AvatarCropModal";
 import type { Profile } from "@/lib/types";
 
@@ -21,10 +22,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [bio, setBio] = useState(profile.bio ?? "");
   const [isAvailable, setIsAvailable] = useState(profile.is_available);
 
-  const knownTrades = TRADES as readonly string[];
-  const savedCustomTrade = profile.trade && !knownTrades.includes(profile.trade) ? profile.trade : null;
   const [tradeVal, setTradeVal] = useState(profile.trade ?? "");
-  const [tradeCustom, setTradeCustom] = useState("");
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
   const [bannerUrl, setBannerUrl] = useState<string | null>(profile.banner_url);
@@ -93,8 +91,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
     setError(null);
     setSaved(false);
     startTransition(async () => {
-      const effectiveTrade =
-        tradeVal === "Other" ? (tradeCustom.trim() || "Other") : tradeVal || undefined;
+      const effectiveTrade = tradeVal.trim() || undefined;
       const result = await saveProfileStep({
         full_name: (fd.get("full_name") as string).trim(),
         headline: (fd.get("headline") as string).trim() || undefined,
@@ -218,28 +215,13 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade</label>
-              {tradeVal === "Other" ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={tradeCustom}
-                    onChange={(e) => setTradeCustom(e.target.value)}
-                    placeholder="e.g. Mason, Ironworker…"
-                    className={inputClass}
-                    autoFocus
-                  />
-                  <button type="button" onClick={() => { setTradeVal(savedCustomTrade ?? ""); setTradeCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
-                    ← back
-                  </button>
-                </div>
-              ) : (
-                <select value={tradeVal} onChange={(e) => setTradeVal(e.target.value)} className={inputClass}>
-                  <option value="">Select trade...</option>
-                  {TRADES.filter(t => t !== "Other").map((t) => <option key={t}>{t}</option>)}
-                  {savedCustomTrade && <option key={savedCustomTrade} value={savedCustomTrade}>{savedCustomTrade}</option>}
-                  <option value="Other">Other</option>
-                </select>
-              )}
+              <AutocompleteInput
+                value={tradeVal}
+                onChange={setTradeVal}
+                suggestions={TRADES}
+                placeholder="e.g. Electrician, Welder…"
+                className={inputClass}
+              />
             </div>
             <div>
               <label className={labelClass}>Experience Level</label>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createProject } from "@/app/actions/projects";
 import { PROJECT_SKILLS, TRADES } from "@/lib/constants";
 import SkillTagInput from "@/components/SkillTagInput";
+import AutocompleteInput from "@/components/AutocompleteInput";
 
 const inputClass =
   "w-full bg-sm-bg border border-border rounded-md px-3 py-2.5 text-sm text-navy placeholder:text-text-dim focus:outline-none focus:border-accent focus:bg-white transition-all";
@@ -18,7 +19,6 @@ export default function NewProjectForm() {
   const [error, setError] = useState<string | null>(null);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [tradeCat, setTradeCat] = useState("");
-  const [tradeCatCustom, setTradeCatCustom] = useState("");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -62,27 +62,14 @@ export default function NewProjectForm() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade Category</label>
-              <input type="hidden" name="trade_category" value={tradeCat === "Other" ? tradeCatCustom : tradeCat} />
-              {tradeCat === "Other" ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={tradeCatCustom}
-                    onChange={(e) => setTradeCatCustom(e.target.value)}
-                    placeholder="e.g. Mason, Ironworker…"
-                    className={inputClass}
-                    autoFocus
-                  />
-                  <button type="button" onClick={() => { setTradeCat(""); setTradeCatCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
-                    ← back
-                  </button>
-                </div>
-              ) : (
-                <select value={tradeCat} onChange={(e) => setTradeCat(e.target.value)} className={inputClass}>
-                  <option value="">Select trade...</option>
-                  {TRADES.map((t) => <option key={t}>{t}</option>)}
-                </select>
-              )}
+              <input type="hidden" name="trade_category" value={tradeCat} />
+              <AutocompleteInput
+                value={tradeCat}
+                onChange={setTradeCat}
+                suggestions={TRADES}
+                placeholder="e.g. Electrician, Welder…"
+                className={inputClass}
+              />
             </div>
             <div>
               <label className={labelClass}>Location (optional)</label>

@@ -3,48 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveProfileStep, addWorkExperience, completeOnboarding } from "@/app/actions/profile";
-import { US_STATES } from "@/lib/constants";
-
-function ZapIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
-}
-function DropletIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>;
-}
-function WindIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>;
-}
-function HammerIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0v0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15L22 10.64"/><path d="M20.35 7.35A5.5 5.5 0 0 0 11 11l1 1"/></svg>;
-}
-function FlameIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
-}
-function GearIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/></svg>;
-}
-function HouseIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-}
-function BrushIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1 1 2.48 1.02 3.5 1.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-2.5-3.02z"/></svg>;
-}
-function LayersIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
-}
-function TruckIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
-}
-function WrenchIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
-}
-
-const TRADES = [
-  { label: "Electrician", icon: <ZapIcon /> },
-  { label: "Plumber", icon: <DropletIcon /> },
-  { label: "HVAC Technician", icon: <WindIcon /> },
-  { label: "Other", icon: <WrenchIcon /> },
-];
+import { US_STATES, TRADES } from "@/lib/constants";
+import AutocompleteInput from "@/components/AutocompleteInput";
 
 const LEVELS = [
   {
@@ -77,7 +37,6 @@ export default function OnboardingClient() {
 
   const [fullName, setFullName] = useState("");
   const [trade, setTrade] = useState("");
-  const [tradeCustom, setTradeCustom] = useState("");
   const [level, setLevel] = useState("");
   const [years, setYears] = useState(0);
   const [city, setCity] = useState("");
@@ -110,9 +69,8 @@ export default function OnboardingClient() {
         if (!fullName.trim()) { handleError("Please enter your full name."); return; }
         result = await saveProfileStep({ full_name: fullName.trim() });
       } else if (step === 2) {
-        if (!trade) { handleError("Please select your trade."); return; }
-        const effectiveTrade = trade === "Other" ? (tradeCustom.trim() || "Other") : trade;
-        result = await saveProfileStep({ trade: effectiveTrade });
+        if (!trade.trim()) { handleError("Please enter your trade."); return; }
+        result = await saveProfileStep({ trade: trade.trim() });
       } else if (step === 3) {
         if (!level) { handleError("Please select your experience level."); return; }
         result = await saveProfileStep({ experience_level: level });
@@ -210,36 +168,15 @@ export default function OnboardingClient() {
           {step === 2 && (
             <div className="bg-white border border-border rounded-xl shadow-sm p-8">
               <h1 className="font-serif text-2xl font-bold text-navy mb-1">What&apos;s your trade?</h1>
-              <p className="text-text-dim text-sm mb-6">Select the primary trade you work in.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {TRADES.map(({ label, icon }) =>
-                  trade === "Other" && label === "Other" ? (
-                    <input
-                      key="other-input"
-                      type="text"
-                      value={tradeCustom}
-                      onChange={(e) => setTradeCustom(e.target.value)}
-                      placeholder="Your trade…"
-                      className="flex-1 bg-accent/5 border-2 border-accent rounded-xl px-3 py-4 text-sm text-navy placeholder:text-accent/50 focus:outline-none"
-                      autoFocus
-                    />
-                  ) : (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => { setTrade(label); setTradeCustom(""); }}
-                      className={`flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                        trade === label
-                          ? "border-accent bg-accent/5 text-accent"
-                          : "border-border bg-sm-bg text-text-mid hover:border-border2 hover:bg-white"
-                      }`}
-                    >
-                      {icon}
-                      <span className="text-xs font-semibold text-center leading-tight">{label}</span>
-                    </button>
-                  )
-                )}
-              </div>
+              <p className="text-text-dim text-sm mb-6">Type to search, or enter your own if it&apos;s not listed.</p>
+              <AutocompleteInput
+                value={trade}
+                onChange={setTrade}
+                suggestions={TRADES}
+                placeholder="e.g. Electrician, Welder, Pipefitter…"
+                className={inputClass}
+                autoFocus
+              />
             </div>
           )}
 

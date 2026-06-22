@@ -8,6 +8,7 @@ import { updateProject, saveProjectCoverPhoto, saveProjectBeforePhoto, saveProje
 import { getProjectPhotoUploadUrl, getProjectBeforePhotoUploadUrl, getProjectAfterPhotoUploadUrl } from "@/app/actions/upload";
 import { PROJECT_SKILLS, TRADES } from "@/lib/constants";
 import SkillTagInput from "@/components/SkillTagInput";
+import AutocompleteInput from "@/components/AutocompleteInput";
 import type { Project } from "@/lib/types";
 
 const inputClass =
@@ -29,13 +30,7 @@ export default function EditProjectForm({ project }: { project: Project }) {
   const [afterError, setAfterError] = useState<string | null>(null);
   const beforeFileRef = useRef<HTMLInputElement>(null);
   const afterFileRef = useRef<HTMLInputElement>(null);
-  const knownTrades = TRADES as readonly string[];
-  const [tradeCat, setTradeCat] = useState(
-    project.trade_category && !knownTrades.includes(project.trade_category) ? "Other" : (project.trade_category ?? "")
-  );
-  const [tradeCatCustom, setTradeCatCustom] = useState(
-    project.trade_category && !knownTrades.includes(project.trade_category) ? project.trade_category : ""
-  );
+  const [tradeCat, setTradeCat] = useState(project.trade_category ?? "");
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -283,27 +278,14 @@ export default function EditProjectForm({ project }: { project: Project }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Trade Category</label>
-              <input type="hidden" name="trade_category" value={tradeCat === "Other" ? tradeCatCustom : tradeCat} />
-              {tradeCat === "Other" ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={tradeCatCustom}
-                    onChange={(e) => setTradeCatCustom(e.target.value)}
-                    placeholder="e.g. Mason, Ironworker…"
-                    className={inputClass}
-                    autoFocus
-                  />
-                  <button type="button" onClick={() => { setTradeCat(""); setTradeCatCustom(""); }} className="shrink-0 text-xs text-text-dim hover:text-navy whitespace-nowrap">
-                    ← back
-                  </button>
-                </div>
-              ) : (
-                <select value={tradeCat} onChange={(e) => setTradeCat(e.target.value)} className={inputClass}>
-                  <option value="">Select trade...</option>
-                  {TRADES.map((t) => <option key={t}>{t}</option>)}
-                </select>
-              )}
+              <input type="hidden" name="trade_category" value={tradeCat} />
+              <AutocompleteInput
+                value={tradeCat}
+                onChange={setTradeCat}
+                suggestions={TRADES}
+                placeholder="e.g. Electrician, Welder…"
+                className={inputClass}
+              />
             </div>
             <div>
               <label className={labelClass}>Location (optional)</label>
