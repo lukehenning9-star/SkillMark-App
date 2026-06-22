@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createProject } from "@/app/actions/projects";
 import { PROJECT_SKILLS, TRADES } from "@/lib/constants";
+import SkillTagInput from "@/components/SkillTagInput";
 
 const inputClass =
   "w-full bg-sm-bg border border-border rounded-md px-3 py-2.5 text-sm text-navy placeholder:text-text-dim focus:outline-none focus:border-accent focus:bg-white transition-all";
@@ -18,12 +19,6 @@ export default function NewProjectForm() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [tradeCat, setTradeCat] = useState("");
   const [tradeCatCustom, setTradeCatCustom] = useState("");
-
-  function toggleSkill(skill: string) {
-    setSelectedSkills((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
-    );
-  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -113,23 +108,12 @@ export default function NewProjectForm() {
 
         <div className="bg-white border border-border rounded-xl p-6">
           <h2 className="font-semibold text-navy text-sm mb-1">Skills Used</h2>
-          <p className="text-xs text-text-dim mb-3">Select all that apply.</p>
-          <div className="flex flex-wrap gap-2">
-            {PROJECT_SKILLS.map((skill) => (
-              <button
-                key={skill}
-                type="button"
-                onClick={() => toggleSkill(skill)}
-                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors cursor-pointer ${
-                  selectedSkills.includes(skill)
-                    ? "bg-navy text-white border-navy"
-                    : "bg-sm-bg text-text-dim border-border hover:border-border2 hover:text-navy"
-                }`}
-              >
-                {skill}
-              </button>
-            ))}
-          </div>
+          <p className="text-xs text-text-dim mb-3">Type to search or add your own — press Enter to add.</p>
+          <SkillTagInput
+            value={selectedSkills}
+            onChange={setSelectedSkills}
+            suggestions={PROJECT_SKILLS}
+          />
         </div>
 
         {error && (
