@@ -38,7 +38,7 @@ Used in `app/page.tsx` and in `/home/user/SkillMark/index.html`. Must stay exact
 ```css
 --color-navy: #0f1f3d
 --color-navy-mid: #1a3260
---color-accent: #0c6e74        /* main green */
+--color-accent: #1a56db        /* main blue */
 --color-sm-bg: #f5f4f1         /* page background */
 --color-border: #e4e2de
 --color-border2: #d0cec9
@@ -49,10 +49,10 @@ Use as Tailwind classes: `bg-accent`, `text-navy`, `border-border`, etc.
 
 ### Landing page — custom CSS (`landing.css`)
 ```css
---accent: #0c6e74;  --accent-light: #e6f4f4;  --accent-border: #9dd0ce;
+--accent: #1a56db;  --accent-light: #eff4ff;  --accent-border: #93b8f8;
 --navy: #0f1f3d;    --navy-light: #2a4a8a;
 ```
-Hover: `#0a5860`. On dark navy backgrounds use `#7eccc7` for tinted text/icons.
+Hover: `#1648c0`. On dark navy backgrounds use `#7eb3f8` for tinted text/icons.
 
 ---
 
