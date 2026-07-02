@@ -65,8 +65,8 @@ app/
   layout.tsx            ← Root layout, fonts (Playfair Display + Plus Jakarta Sans), meta
   globals.css           ← Tailwind v4 theme tokens
   dashboard/
-    page.tsx            ← Main feed (currently redirects to profile — see TODO below)
-    FeedClient.tsx      ← Social feed client component (see TODO)
+    page.tsx            ← Main feed (server component — queries latest 60 projects)
+    FeedClient.tsx      ← Social feed client component (FeedCard, PhotoCarousel, timeAgo)
   [username]/
     page.tsx            ← Public profile page (server component)
     ProfileView.tsx     ← Profile UI (client component, large file)
@@ -80,9 +80,10 @@ app/
   onboarding/OnboardingClient.tsx + page.tsx
   actions/
     auth.ts             ← signup/login, rate limiting, 8-char min password
-    profile.ts          ← saveProfileStep, addWorkExperience, deleteWorkExperience,
-                          updateWorkExperience, incrementProfileViews,
-                          saveAvatarUrl, saveBannerUrl, completeOnboarding
+    profile.ts          ← saveProfileStep (column-whitelisted), addWorkExperience,
+                          deleteWorkExperience, saveAvatarUrl, saveBannerUrl,
+                          completeOnboarding (profile views increment via
+                          increment_profile_views RPC from [username]/page.tsx)
     projects.ts         ← createProject, updateProject, deleteProject,
                           saveProjectCoverPhoto, saveProjectBeforePhoto, saveProjectAfterPhoto
     certifications.ts + messages.ts + upload.ts
@@ -180,47 +181,16 @@ Trigger: `handle_new_user()` auto-creates a `profiles` row on `auth.users` inser
 
 ## What's Built
 
-- **Landing page** (`app/page.tsx`): hero, stats, Why Trades, How It Works, Mission, Signup, Waitlist — scroll-reveal animations, green color scheme, Formspree waitlist
-- **Auth**: signup (email/username/password), login, username availability check
+- **Landing page** (`app/page.tsx`): hero, stats, Why Trades, How It Works, Mission, Signup (worker card only), Waitlist — scroll-reveal animations, blue color scheme, Formspree waitlist
+- **Auth**: signup (email/username/password, 8-char min enforced client + server), login, username availability check
 - **Onboarding**: post-signup flow
-- **Profile** (`/[username]`): banner, avatar, headline, bio, trade, work experience, projects grid, certifications, profile views, available badge, message button
-- **Projects**: create/edit/delete, cover + before + after photo upload (Supabase Storage), project detail page
-- **Settings**: edit all profile fields, avatar crop+upload, banner upload, work experience CRUD
+- **Dashboard Feed** (`/dashboard`): social feed of latest 60 projects — FeedCard with author header, photo carousel (cover/before/after), skill tags
+- **Profile** (`/[username]`): banner, avatar, headline, bio, trade, work experience, projects grid, certifications, profile views (incremented via `increment_profile_views` RPC on non-owner visits), available badge, message button
+- **Projects**: create/edit/delete (with confirm), cover + before + after photo upload (Supabase Storage), project detail page
+- **Settings**: edit all profile fields (clearable), avatar crop+upload, banner upload, work experience add/delete, certifications add/delete
 - **Search** (`/search`): live filter by keyword/trade/level/state/union/availability
 - **Messages** (`/messages`): real-time messaging, unread count badge in nav
 - **AppNav**: Feed / My Profile / Search / Add Project / Messages / User dropdown
-
----
-
-## TODO — Dashboard Feed (Priority)
-
-The dashboard (`/dashboard`) currently redirects to the user's profile. It should be a social feed.
-
-**Create `app/dashboard/FeedClient.tsx`** (client component):
-```typescript
-export type FeedProject = {
-  id: string; title: string; description: string | null;
-  cover_photo_url: string | null; before_photo_url: string | null; after_photo_url: string | null;
-  specific_skills: string[]; trade_category: string | null; created_at: string;
-  profiles: { username: string; full_name: string | null; avatar_url: string | null; trade: string | null; };
-};
-```
-- `timeAgo(dateStr)` → "2h ago", "3d ago", etc.
-- `PhotoCarousel`: photos = [cover, before, after].filter(Boolean), idx state, left/right arrows, dot indicators
-- `FeedCard`: profile header (avatar + name + trade + timestamp) → title + description (line-clamp-4) → PhotoCarousel → skill tags → "View full project →"
-- Default export renders `space-y-4` list of cards, empty state with link to add project
-
-**Update `app/dashboard/page.tsx`** (server component):
-```typescript
-const { data: raw } = await supabase
-  .from("projects")
-  .select(`id, title, description, cover_photo_url, before_photo_url, after_photo_url,
-           specific_skills, trade_category, created_at,
-           profiles(username, full_name, avatar_url, trade)`)
-  .order("created_at", { ascending: false })
-  .limit(60);
-// filter out rows where profiles is null, cast to FeedProject[], render in max-w-[470px] mx-auto
-```
 
 ---
 

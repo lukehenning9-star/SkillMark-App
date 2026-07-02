@@ -87,20 +87,29 @@ export default function AvatarCropModal({ src, onApply, onCancel }: AvatarCropMo
     stateRef.current.dragging = false;
   }, []);
 
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    const img = imgRef.current;
-    if (!img) return;
-    const s = stateRef.current;
-    const delta = e.deltaY < 0 ? 1.08 : 0.92;
-    const minScale = Math.max(SIZE / img.naturalWidth, SIZE / img.naturalHeight);
-    const newScale = Math.min(5, Math.max(minScale, s.scale * delta));
-    const ratio = newScale / s.scale;
-    s.x = SIZE / 2 - (SIZE / 2 - s.x) * ratio;
-    s.y = SIZE / 2 - (SIZE / 2 - s.y) * ratio;
-    s.scale = newScale;
-    clamp(s, img);
-    draw();
+  // React registers wheel listeners as passive, so e.preventDefault() in an
+  // onWheel prop throws and the page scrolls behind the modal. Attach a
+  // native non-passive listener instead.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const img = imgRef.current;
+      if (!img) return;
+      const s = stateRef.current;
+      const delta = e.deltaY < 0 ? 1.08 : 0.92;
+      const minScale = Math.max(SIZE / img.naturalWidth, SIZE / img.naturalHeight);
+      const newScale = Math.min(5, Math.max(minScale, s.scale * delta));
+      const ratio = newScale / s.scale;
+      s.x = SIZE / 2 - (SIZE / 2 - s.x) * ratio;
+      s.y = SIZE / 2 - (SIZE / 2 - s.y) * ratio;
+      s.scale = newScale;
+      clamp(s, img);
+      draw();
+    };
+    canvas.addEventListener("wheel", handler, { passive: false });
+    return () => canvas.removeEventListener("wheel", handler);
   }, [draw, clamp]);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
@@ -118,7 +127,8 @@ export default function AvatarCropModal({ src, onApply, onCancel }: AvatarCropMo
   }, []);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
+    // No preventDefault here: React touch listeners are passive; the
+    // canvas's touch-none class already blocks page scrolling.
     const s = stateRef.current;
     const img = imgRef.current;
     if (!img) return;
@@ -190,7 +200,6 @@ export default function AvatarCropModal({ src, onApply, onCancel }: AvatarCropMo
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseUp}
-            onWheel={onWheel}
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}

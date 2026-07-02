@@ -47,7 +47,7 @@ export default function NewProjectForm() {
           Back to Dashboard
         </Link>
         <h1 className="font-serif text-2xl font-bold text-navy">Add a Project</h1>
-        <p className="text-text-dim text-sm mt-1">Document your work and build your verified portfolio.</p>
+        <p className="text-text-dim text-sm mt-1">Document your work and build your portfolio.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

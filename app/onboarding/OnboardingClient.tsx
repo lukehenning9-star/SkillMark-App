@@ -61,6 +61,7 @@ export default function OnboardingClient() {
   }
 
   function handleNext() {
+    if (isPending) return;
     setError(null);
     startTransition(async () => {
       let result: { error?: string; success?: boolean } | undefined;
@@ -95,8 +96,11 @@ export default function OnboardingClient() {
           if (result?.error) { handleError(result.error); return; }
         }
         const done = await completeOnboarding();
-        if (done?.error) { handleError(done.error); return; }
-        finish(done?.username ?? null);
+        if (done?.error || !done?.username) {
+          handleError(done?.error ?? "Something went wrong. Please try again.");
+          return;
+        }
+        finish(done.username);
         return;
       }
 
@@ -106,9 +110,14 @@ export default function OnboardingClient() {
   }
 
   async function handleSkip() {
+    if (isPending) return;
     startTransition(async () => {
       const done = await completeOnboarding();
-      finish(done?.username ?? null);
+      if (done?.error || !done?.username) {
+        handleError(done?.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      finish(done.username);
     });
   }
 

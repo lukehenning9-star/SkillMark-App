@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, useEffect, useCallback } from "react";
+import { useActionState, useState, useEffect, useCallback, useRef } from "react";
 import { signup } from "@/app/actions/auth";
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -32,15 +32,18 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
 
+  const checkSeq = useRef(0);
   const checkUsername = useCallback(async (value: string) => {
+    const seq = ++checkSeq.current;
     if (value.length < 3) { setUsernameStatus("idle"); return; }
     setUsernameStatus("checking");
     try {
       const res = await fetch(`/api/check-username?username=${encodeURIComponent(value)}`);
       const json = await res.json();
+      if (seq !== checkSeq.current) return; // stale response — a newer check is in flight
       setUsernameStatus(json.available ? "available" : "taken");
     } catch {
-      setUsernameStatus("idle");
+      if (seq === checkSeq.current) setUsernameStatus("idle");
     }
   }, []);
 
@@ -77,7 +80,7 @@ export default function SignupPage() {
           <Link href="https://joinskillmark.com" className="font-serif text-3xl font-bold text-navy">
             Skill<span className="text-accent">Mark</span>
           </Link>
-          <p className="mt-2 text-text-dim text-sm">The verified skills network for the trades</p>
+          <p className="mt-2 text-text-dim text-sm">The skills network for the trades</p>
         </div>
 
         <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
@@ -157,7 +160,7 @@ export default function SignupPage() {
               <div>
                 <label className={labelClass}>Password</label>
                 <div className="relative">
-                  <input name="password" type={showPassword ? "text" : "password"} placeholder="At least 6 characters" required minLength={6} className={`${inputClass} pr-10`} />
+                  <input name="password" type={showPassword ? "text" : "password"} placeholder="At least 8 characters" required minLength={8} className={`${inputClass} pr-10`} />
                   <button type="button" onClick={() => setShowPassword((v) => !v)} tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-dim hover:text-navy transition-colors">
                     <EyeIcon open={showPassword} />
                   </button>
@@ -167,7 +170,7 @@ export default function SignupPage() {
               <div>
                 <label className={labelClass}>Confirm Password</label>
                 <div className="relative">
-                  <input name="confirm_password" type={showConfirm ? "text" : "password"} placeholder="Repeat your password" required minLength={6} className={`${inputClass} pr-10`} />
+                  <input name="confirm_password" type={showConfirm ? "text" : "password"} placeholder="Repeat your password" required minLength={8} className={`${inputClass} pr-10`} />
                   <button type="button" onClick={() => setShowConfirm((v) => !v)} tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-dim hover:text-navy transition-colors">
                     <EyeIcon open={showConfirm} />
                   </button>
@@ -180,7 +183,7 @@ export default function SignupPage() {
 
               <button
                 type="submit"
-                disabled={pending || usernameStatus === "taken"}
+                disabled={pending || usernameStatus === "taken" || usernameStatus === "checking"}
                 className="w-full bg-accent text-white font-semibold text-[15px] py-3 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-1"
               >
                 {pending ? "Creating account…" : "Create Account →"}

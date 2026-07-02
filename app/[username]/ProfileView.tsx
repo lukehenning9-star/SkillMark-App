@@ -22,9 +22,16 @@ interface Props {
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
-  const fmt = (d: string) =>
-    new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" });
-  return `${fmt(start)} – ${isCurrent ? "Present" : end ? fmt(end) : ""}`;
+  const fmt = (d: string) => {
+    // Accept both YYYY-MM-DD and legacy YYYY-MM values.
+    const iso = /^\d{4}-\d{2}$/.test(d) ? `${d}-01` : d;
+    const date = new Date(iso + "T00:00:00");
+    return isNaN(date.getTime())
+      ? ""
+      : date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  };
+  if (isCurrent || !end) return `${fmt(start)} – Present`;
+  return `${fmt(start)} – ${fmt(end)}`;
 }
 
 const inputClass =
@@ -49,6 +56,7 @@ export default function ProfileView({
   const [bannerUrl, setBannerUrl] = useState<string | null>(profile.banner_url);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
 
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -61,52 +69,76 @@ export default function ProfileView({
   const profileIsComplete =
     !!(avatarUrl && profile.bio && profile.trade && (profile.city || profile.state) && projects.length > 0);
 
+  const clearCropSrc = useCallback(() => {
+    setCropSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }, []);
+
   const handleAvatarFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCropSrc(URL.createObjectURL(file));
+    setCropSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
     if (avatarFileRef.current) avatarFileRef.current.value = "";
   }, []);
 
   const handleCropApply = useCallback(
     async (blob: Blob) => {
-      setCropSrc(null);
+      clearCropSrc();
       setAvatarUploading(true);
+      setUploadError(null);
       try {
         const urlResult = await getAvatarUploadUrl();
-        if (!urlResult || "error" in urlResult) return;
+        if (!urlResult || "error" in urlResult) {
+          setUploadError(urlResult?.error ?? "Could not get upload URL.");
+          return;
+        }
         const res = await fetch(urlResult.signedUrl, {
           method: "PUT",
           body: blob,
           headers: { "Content-Type": "image/jpeg" },
         });
-        if (!res.ok) return;
-        await saveAvatarUrl(urlResult.publicUrl);
+        if (!res.ok) { setUploadError("Photo upload failed. Please try again."); return; }
+        const saveResult = await saveAvatarUrl(urlResult.publicUrl);
+        if (saveResult?.error) { setUploadError(saveResult.error); return; }
         setAvatarUrl(urlResult.publicUrl);
         router.refresh();
+      } catch {
+        setUploadError("Photo upload failed. Please try again.");
       } finally {
         setAvatarUploading(false);
       }
     },
-    [router]
+    [router, clearCropSrc]
   );
 
   const handleBannerUpload = useCallback(
     async (file: File) => {
-      if (!file.type.startsWith("image/")) return;
+      if (!file.type.startsWith("image/")) { setUploadError("Please select an image file."); return; }
       setBannerUploading(true);
+      setUploadError(null);
       try {
         const urlResult = await getBannerUploadUrl();
-        if (!urlResult || "error" in urlResult) return;
+        if (!urlResult || "error" in urlResult) {
+          setUploadError(urlResult?.error ?? "Could not get upload URL.");
+          return;
+        }
         const res = await fetch(urlResult.signedUrl, {
           method: "PUT",
           body: file,
           headers: { "Content-Type": file.type },
         });
-        if (!res.ok) return;
-        await saveBannerUrl(urlResult.publicUrl);
+        if (!res.ok) { setUploadError("Banner upload failed. Please try again."); return; }
+        const saveResult = await saveBannerUrl(urlResult.publicUrl);
+        if (saveResult?.error) { setUploadError(saveResult.error); return; }
         setBannerUrl(urlResult.publicUrl);
         router.refresh();
+      } catch {
+        setUploadError("Banner upload failed. Please try again.");
       } finally {
         setBannerUploading(false);
         if (bannerFileRef.current) bannerFileRef.current.value = "";
@@ -120,18 +152,19 @@ export default function ProfileView({
     const fd = new FormData(e.currentTarget);
     setSaveError(null);
     startTransition(async () => {
-      const effectiveTrade = tradeVal.trim() || undefined;
+      // null (not undefined) so emptied fields are actually cleared —
+      // supabase-js drops undefined keys from the update payload.
       const result = await saveProfileStep({
         full_name: (fd.get("full_name") as string).trim() || undefined,
-        headline: (fd.get("headline") as string).trim() || undefined,
-        trade: effectiveTrade,
-        experience_level: (fd.get("experience_level") as Profile["experience_level"]) || undefined,
+        headline: (fd.get("headline") as string).trim() || null,
+        trade: tradeVal.trim() || null,
+        experience_level: (fd.get("experience_level") as Profile["experience_level"]) || null,
         years_experience: Number(fd.get("years_experience")) || 0,
-        city: (fd.get("city") as string).trim() || undefined,
-        state: (fd.get("state") as string) || undefined,
-        bio: bio.trim() || undefined,
+        city: (fd.get("city") as string).trim() || null,
+        state: (fd.get("state") as string) || null,
+        bio: bio.trim() || null,
         is_available: isAvailable,
-        union_status: (fd.get("union_status") as string) || undefined,
+        union_status: (fd.get("union_status") as string) || null,
       });
       if (result?.error) {
         setSaveError(result.error);
@@ -238,6 +271,12 @@ export default function ProfileView({
             )}
           </div>
         </div>
+
+        {uploadError && (
+          <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+            {uploadError}
+          </p>
+        )}
 
         {/* Identity */}
         <div className="mb-4">
@@ -366,10 +405,10 @@ export default function ProfileView({
                       <div>
                         <p className="text-sm font-semibold text-navy leading-tight">{cert.name}</p>
                         {cert.issuing_org && <p className="text-xs text-text-dim">{cert.issuing_org}</p>}
-                        {cert.date_earned && (
+                        {(cert.date_earned || cert.expiry_date) && (
                           <p className="text-xs text-text-dim">
-                            {new Date(cert.date_earned + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}
-                            {cert.expiry_date && ` – ${new Date(cert.expiry_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}`}
+                            {cert.date_earned && new Date(cert.date_earned + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                            {cert.expiry_date && `${cert.date_earned ? " – " : "Expires "}${new Date(cert.expiry_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}`}
                           </p>
                         )}
                       </div>
@@ -465,7 +504,7 @@ export default function ProfileView({
         <AvatarCropModal
           src={cropSrc}
           onApply={handleCropApply}
-          onCancel={() => setCropSrc(null)}
+          onCancel={clearCropSrc}
         />
       )}
 

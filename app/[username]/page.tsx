@@ -46,6 +46,11 @@ export default async function PublicProfilePage({
 
   const isOwner = viewer?.id === profile.id;
 
+  if (viewer && !isOwner) {
+    // Fire-and-forget; never block the page render on the counter.
+    void supabase.rpc("increment_profile_views", { target_profile_id: profile.id });
+  }
+
   let unreadCount = 0;
   if (isOwner) {
     const { count } = await supabase

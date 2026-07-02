@@ -1,11 +1,16 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function sendMessage(recipientId: string, content: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
+
+  if (!checkRateLimit(`send-message:${user.id}`, 30, 60_000)) {
+    return { error: "You're sending messages too quickly. Please wait a moment." };
+  }
 
   const trimmed = content.trim();
   if (!trimmed) return { error: "Message cannot be empty" };
@@ -40,7 +45,11 @@ export async function searchUsers(query: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const q = query.trim();
+  if (!checkRateLimit(`search-users:${user.id}`, 30, 60_000)) return [];
+
+  // Strip characters with meaning in PostgREST filter grammar (, ( ) \)
+  // and LIKE wildcards (% _) — user input is interpolated into .or() below.
+  const q = query.trim().replace(/[^\p{L}\p{N} .'-]/gu, "").trim();
   if (!q || q.length < 2 || q.length > 100) return [];
 
   const { data } = await supabase

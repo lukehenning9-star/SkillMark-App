@@ -1,10 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { PROJECT_SKILLS } from "@/lib/constants";
+
+const STORAGE_URL_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/`;
 
 function validateProjectFields(formData: FormData) {
-  const title = (formData.get("title") as string).trim();
+  const rawTitle = formData.get("title");
+  const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
   if (!title) return { error: "Project title is required." };
   if (title.length > 200) return { error: "Title must be 200 characters or less." };
 
@@ -14,18 +16,35 @@ function validateProjectFields(formData: FormData) {
   const location = (formData.get("location") as string | null)?.trim() || null;
   if (location && location.length > 200) return { error: "Location must be 200 characters or less." };
 
-  const validSkillSet = new Set<string>(PROJECT_SKILLS);
-  const specificSkills = (formData.getAll("specific_skills") as string[])
-    .filter((s) => validSkillSet.has(s))
-    .slice(0, 20);
+  // Users may type custom skills (SkillTagInput allows free entry), so
+  // sanitize rather than filter against a preset list: trim, cap length,
+  // dedupe, and bound the array.
+  const seen = new Set<string>();
+  const specificSkills: string[] = [];
+  for (const raw of formData.getAll("specific_skills")) {
+    if (typeof raw !== "string") continue;
+    const skill = raw.trim();
+    if (!skill || skill.length > 50) continue;
+    const key = skill.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    specificSkills.push(skill);
+    if (specificSkills.length >= 20) break;
+  }
+
+  const rawTradeCategory = (formData.get("trade_category") as string | null)?.trim() || null;
+  if (rawTradeCategory && rawTradeCategory.length > 100) return { error: "Trade category must be 100 characters or less." };
+
+  const rawDate = (formData.get("completed_date") as string | null) || null;
+  const completedDate = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : null;
 
   return {
     title,
     description,
     location,
     specificSkills,
-    tradeCategory: (formData.get("trade_category") as string | null) || null,
-    completedDate: (formData.get("completed_date") as string | null) || null,
+    tradeCategory: rawTradeCategory,
+    completedDate,
   };
 }
 
@@ -85,7 +104,7 @@ export async function saveProjectCoverPhoto(projectId: string, url: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  if (!url.startsWith(`${STORAGE_URL_PREFIX}project-photos/${user.id}/${projectId}/`)) return { error: "Invalid URL." };
 
   const { error } = await supabase
     .from("projects")
@@ -116,7 +135,7 @@ export async function saveProjectBeforePhoto(projectId: string, url: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
-  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  if (!url.startsWith(`${STORAGE_URL_PREFIX}project-photos/${user.id}/${projectId}/`)) return { error: "Invalid URL." };
   const { error } = await supabase
     .from("projects")
     .update({ before_photo_url: url })
@@ -130,7 +149,7 @@ export async function saveProjectAfterPhoto(projectId: string, url: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
-  if (!url.startsWith("https://")) return { error: "Invalid URL." };
+  if (!url.startsWith(`${STORAGE_URL_PREFIX}project-photos/${user.id}/${projectId}/`)) return { error: "Invalid URL." };
   const { error } = await supabase
     .from("projects")
     .update({ after_photo_url: url })

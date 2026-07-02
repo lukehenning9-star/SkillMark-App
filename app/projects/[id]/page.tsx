@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, Wrench, MapPin, Calendar, Camera } from "lucide-react";
 import AppNav from "@/components/AppNav";
-import { deleteProject } from "@/app/actions/projects";
+import DeleteProjectButton from "./DeleteProjectButton";
 import type { Project, Profile } from "@/lib/types";
 
 export default async function ProjectDetailPage({
@@ -33,12 +33,6 @@ export default async function ProjectDetailPage({
 
   const isOwner = user?.id === project.profile_id;
 
-  async function handleDelete() {
-    "use server";
-    await deleteProject(id);
-    redirect("/dashboard");
-  }
-
   return (
     <>
       <AppNav />
@@ -60,14 +54,7 @@ export default async function ProjectDetailPage({
                 >
                   Edit
                 </Link>
-                <form action={handleDelete}>
-                  <button
-                    type="submit"
-                    className="text-sm font-semibold text-red-600 border border-red-200 px-3 py-1.5 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
-                  >
-                    Delete
-                  </button>
-                </form>
+                <DeleteProjectButton projectId={id} ownerUsername={profile?.username ?? null} />
               </div>
             )}
           </div>

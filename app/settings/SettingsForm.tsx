@@ -34,8 +34,15 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
+  function clearCropSrc() {
+    setCropSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }
+
   async function handleCropApply(blob: Blob) {
-    setCropSrc(null);
+    clearCropSrc();
     setAvatarUploading(true);
     setAvatarError(null);
     try {
@@ -91,18 +98,19 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
     setError(null);
     setSaved(false);
     startTransition(async () => {
-      const effectiveTrade = tradeVal.trim() || undefined;
+      // null (not undefined) so emptied fields are actually cleared —
+      // supabase-js drops undefined keys from the update payload.
       const result = await saveProfileStep({
         full_name: (fd.get("full_name") as string).trim(),
-        headline: (fd.get("headline") as string).trim() || undefined,
-        trade: effectiveTrade,
-        experience_level: (fd.get("experience_level") as Profile["experience_level"]) || undefined,
+        headline: (fd.get("headline") as string).trim() || null,
+        trade: tradeVal.trim() || null,
+        experience_level: (fd.get("experience_level") as Profile["experience_level"]) || null,
         years_experience: Number(fd.get("years_experience")) || 0,
-        city: (fd.get("city") as string).trim() || undefined,
-        state: (fd.get("state") as string) || undefined,
-        bio: bio.trim() || undefined,
+        city: (fd.get("city") as string).trim() || null,
+        state: (fd.get("state") as string) || null,
+        bio: bio.trim() || null,
         is_available: isAvailable,
-        union_status: (fd.get("union_status") as string) || undefined,
+        union_status: (fd.get("union_status") as string) || null,
       });
       if (result?.error) setError(result.error);
       else setSaved(true);
@@ -155,7 +163,10 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  setCropSrc(URL.createObjectURL(file));
+                  setCropSrc((prev) => {
+                    if (prev) URL.revokeObjectURL(prev);
+                    return URL.createObjectURL(file);
+                  });
                   if (avatarInputRef.current) avatarInputRef.current.value = "";
                 }
               }}
@@ -319,7 +330,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         <AvatarCropModal
           src={cropSrc}
           onApply={handleCropApply}
-          onCancel={() => setCropSrc(null)}
+          onCancel={clearCropSrc}
         />
       )}
     </div>

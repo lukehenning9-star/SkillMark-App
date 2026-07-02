@@ -3,9 +3,12 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  // x-real-ip is set by the platform proxy; the last x-forwarded-for hop is
+  // proxy-appended. Never trust the first XFF entry — the client controls it.
+  const xff = req.headers.get("x-forwarded-for");
   const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-    req.headers.get("x-real-ip") ??
+    req.headers.get("x-real-ip")?.trim() ??
+    xff?.split(",").map((s) => s.trim()).filter(Boolean).pop() ??
     "unknown";
 
   if (!checkRateLimit(`check-username:${ip}`, 30, 60_000)) {
@@ -14,10 +17,11 @@ export async function GET(req: NextRequest) {
 
   const username = req.nextUrl.searchParams.get("username")?.toLowerCase().trim();
 
-  if (!username || username.length < 3) {
+  // Must match the validation in app/actions/auth.ts signup().
+  if (!username || username.length < 3 || username.length > 30) {
     return NextResponse.json({ available: false });
   }
-  if (!/^[a-z0-9_]+$/.test(username)) {
+  if (!/^[a-z0-9_-]+$/.test(username)) {
     return NextResponse.json({ available: false });
   }
 

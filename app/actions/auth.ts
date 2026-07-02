@@ -8,9 +8,16 @@ import { redirect } from "next/navigation";
 type State = { error?: string; message?: string } | undefined;
 
 function getIp(): Promise<string> {
-  return headers().then((h) =>
-    h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown"
-  );
+  // x-real-ip is set by the hosting platform's proxy and can't be spoofed by
+  // the client. Fall back to the LAST x-forwarded-for hop (appended by the
+  // trusted proxy) — never the first, which the client controls.
+  return headers().then((h) => {
+    const realIp = h.get("x-real-ip");
+    if (realIp) return realIp.trim();
+    const xff = h.get("x-forwarded-for");
+    const last = xff?.split(",").map((s) => s.trim()).filter(Boolean).pop();
+    return last ?? "unknown";
+  });
 }
 
 export async function signup(state: State, formData: FormData): Promise<State> {
@@ -21,13 +28,19 @@ export async function signup(state: State, formData: FormData): Promise<State> {
 
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
-  const username = (formData.get("username") as string).toLowerCase().trim();
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirm_password") as string;
-  const rawRole = formData.get("role") as string;
+  const email = typeof formData.get("email") === "string" ? (formData.get("email") as string).trim() : "";
+  const username = typeof formData.get("username") === "string" ? (formData.get("username") as string).toLowerCase().trim() : "";
+  const password = typeof formData.get("password") === "string" ? (formData.get("password") as string) : "";
+  const confirmPassword = typeof formData.get("confirm_password") === "string" ? (formData.get("confirm_password") as string) : "";
+  const rawRole = formData.get("role");
   const role = rawRole === "worker" || rawRole === "contractor" ? rawRole : "worker";
 
+  if (!email || !email.includes("@") || email.length > 254) {
+    return { error: "Please enter a valid email address." };
+  }
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
   if (password !== confirmPassword) {
     return { error: "Passwords do not match." };
   }
@@ -66,10 +79,13 @@ export async function login(state: State, formData: FormData): Promise<State> {
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  });
+  const email = formData.get("email");
+  const password = formData.get("password");
+  if (typeof email !== "string" || typeof password !== "string" || !email || !password) {
+    return { error: "Email and password are required." };
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) return { error: error.message };
   redirect("/dashboard");

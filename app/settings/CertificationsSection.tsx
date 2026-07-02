@@ -18,6 +18,7 @@ export default function CertificationsSection({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -36,6 +37,10 @@ export default function CertificationsSection({
 
   function handleAdd() {
     if (!name.trim()) { setError("Certification name is required."); return; }
+    if (dateEarned && expiryDate && expiryDate < dateEarned) {
+      setError("Expiry date cannot be before the date earned.");
+      return;
+    }
     setError(null);
     startTransition(async () => {
       const result = await addCertification({
@@ -54,8 +59,10 @@ export default function CertificationsSection({
   }
 
   function handleDelete(certId: string) {
+    setDeletingId(certId);
     startTransition(async () => {
       await deleteCertification(certId);
+      setDeletingId(null);
       router.refresh();
     });
   }
@@ -87,10 +94,10 @@ export default function CertificationsSection({
                 <div>
                   <p className="text-sm font-semibold text-navy leading-tight">{cert.name}</p>
                   {cert.issuing_org && <p className="text-xs text-text-dim">{cert.issuing_org}</p>}
-                  {cert.date_earned && (
+                  {(cert.date_earned || cert.expiry_date) && (
                     <p className="text-xs text-text-dim">
-                      {new Date(cert.date_earned + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}
-                      {cert.expiry_date && ` – ${new Date(cert.expiry_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}`}
+                      {cert.date_earned && new Date(cert.date_earned + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                      {cert.expiry_date && `${cert.date_earned ? " – " : "Expires "}${new Date(cert.expiry_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })}`}
                     </p>
                   )}
                 </div>
@@ -98,10 +105,10 @@ export default function CertificationsSection({
               <button
                 type="button"
                 onClick={() => handleDelete(cert.id)}
-                disabled={pending}
+                disabled={deletingId === cert.id}
                 className="text-xs text-red-500 hover:text-red-700 shrink-0 cursor-pointer disabled:opacity-50"
               >
-                Remove
+                {deletingId === cert.id ? "Removing…" : "Remove"}
               </button>
             </li>
           ))}

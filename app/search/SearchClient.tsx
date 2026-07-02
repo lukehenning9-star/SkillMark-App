@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -31,7 +31,9 @@ export default function SearchClient() {
   const [results, setResults] = useState<SearchProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const searchSeq = useRef(0);
   const runSearch = useCallback(async () => {
+    const seq = ++searchSeq.current;
     setLoading(true);
     const supabase = createClient();
     let q = supabase
@@ -41,7 +43,9 @@ export default function SearchClient() {
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (query.trim()) q = q.ilike("full_name", `%${query.trim()}%`);
+    // Strip LIKE wildcards so user input can't act as a pattern.
+    const name = query.trim().replace(/[%_]/g, "");
+    if (name) q = q.ilike("full_name", `%${name}%`);
     if (trade) q = q.eq("trade", trade);
     if (level) q = q.eq("experience_level", level);
     if (state) q = q.eq("state", state);
@@ -49,6 +53,7 @@ export default function SearchClient() {
     if (availableOnly) q = q.eq("is_available", true);
 
     const { data } = await q;
+    if (seq !== searchSeq.current) return; // stale — a newer search superseded this one
     setResults((data ?? []) as SearchProfile[]);
     setLoading(false);
   }, [query, trade, level, state, unionStatus, availableOnly]);

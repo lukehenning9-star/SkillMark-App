@@ -102,6 +102,8 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const activePartnerIdRef = useRef<string | null>(initialPartner?.id ?? null);
+  const convPartnerIdsRef = useRef<Set<string>>(new Set());
+  const pendingPartnerFetch = useRef<Set<string>>(new Set());
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -207,6 +209,7 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
         setInputText(content);
         return;
       }
+      if (inputRef.current) inputRef.current.style.height = "auto";
       const newMsg = result.message as Message;
       setMessages((prev) => {
         if (prev.some((m) => m.id === newMsg.id)) return prev;
@@ -232,8 +235,16 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
   // ── Real-time subscription ──────────────────────────────────────────────
 
   useEffect(() => {
-    loadConversations();
-    if (initialPartner) loadMessages(initialPartner.id);
+    (async () => {
+      if (initialPartner) {
+        loadMessages(initialPartner.id);
+        // Opening a thread via /messages?to=... counts as reading it — mark
+        // read BEFORE loading the conversation list so the unread badge and
+        // dot reflect it.
+        await markMessagesRead(initialPartner.id);
+      }
+      loadConversations();
+    })();
 
     const channel = supabase
       .channel(`inbox-${currentUser.id}`)
@@ -248,8 +259,9 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
         async (payload: any) => {
           const msg = payload.new as Message;
           const senderId = msg.sender_id;
+          const isActive = activePartnerIdRef.current === senderId;
 
-          if (activePartnerIdRef.current === senderId) {
+          if (isActive) {
             setMessages((prev) => {
               if (prev.some((m) => m.id === msg.id)) return prev;
               return [...prev, msg];
@@ -258,10 +270,10 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
             setTimeout(scrollToBottom, 50);
           }
 
-          setConversations((prev) => {
-            const existing = prev.find((c) => c.partner.id === senderId);
-            const isActive = activePartnerIdRef.current === senderId;
-            if (existing) {
+          if (convPartnerIdsRef.current.has(senderId)) {
+            setConversations((prev) => {
+              const existing = prev.find((c) => c.partner.id === senderId);
+              if (!existing) return prev;
               return [
                 {
                   ...existing,
@@ -270,26 +282,31 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
                 },
                 ...prev.filter((c) => c.partner.id !== senderId),
               ];
-            }
-            // New sender — fetch their profile then prepend
-            supabase
+            });
+          } else if (!pendingPartnerFetch.current.has(senderId)) {
+            // New sender: fetch their profile OUTSIDE any state updater
+            // (side effects in updaters double-fire under StrictMode), with
+            // an in-flight guard and a dedupe check on insert.
+            pendingPartnerFetch.current.add(senderId);
+            const { data } = await supabase
               .from("profiles")
               .select("id, username, full_name, avatar_url, trade, experience_level")
               .eq("id", senderId)
-              .single()
-              .then(({ data }) => {
-                if (!data) return;
-                setConversations((p) => [
-                  {
-                    partner: data as Partner,
-                    lastMessage: msg,
-                    unreadCount: isActive ? 0 : 1,
-                  },
-                  ...p,
-                ]);
-              });
-            return prev;
-          });
+              .single();
+            pendingPartnerFetch.current.delete(senderId);
+            if (!data) return;
+            setConversations((p) => {
+              if (p.some((c) => c.partner.id === senderId)) return p;
+              return [
+                {
+                  partner: data as Partner,
+                  lastMessage: msg,
+                  unreadCount: activePartnerIdRef.current === senderId ? 0 : 1,
+                },
+                ...p,
+              ];
+            });
+          }
         }
       )
       .subscribe();
@@ -298,6 +315,11 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
       supabase.removeChannel(channel);
     };
   }, [currentUser.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mirror conversation partner ids into a ref for the realtime handler.
+  useEffect(() => {
+    convPartnerIdsRef.current = new Set(conversations.map((c) => c.partner.id));
+  }, [conversations]);
 
   // Keep ref in sync
   useEffect(() => {
