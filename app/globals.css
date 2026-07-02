@@ -30,3 +30,10 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
+
+/* Clear the fixed mobile bottom nav so page content isn't hidden behind it */
+@media (max-width: 639px) {
+  body:has(nav[aria-label="Primary"]) {
+    padding-bottom: 60px;
+  }
+}

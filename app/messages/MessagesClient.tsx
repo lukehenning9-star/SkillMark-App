@@ -359,7 +359,7 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
   // ── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex bg-sm-bg overflow-hidden">
+    <div className="h-[calc(100vh-3.5rem-60px)] sm:h-[calc(100vh-3.5rem)] flex bg-sm-bg overflow-hidden">
 
       {/* ── Left panel: Conversation list ────────────────────────────── */}
       <div

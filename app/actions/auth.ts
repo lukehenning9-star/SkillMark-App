@@ -96,3 +96,51 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+export async function requestPasswordReset(state: State, formData: FormData): Promise<State> {
+  const ip = await getIp();
+  if (!checkRateLimit(`pw-reset:${ip}`, 5, 60_000)) {
+    return { error: "Too many requests. Please try again in a minute." };
+  }
+
+  const email = formData.get("email");
+  if (typeof email !== "string" || !email.includes("@")) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = `${proto}://${host}`;
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: `${origin}/auth/confirm?next=/reset-password`,
+  });
+
+  // Always report success — never reveal whether an account exists.
+  return { message: "If an account exists for that email, we've sent a reset link. Check your inbox." };
+}
+
+export async function updatePassword(state: State, formData: FormData): Promise<State> {
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirm_password");
+
+  if (typeof password !== "string" || password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match." };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Your reset link has expired. Please request a new one." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+
+  redirect("/dashboard");
+}

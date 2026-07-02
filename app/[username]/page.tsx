@@ -1,8 +1,47 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import AppNav from "@/components/AppNav";
 import ProfileView from "./ProfileView";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username, full_name, headline, bio, trade, avatar_url")
+    .eq("username", username.toLowerCase())
+    .single();
+
+  if (!profile) return { title: "Profile not found" };
+
+  const name = profile.full_name || profile.username;
+  const title = `${name} (@${profile.username})`;
+  const description =
+    profile.headline ||
+    profile.bio ||
+    [name, profile.trade].filter(Boolean).join(" · ") + " on SkillMark";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(profile.avatar_url ? { images: [profile.avatar_url] } : {}),
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PublicProfilePage({
   params,

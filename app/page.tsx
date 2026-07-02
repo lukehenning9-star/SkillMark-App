@@ -328,6 +328,8 @@ export default function LandingPage() {
             <li><a href="#why">Why Trades</a></li>
             <li><a href="#how">How It Works</a></li>
             <li><a href="#signup">For Workers</a></li>
+            <li><Link href="/privacy">Privacy</Link></li>
+            <li><Link href="/terms">Terms</Link></li>
           </ul>
         </div>
       </footer>

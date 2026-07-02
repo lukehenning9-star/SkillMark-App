@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Home, User, Search, FolderPlus, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import UserMenuDropdown from "./UserMenuDropdown";
+import MobileBottomNav from "./MobileBottomNav";
 import type { Profile } from "@/lib/types";
 
 export default async function AppNav() {
@@ -88,6 +89,7 @@ export default async function AppNav() {
           />
         </div>
       </div>
+      <MobileBottomNav username={profile.username} unreadCount={msgCount} />
     </header>
   );
 }

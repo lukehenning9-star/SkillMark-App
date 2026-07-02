@@ -1,11 +1,47 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, Wrench, MapPin, Calendar, Camera } from "lucide-react";
 import AppNav from "@/components/AppNav";
 import DeleteProjectButton from "./DeleteProjectButton";
 import type { Project, Profile } from "@/lib/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: project } = await supabase
+    .from("projects")
+    .select("title, description, trade_category, cover_photo_url")
+    .eq("id", id)
+    .single();
+
+  if (!project) return { title: "Project not found" };
+
+  const description =
+    project.description?.slice(0, 160) ||
+    [project.trade_category, "on SkillMark"].filter(Boolean).join(" · ");
+
+  return {
+    title: project.title,
+    description,
+    openGraph: {
+      title: project.title,
+      description,
+      ...(project.cover_photo_url ? { images: [project.cover_photo_url] } : {}),
+    },
+    twitter: {
+      card: project.cover_photo_url ? "summary_large_image" : "summary",
+      title: project.title,
+      description,
+    },
+  };
+}
 
 export default async function ProjectDetailPage({
   params,

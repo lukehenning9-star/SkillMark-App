@@ -32,7 +32,9 @@ export default function NewProjectForm() {
       if (result && "error" in result) {
         setError(result.error ?? null);
       } else if (result && "id" in result) {
-        router.push(`/projects/${result.id}`);
+        // Land on the edit page so photos can be added immediately —
+        // photo upload needs a project id, so it can't happen pre-create.
+        router.push(`/projects/${result.id}/edit`);
       }
     });
   }
@@ -119,7 +121,7 @@ export default function NewProjectForm() {
             disabled={pending}
             className="flex-1 bg-navy text-white font-semibold text-sm py-3 rounded-md hover:bg-navy-mid transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            {pending ? "Saving…" : "Save Project →"}
+            {pending ? "Saving…" : "Save & Add Photos →"}
           </button>
         </div>
       </form>
