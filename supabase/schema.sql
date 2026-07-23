@@ -103,6 +103,27 @@ revoke execute on function increment_profile_views(uuid) from anon;
 grant execute on function increment_profile_views(uuid) to authenticated;
 
 
+-- ── SELF-SERVE ACCOUNT DELETION ───────────────────────────────
+-- Lets a signed-in user permanently delete their own account. Deleting the
+-- auth.users row cascades to profiles (on delete cascade) and from there to
+-- work_experience, projects, project_photos, certifications, messages, and
+-- notifications — removing all of the user's personal data in one shot.
+-- SECURITY DEFINER so it can touch auth.users; scoped strictly to auth.uid().
+create or replace function delete_own_account()
+returns void
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke execute on function delete_own_account() from anon;
+grant execute on function delete_own_account() to authenticated;
+
+
 -- ── AUTO-CREATE PROFILE ON SIGNUP ─────────────────────────────
 create or replace function handle_new_user()
 returns trigger

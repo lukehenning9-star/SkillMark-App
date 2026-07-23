@@ -71,6 +71,7 @@ export default async function AppNav() {
           <div className="relative">
             <Link
               href="/messages"
+              aria-label="Messages"
               className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
             >
               <MessageSquare size={18} />

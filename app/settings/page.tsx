@@ -4,6 +4,7 @@ import AppNav from "@/components/AppNav";
 import SettingsForm from "./SettingsForm";
 import CertificationsSection from "./CertificationsSection";
 import WorkExperienceSection from "./WorkExperienceSection";
+import DeleteAccountSection from "./DeleteAccountSection";
 import type { Profile, Certification, WorkExperience } from "@/lib/types";
 
 export default async function SettingsPage() {
@@ -35,6 +36,7 @@ export default async function SettingsPage() {
         <div className="max-w-2xl mx-auto px-4 pb-8 space-y-5">
           <WorkExperienceSection workExperience={(workExperience ?? []) as WorkExperience[]} />
           <CertificationsSection certifications={(certifications ?? []) as Certification[]} />
+          <DeleteAccountSection />
         </div>
       </main>
     </>

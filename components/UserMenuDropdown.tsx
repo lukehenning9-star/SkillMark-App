@@ -29,6 +29,9 @@ export default function UserMenuDropdown({ username, displayName, avatarUrl }: P
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
+        aria-label="Account menu"
+        aria-expanded={open}
+        aria-haspopup="menu"
         className="w-9 h-9 rounded-full bg-navy-mid border-2 border-border overflow-hidden flex items-center justify-center hover:border-accent transition-colors cursor-pointer"
       >
         {avatarUrl ? (

@@ -97,6 +97,36 @@ export async function logout() {
   redirect("/login");
 }
 
+export async function deleteAccount() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  // Best-effort storage cleanup (DB rows are removed by the cascade below).
+  try {
+    await supabase.storage.from("avatars").remove([`${user.id}/avatar`]);
+    await supabase.storage.from("banners").remove([`${user.id}/banner`]);
+    const { data: projectFolders } = await supabase.storage
+      .from("project-photos")
+      .list(user.id, { limit: 1000 });
+    for (const folder of projectFolders ?? []) {
+      const { data: files } = await supabase.storage
+        .from("project-photos")
+        .list(`${user.id}/${folder.name}`, { limit: 1000 });
+      const paths = (files ?? []).map((f) => `${user.id}/${folder.name}/${f.name}`);
+      if (paths.length) await supabase.storage.from("project-photos").remove(paths);
+    }
+  } catch {
+    // Non-fatal — the account deletion below still removes all personal data.
+  }
+
+  const { error } = await supabase.rpc("delete_own_account");
+  if (error) return { error: error.message };
+
+  await supabase.auth.signOut();
+  return { success: true };
+}
+
 export async function requestPasswordReset(state: State, formData: FormData): Promise<State> {
   const ip = await getIp();
   if (!checkRateLimit(`pw-reset:${ip}`, 5, 60_000)) {
