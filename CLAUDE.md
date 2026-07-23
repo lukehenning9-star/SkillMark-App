@@ -21,6 +21,39 @@ A skills portfolio network for skilled tradespeople (electricians, plumbers, HVA
 | `lukehenning9-star/SkillMark-App` | `/home/user/SkillMark-App` | Next.js app — the actual product |
 
 **Always push directly to `main`.** No PR workflow needed unless asked.
+**NOTE:** recent work has been on branch `claude/view-full-build-KcLOW` (open as PR #6), not `main`. Two Vercel projects auto-deploy from it: `skill-mark-app` and `next.js.skillmark`.
+
+---
+
+## CURRENT STATE / RECENT WORK (read this first)
+
+**Accent color is now BLUE `#1a56db`** (was teal/green `#0c6e74`). Hover `#1648c0`; dark-nav tint `#7eb3f8`; accent-light `#eff4ff`; accent-border `#93b8f8`.
+
+**Built & shipped this cycle:**
+- **Dashboard feed** (`/dashboard` + `FeedClient.tsx`) — social feed of latest 60 projects; photo carousel, skill tags, author headers. Replaced the old redirect stub.
+- **Autocomplete inputs** — `components/AutocompleteInput.tsx` (trade fields, free-text + suggestions) and `components/SkillTagInput.tsx` (custom skills allowed). `TRADES` expanded to 29 in `lib/constants.ts`.
+- **Password reset** — `/forgot-password`, `/reset-password`, `app/auth/confirm/route.ts`. Actions `requestPasswordReset`/`updatePassword` in `actions/auth.ts`.
+- **Account deletion** — `delete_own_account()` SECURITY DEFINER RPC (schema.sql), `deleteAccount` action (actions/auth.ts, cascades all PII + best-effort storage purge), `app/settings/DeleteAccountSection.tsx` ("Danger Zone", type-DELETE confirm).
+- **Work experience CRUD in Settings** (`app/settings/WorkExperienceSection.tsx`), profile-view counting via `increment_profile_views` RPC.
+- **Mobile bottom nav** (`components/MobileBottomNav.tsx`), loading skeletons, `not-found.tsx`, `robots.ts`, SEO/OpenGraph metadata + `generateMetadata` on profile/project pages.
+- **Legal pages** — app `/privacy` + `/terms`; static site `privacy.html` + `terms.html`.
+- **`middleware.ts` → `proxy.ts`** (Next 16 rename).
+
+**Security hardening (all applied; see `SECURITY_AUDIT.md` for the full 32-finding report + status table):**
+- `saveProfileStep` column-whitelisted (no raw `.update(data)`); `username`/`profile_views`/`verified_project_count` locked via DB column grants.
+- RLS: `WITH CHECK` on all UPDATE policies; `supervisor_verifications` + `notifications` INSERT locked down; storage-path-pinned image URL validation; PostgREST input sanitized in `searchUsers`.
+- Rate limiter uses trusted `x-real-ip` (not spoofable XFF) + eviction; throttles on send/search.
+- `package.json` has `overrides` pinning sharp/ws/postcss (CVE fixes; `npm audit` = 0).
+- HSTS header in `next.config.ts`.
+
+**Planning docs in repo root:** `FUTURE_PLANS.md` (strategy, 30/60/90, ops checklist), `YEAR_ONE_PLAN.md` (quarter-by-quarter playbook), `SECURITY_AUDIT.md` (audit + remediation).
+
+**⚠️ PENDING — user must do in Supabase dashboard (not code):**
+1. **Re-run `supabase/schema.sql`** in the SQL Editor — RLS policy changes + `delete_own_account`/`increment_profile_views` functions only take effect after this. Account deletion won't work until it's run.
+2. Set storage bucket limits (`image/*` MIME + file-size) on `avatars`/`banners`/`project-photos`.
+3. Add the app URL to **Auth → Redirect URLs** (password reset depends on it).
+
+**Still recommended (not built):** full WCAG/axe accessibility pass (aria-labels done, contrast/focus not audited), CSP header, cookie-consent (only when analytics added), CAN-SPAM footer (only when marketing email starts), error monitoring (Sentry) + analytics + Redis rate limiting per the plans.
 
 ---
 
