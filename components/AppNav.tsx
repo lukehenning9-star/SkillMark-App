@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, User, Search, FolderPlus, MessageSquare } from "lucide-react";
+import { Home, User, Search, FolderPlus, MessageSquare, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import UserMenuDropdown from "./UserMenuDropdown";
 import MobileBottomNav from "./MobileBottomNav";
@@ -56,6 +56,13 @@ export default async function AppNav() {
           >
             <Search size={14} />
             Search
+          </Link>
+          <Link
+            href="/connections"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+          >
+            <Users size={14} />
+            Connections
           </Link>
           <Link
             href="/projects/new"

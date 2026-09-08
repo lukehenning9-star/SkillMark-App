@@ -103,16 +103,67 @@ export default async function PublicProfilePage({
     unreadCount = count ?? 0;
   }
 
+  // Projects this person is an accepted collaborator on show on their profile too.
+  const { data: collabRows } = await supabase
+    .from("project_collaborators")
+    .select("projects(*)")
+    .eq("profile_id", profile.id)
+    .eq("status", "accepted");
+  const collabProjects = (collabRows ?? [])
+    .map((r) => (Array.isArray(r.projects) ? r.projects[0] : r.projects))
+    .filter(Boolean) as Project[];
+  const ownedProjects = (projects ?? []) as Project[];
+  const ownedIds = new Set(ownedProjects.map((p) => p.id));
+  const allProjects = [...ownedProjects, ...collabProjects.filter((p) => !ownedIds.has(p.id))].sort((a, b) =>
+    a.created_at < b.created_at ? 1 : -1
+  );
+
+  // Viewer's connection state to this profile (drives the Connect button).
+  let connectionState: "none" | "pending_out" | "pending_in" | "connected" = "none";
+  if (viewer && !isOwner) {
+    const { data: edges } = await supabase
+      .from("connections")
+      .select("requester_id, addressee_id, status")
+      .or(
+        `and(requester_id.eq.${viewer.id},addressee_id.eq.${profile.id}),` +
+        `and(requester_id.eq.${profile.id},addressee_id.eq.${viewer.id})`
+      );
+    const edge = edges?.[0];
+    if (edge) {
+      if (edge.status === "accepted") connectionState = "connected";
+      else if (edge.requester_id === viewer.id) connectionState = "pending_out";
+      else connectionState = "pending_in";
+    }
+  }
+
+  // Frequent collaborators (public "works with most" strip).
+  const { data: topRaw } = await supabase.rpc("top_collaborators", { target: profile.id, lim: 8 });
+  let topCollaborators: { id: string; username: string; full_name: string | null; avatar_url: string | null; shared_count: number }[] = [];
+  if (Array.isArray(topRaw) && topRaw.length) {
+    const ids = topRaw.map((t: { profile_id: string }) => t.profile_id);
+    const { data: tp } = await supabase.from("profiles").select("id, username, full_name, avatar_url").in("id", ids);
+    const pmap = new Map((tp ?? []).map((p) => [p.id, p]));
+    topCollaborators = topRaw
+      .map((t: { profile_id: string; shared_count: number }) => {
+        const p = pmap.get(t.profile_id);
+        return p ? { ...p, shared_count: Number(t.shared_count) } : null;
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+  }
+
   return (
     <>
       <AppNav />
       <ProfileView
         profile={profile}
-        projects={(projects ?? []) as Project[]}
+        projects={allProjects}
         workExperience={(workExperience ?? []) as WorkExperience[]}
         certifications={(certifications ?? []) as Certification[]}
         isOwner={isOwner}
         unreadCount={unreadCount}
+        connectionState={connectionState}
+        viewerId={viewer?.id ?? null}
+        topCollaborators={topCollaborators}
       />
     </>
   );

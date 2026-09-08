@@ -10,7 +10,16 @@ import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
 import AvatarCropModal from "@/components/AvatarCropModal";
 import AutocompleteInput from "@/components/AutocompleteInput";
+import ConnectButton, { type ConnectionState } from "@/components/ConnectButton";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
+
+type TopCollaboratorLite = {
+  id: string;
+  username: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  shared_count: number;
+};
 
 interface Props {
   profile: Profile;
@@ -19,6 +28,9 @@ interface Props {
   certifications: Certification[];
   isOwner: boolean;
   unreadCount: number;
+  connectionState?: ConnectionState;
+  viewerId?: string | null;
+  topCollaborators?: TopCollaboratorLite[];
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
@@ -46,6 +58,9 @@ export default function ProfileView({
   certifications,
   isOwner,
   unreadCount,
+  connectionState = "none",
+  viewerId = null,
+  topCollaborators = [],
 }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -262,12 +277,15 @@ export default function ProfileView({
                 </button>
               </>
             ) : (
-              <Link
-                href={`/messages?to=${profile.username}`}
-                className="text-sm font-semibold text-white bg-accent px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
-              >
-                Send Message
-              </Link>
+              <>
+                {viewerId && <ConnectButton targetId={profile.id} initialState={connectionState} />}
+                <Link
+                  href={`/messages?to=${profile.username}`}
+                  className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors"
+                >
+                  Send Message
+                </Link>
+              </>
             )}
           </div>
         </div>
@@ -421,6 +439,29 @@ export default function ProfileView({
 
           {/* Main column */}
           <div className="md:col-span-2 space-y-6">
+            {topCollaborators.length > 0 && (
+              <div className="bg-white border border-border rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Works with most</h2>
+                  <div className="h-px bg-border flex-1" />
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  {topCollaborators.map((c) => (
+                    <Link key={c.id} href={`/${c.username}`} className="flex flex-col items-center gap-1.5 w-16 group">
+                      <div className="w-12 h-12 rounded-full bg-navy-mid overflow-hidden flex items-center justify-center relative">
+                        {c.avatar_url ? (
+                          <Image src={c.avatar_url} alt={c.full_name || c.username} fill sizes="48px" className="object-cover" />
+                        ) : (
+                          <span className="text-sm font-bold text-white">{(c.full_name || c.username).charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-navy font-medium text-center truncate w-full group-hover:underline">{c.full_name || c.username}</span>
+                      <span className="text-[10px] text-text-dim">{c.shared_count} project{c.shared_count !== 1 ? "s" : ""}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
             {(projects.length > 0 || isOwner) && (
               <div className="bg-white border border-border rounded-xl p-5">
                 <div className="flex items-center gap-3 mb-4">

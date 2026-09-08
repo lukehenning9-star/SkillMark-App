@@ -65,3 +65,66 @@ export type Certification = {
   expiry_date: string | null
   created_at: string
 }
+
+export type ConnectionStatus = "pending" | "accepted"
+
+export type Connection = {
+  id: string
+  requester_id: string
+  addressee_id: string
+  status: ConnectionStatus
+  created_at: string
+  responded_at: string | null
+}
+
+export type CollaboratorStatus = "invited" | "requested" | "accepted"
+
+export type ProjectCollaborator = {
+  id: string
+  project_id: string
+  profile_id: string
+  status: CollaboratorStatus
+  contribution: string | null
+  invited_by: string | null
+  created_at: string
+  responded_at: string | null
+}
+
+// A collaborator row joined with the person's public profile fields, for display.
+export type CollaboratorWithProfile = ProjectCollaborator & {
+  profile: Pick<Profile, "id" | "username" | "full_name" | "avatar_url" | "trade"> | null
+}
+
+export type ProjectPhoto = {
+  id: string
+  project_id: string
+  photo_url: string
+  caption: string | null
+  display_order: number
+  uploaded_by: string | null
+  created_at: string
+}
+
+export type ProjectComment = {
+  id: string
+  project_id: string
+  profile_id: string
+  content: string
+  created_at: string
+  profile?: Pick<Profile, "username" | "full_name" | "avatar_url"> | null
+}
+
+// A ranked collaborator for the "who you work with most" tracker.
+export type TopCollaborator = {
+  profile: Pick<Profile, "id" | "username" | "full_name" | "avatar_url" | "trade">
+  shared_count: number
+}
+
+// A project as it appears in the ranked feed, with engagement + author.
+export type FeedProject = Project & {
+  author: Pick<Profile, "id" | "username" | "full_name" | "avatar_url" | "trade"> | null
+  like_count: number
+  comment_count: number
+  liked_by_me: boolean
+  from_connection: boolean
+}

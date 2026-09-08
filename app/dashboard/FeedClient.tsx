@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Heart, MessageCircle } from "lucide-react";
+import { toggleLike } from "@/app/actions/social";
 
 export type FeedProject = {
   id: string;
@@ -15,12 +17,62 @@ export type FeedProject = {
   trade_category: string | null;
   created_at: string;
   profiles: {
+    id: string;
     username: string;
     full_name: string | null;
     avatar_url: string | null;
     trade: string | null;
-  };
+  } | null;
+  like_count: number;
+  comment_count: number;
+  liked_by_me: boolean;
+  from_connection: boolean;
 };
+
+function EngagementBar({ project }: { project: FeedProject }) {
+  const [liked, setLiked] = useState(project.liked_by_me);
+  const [count, setCount] = useState(project.like_count);
+  const [, startTransition] = useTransition();
+
+  function onLike() {
+    // optimistic
+    const next = !liked;
+    setLiked(next);
+    setCount((c) => c + (next ? 1 : -1));
+    startTransition(async () => {
+      const res = await toggleLike(project.id);
+      if ("error" in res && res.error) {
+        setLiked(!next);
+        setCount((c) => c + (next ? -1 : 1));
+      } else if ("liked" in res) {
+        setLiked(Boolean(res.liked));
+      }
+    });
+  }
+
+  return (
+    <div className="flex items-center gap-5 px-4 py-2.5 border-t border-border">
+      <button
+        type="button"
+        onClick={onLike}
+        aria-label={liked ? "Unlike" : "Like"}
+        aria-pressed={liked}
+        className="inline-flex items-center gap-1.5 text-sm text-text-dim hover:text-navy transition-colors cursor-pointer"
+      >
+        <Heart size={17} className={liked ? "fill-red-500 stroke-red-500" : ""} />
+        {count > 0 && <span className={liked ? "text-navy font-medium" : ""}>{count}</span>}
+      </button>
+      <Link
+        href={`/projects/${project.id}#comments`}
+        aria-label="Comments"
+        className="inline-flex items-center gap-1.5 text-sm text-text-dim hover:text-navy transition-colors"
+      >
+        <MessageCircle size={17} />
+        {project.comment_count > 0 && <span>{project.comment_count}</span>}
+      </Link>
+    </div>
+  );
+}
 
 function timeAgo(dateStr: string) {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -104,7 +156,8 @@ function PhotoCarousel({ project }: { project: FeedProject }) {
 }
 
 function FeedCard({ project }: { project: FeedProject }) {
-  const { profiles: author } = project;
+  const author = project.profiles;
+  if (!author) return null;
   const displayName = author.full_name || author.username;
 
   return (
@@ -172,6 +225,8 @@ function FeedCard({ project }: { project: FeedProject }) {
           View full project →
         </Link>
       </div>
+
+      <EngagementBar project={project} />
     </article>
   );
 }

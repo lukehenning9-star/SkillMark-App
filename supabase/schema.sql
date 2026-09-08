@@ -427,3 +427,313 @@ create policy "Users can update own notifications"
   using (auth.uid() = profile_id) with check (auth.uid() = profile_id);
 
 create index if not exists idx_notifs_profile on notifications (profile_id, created_at desc);
+
+
+-- ══════════════════════════════════════════════════════════════
+-- COLLABORATION, CONNECTIONS, FEED (added)
+-- All state transitions go through SECURITY DEFINER RPCs with explicit
+-- auth.uid() checks — clients get SELECT only on the sensitive tables, so a
+-- direct PostgREST call can't forge a membership or self-approve a request.
+-- ══════════════════════════════════════════════════════════════
+
+
+-- ── CONNECTIONS ───────────────────────────────────────────────
+-- A directed request that doubles as a one-way follow: the requester follows
+-- the addressee while status='pending'; on 'accepted' they are mutually
+-- connected. The "connected list" = accepted rows in either direction.
+create table if not exists connections (
+  id           uuid default gen_random_uuid() primary key,
+  requester_id uuid references profiles on delete cascade not null,
+  addressee_id uuid references profiles on delete cascade not null,
+  status       text not null default 'pending' check (status in ('pending','accepted')),
+  created_at   timestamptz default now(),
+  responded_at timestamptz,
+  constraint connections_no_self check (requester_id <> addressee_id),
+  constraint connections_unique_pair unique (requester_id, addressee_id)
+);
+
+alter table connections enable row level security;
+
+-- Only the two parties can see the edge (keeps the social graph private).
+drop policy if exists "Parties can see their connections" on connections;
+create policy "Parties can see their connections"
+  on connections for select to authenticated
+  using (auth.uid() = requester_id or auth.uid() = addressee_id);
+
+-- You may only create your own outgoing request (which is also a follow).
+drop policy if exists "Users can send connection requests" on connections;
+create policy "Users can send connection requests"
+  on connections for insert to authenticated
+  with check (auth.uid() = requester_id and status = 'pending' and requester_id <> addressee_id);
+
+-- Only the addressee may accept; the column grant below limits them to the
+-- status/responded_at columns so they can't re-point the edge.
+drop policy if exists "Addressee can accept" on connections;
+create policy "Addressee can accept"
+  on connections for update to authenticated
+  using (auth.uid() = addressee_id) with check (auth.uid() = addressee_id);
+
+-- Either party can remove the edge (withdraw / decline / disconnect).
+drop policy if exists "Either party can remove connection" on connections;
+create policy "Either party can remove connection"
+  on connections for delete to authenticated
+  using (auth.uid() = requester_id or auth.uid() = addressee_id);
+
+revoke update on table connections from anon, authenticated;
+grant update (status, responded_at) on connections to authenticated;
+
+create index if not exists idx_conn_requester on connections (requester_id, status);
+create index if not exists idx_conn_addressee on connections (addressee_id, status);
+
+
+-- ── PROJECT COLLABORATORS ─────────────────────────────────────
+-- The project owner is projects.profile_id. This table holds *additional*
+-- contributors. status: 'invited' (owner invited, awaiting invitee),
+-- 'requested' (user asked to join, awaiting owner), 'accepted' (active).
+-- Each collaborator writes their own `contribution` blurb, shown on THEIR
+-- profile for this project.
+create table if not exists project_collaborators (
+  id           uuid default gen_random_uuid() primary key,
+  project_id   uuid references projects on delete cascade not null,
+  profile_id   uuid references profiles on delete cascade not null,
+  status       text not null default 'invited' check (status in ('invited','requested','accepted')),
+  contribution text check (contribution is null or char_length(contribution) <= 2000),
+  invited_by   uuid references profiles on delete set null,
+  created_at   timestamptz default now(),
+  responded_at timestamptz,
+  constraint pc_unique unique (project_id, profile_id)
+);
+
+alter table project_collaborators enable row level security;
+
+-- Accepted collaborators are public (co-contributors show on public profiles);
+-- pending invites/requests are visible only to the owner and the invitee.
+drop policy if exists "Collaborators visibility" on project_collaborators;
+create policy "Collaborators visibility"
+  on project_collaborators for select using (
+    status = 'accepted'
+    or auth.uid() = profile_id
+    or auth.uid() = (select profile_id from projects where id = project_id)
+  );
+
+-- No direct client writes: every insert/transition/delete goes through the
+-- SECURITY DEFINER RPCs below (revoke leaves only the SELECT policy in force).
+revoke insert, update, delete on table project_collaborators from anon, authenticated;
+
+create index if not exists idx_pc_project on project_collaborators (project_id, status);
+create index if not exists idx_pc_profile on project_collaborators (profile_id, status);
+
+-- helper: is `a` connected (accepted, either direction) to `b`?
+create or replace function are_connected(a uuid, b uuid)
+returns boolean language sql stable security definer set search_path = public, pg_temp as $$
+  select exists (
+    select 1 from connections
+    where status = 'accepted'
+      and ((requester_id = a and addressee_id = b)
+        or (requester_id = b and addressee_id = a))
+  );
+$$;
+
+-- Owner invites a connection to their project.
+create or replace function invite_collaborator(p_project uuid, p_profile uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid;
+begin
+  select profile_id into v_owner from projects where id = p_project;
+  if v_owner is null then raise exception 'Project not found'; end if;
+  if v_owner <> auth.uid() then raise exception 'Only the owner can invite'; end if;
+  if p_profile = v_owner then raise exception 'Owner is already on the project'; end if;
+  if not are_connected(auth.uid(), p_profile) then raise exception 'You can only invite your connections'; end if;
+  insert into project_collaborators (project_id, profile_id, status, invited_by)
+    values (p_project, p_profile, 'invited', auth.uid())
+    on conflict (project_id, profile_id) do nothing;
+end; $$;
+
+-- A connection of the owner asks to join.
+create or replace function request_to_join(p_project uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid;
+begin
+  select profile_id into v_owner from projects where id = p_project;
+  if v_owner is null then raise exception 'Project not found'; end if;
+  if v_owner = auth.uid() then raise exception 'You own this project'; end if;
+  if not are_connected(auth.uid(), v_owner) then raise exception 'Connect with the owner first'; end if;
+  insert into project_collaborators (project_id, profile_id, status, invited_by)
+    values (p_project, auth.uid(), 'requested', auth.uid())
+    on conflict (project_id, profile_id) do nothing;
+end; $$;
+
+-- Invitee accepts/declines an invite.
+create or replace function respond_to_invite(p_collab uuid, p_accept boolean)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_profile uuid; v_status text;
+begin
+  select profile_id, status into v_profile, v_status from project_collaborators where id = p_collab;
+  if v_profile is null then raise exception 'Invite not found'; end if;
+  if v_profile <> auth.uid() then raise exception 'Not your invite'; end if;
+  if v_status <> 'invited' then raise exception 'Invite is no longer pending'; end if;
+  if p_accept then
+    update project_collaborators set status = 'accepted', responded_at = now() where id = p_collab;
+  else
+    delete from project_collaborators where id = p_collab;
+  end if;
+end; $$;
+
+-- Owner approves/denies a join request.
+create or replace function respond_to_join_request(p_collab uuid, p_accept boolean)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid; v_status text;
+begin
+  select p.profile_id, pc.status into v_owner, v_status
+    from project_collaborators pc join projects p on p.id = pc.project_id
+    where pc.id = p_collab;
+  if v_owner is null then raise exception 'Request not found'; end if;
+  if v_owner <> auth.uid() then raise exception 'Only the owner can respond'; end if;
+  if v_status <> 'requested' then raise exception 'Request is no longer pending'; end if;
+  if p_accept then
+    update project_collaborators set status = 'accepted', responded_at = now() where id = p_collab;
+  else
+    delete from project_collaborators where id = p_collab;
+  end if;
+end; $$;
+
+-- A collaborator edits their own contribution blurb.
+create or replace function update_my_contribution(p_collab uuid, p_text text)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_profile uuid; v_status text;
+begin
+  select profile_id, status into v_profile, v_status from project_collaborators where id = p_collab;
+  if v_profile is null or v_profile <> auth.uid() then raise exception 'Not your collaboration'; end if;
+  if v_status <> 'accepted' then raise exception 'Not an active collaborator'; end if;
+  if p_text is not null and char_length(p_text) > 2000 then raise exception 'Contribution too long'; end if;
+  update project_collaborators set contribution = nullif(btrim(p_text), '') where id = p_collab;
+end; $$;
+
+-- Owner removes a collaborator, or a collaborator leaves.
+create or replace function remove_collaborator(p_collab uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid; v_profile uuid;
+begin
+  select p.profile_id, pc.profile_id into v_owner, v_profile
+    from project_collaborators pc join projects p on p.id = pc.project_id
+    where pc.id = p_collab;
+  if v_owner is null then raise exception 'Not found'; end if;
+  if auth.uid() <> v_owner and auth.uid() <> v_profile then raise exception 'Not allowed'; end if;
+  delete from project_collaborators where id = p_collab;
+end; $$;
+
+revoke execute on function invite_collaborator(uuid,uuid), request_to_join(uuid),
+  respond_to_invite(uuid,boolean), respond_to_join_request(uuid,boolean),
+  update_my_contribution(uuid,text), remove_collaborator(uuid), are_connected(uuid,uuid) from anon;
+grant execute on function invite_collaborator(uuid,uuid), request_to_join(uuid),
+  respond_to_invite(uuid,boolean), respond_to_join_request(uuid,boolean),
+  update_my_contribution(uuid,text), remove_collaborator(uuid), are_connected(uuid,uuid) to authenticated;
+
+
+-- ── PROJECT PHOTOS: collaborator uploads ──────────────────────
+alter table project_photos add column if not exists uploaded_by uuid references profiles on delete set null;
+
+-- Owner OR an accepted collaborator may add photos; the row must be attributed
+-- to the uploader. (Owner-only delete stays below — collaborators can only add.)
+drop policy if exists "Users can insert own project photos" on project_photos;
+drop policy if exists "Owner or collaborator can add photos" on project_photos;
+create policy "Owner or collaborator can add photos"
+  on project_photos for insert to authenticated with check (
+    uploaded_by = auth.uid()
+    and (
+      auth.uid() = (select profile_id from projects where id = project_id)
+      or exists (
+        select 1 from project_collaborators pc
+        where pc.project_id = project_photos.project_id
+          and pc.profile_id = auth.uid() and pc.status = 'accepted'
+      )
+    )
+  );
+
+-- Only the project owner can delete photos (nobody else — collaborators add only).
+drop policy if exists "Users can delete own project photos" on project_photos;
+drop policy if exists "Only owner can delete photos" on project_photos;
+create policy "Only owner can delete photos"
+  on project_photos for delete to authenticated using (
+    auth.uid() = (select profile_id from projects where id = project_id)
+  );
+
+create index if not exists idx_projphotos_uploader on project_photos (uploaded_by);
+
+
+-- ── PROJECT LIKES ─────────────────────────────────────────────
+create table if not exists project_likes (
+  project_id uuid references projects on delete cascade not null,
+  profile_id uuid references profiles on delete cascade not null,
+  created_at timestamptz default now(),
+  primary key (project_id, profile_id)
+);
+
+alter table project_likes enable row level security;
+
+drop policy if exists "Likes are publicly readable" on project_likes;
+create policy "Likes are publicly readable" on project_likes for select using (true);
+drop policy if exists "Users can like" on project_likes;
+create policy "Users can like" on project_likes for insert to authenticated
+  with check (auth.uid() = profile_id);
+drop policy if exists "Users can unlike" on project_likes;
+create policy "Users can unlike" on project_likes for delete to authenticated
+  using (auth.uid() = profile_id);
+
+create index if not exists idx_likes_project on project_likes (project_id);
+
+
+-- ── PROJECT COMMENTS ──────────────────────────────────────────
+create table if not exists project_comments (
+  id         uuid default gen_random_uuid() primary key,
+  project_id uuid references projects on delete cascade not null,
+  profile_id uuid references profiles on delete cascade not null,
+  content    text not null check (char_length(content) between 1 and 2000),
+  created_at timestamptz default now()
+);
+
+alter table project_comments enable row level security;
+
+drop policy if exists "Comments are publicly readable" on project_comments;
+create policy "Comments are publicly readable" on project_comments for select using (true);
+drop policy if exists "Users can comment" on project_comments;
+create policy "Users can comment" on project_comments for insert to authenticated
+  with check (auth.uid() = profile_id);
+-- A comment can be removed by its author OR by the project owner (moderation).
+drop policy if exists "Author or project owner can delete comment" on project_comments;
+create policy "Author or project owner can delete comment"
+  on project_comments for delete to authenticated using (
+    auth.uid() = profile_id
+    or auth.uid() = (select profile_id from projects where id = project_id)
+  );
+
+create index if not exists idx_comments_project on project_comments (project_id, created_at desc);
+
+
+-- ── TRACKER: who you work with most ───────────────────────────
+-- For `target`, everyone who shares a project (owned or accepted-collab) with
+-- them, ranked by distinct shared projects. All inputs are public.
+create or replace function top_collaborators(target uuid, lim int default 20)
+returns table (profile_id uuid, shared_count bigint)
+language sql stable security definer set search_path = public, pg_temp as $$
+  with my_projects as (
+    select id from projects where profile_id = target
+    union
+    select project_id from project_collaborators where profile_id = target and status = 'accepted'
+  ),
+  participants as (
+    select p.profile_id as pid, p.id as proj
+      from projects p join my_projects mp on p.id = mp.id
+    union all
+    select pc.profile_id as pid, pc.project_id as proj
+      from project_collaborators pc join my_projects mp on pc.project_id = mp.id
+      where pc.status = 'accepted'
+  )
+  select pid as profile_id, count(distinct proj) as shared_count
+  from participants
+  where pid <> target
+  group by pid
+  order by shared_count desc, pid
+  limit lim;
+$$;
+grant execute on function top_collaborators(uuid, int) to anon, authenticated;
