@@ -6,7 +6,7 @@
   --navy: #0f1f3d;
   --navy-mid: #1a3260;
   --navy-light: #2a4a8a;
-  --accent: #1d4ed8;
+  --accent: #1e40af;
   --accent-light: #eff4ff;
   --accent-border: #bfcfff;
   --text: #0f1f3d;
@@ -75,7 +75,7 @@
 }
 .lp-hero::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(29,78,216,0.045) 0%, transparent 65%);
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(30,64,175,0.045) 0%, transparent 65%);
   pointer-events: none;
 }
 .lp-hero-eyebrow {
@@ -147,7 +147,7 @@
 .lp-why-card p strong { color: #93c5fd; font-weight: 600; }
 .lp-why-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 760px; margin: 0 auto; }
 .lp-why-compare-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--r); padding: 28px 24px; }
-.lp-why-compare-card.highlight { background: rgba(29,78,216,0.2); border-color: rgba(29,78,216,0.4); }
+.lp-why-compare-card.highlight { background: rgba(30,64,175,0.2); border-color: rgba(30,64,175,0.4); }
 .lp-why-compare-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 8px; }
 .lp-why-compare-card.highlight .lp-why-compare-label { color: #93c5fd; }
 .lp-why-compare-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
@@ -190,7 +190,7 @@
 .lp-signup-btn { display: block; width: 100%; text-align: center; padding: 13px 20px; font-size: 15px; font-weight: 600; border-radius: var(--r-sm); font-family: var(--font-jakarta, sans-serif); cursor: pointer; transition: all 0.18s; text-decoration: none; }
 .lp-signup-btn:active { transform: scale(0.97) !important; }
 .lp-signup-btn.worker { background: var(--accent); color: white; }
-.lp-signup-btn.worker:hover { background: #1a42c8; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.lp-signup-btn.worker:hover { background: #1e3a8a; transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .lp-signup-btn.contractor { background: var(--green); color: white; }
 .lp-signup-btn.contractor:hover { background: #047857; transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .lp-signup-note { font-size: 11px; color: var(--text-dimmer); text-align: center; }
@@ -204,7 +204,7 @@
 .lp-waitlist-box p { font-size: 14px; color: var(--text-dim); margin-bottom: 22px; font-weight: 300; line-height: 1.65; }
 .lp-waitlist-row { display: flex; gap: 8px; }
 .lp-waitlist-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 13px; color: var(--text); font-family: var(--font-jakarta, sans-serif); font-size: 14px; outline: none; transition: all 0.18s; }
-.lp-waitlist-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(29,78,216,0.08); }
+.lp-waitlist-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(30,64,175,0.08); }
 .lp-waitlist-input::placeholder { color: var(--text-dimmer); }
 .lp-waitlist-input.error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
 .lp-waitlist-btn { background: var(--navy); color: white; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: var(--r-sm); border: none; cursor: pointer; font-family: var(--font-jakarta, sans-serif); transition: all 0.18s; white-space: nowrap; flex-shrink: 0; }
@@ -319,8 +319,6 @@
   .lp-footer-links { gap: 14px; flex-wrap: wrap; }
   .lp-footer-links a { font-size: 12px; }
   .lp-toast { bottom: 16px; right: 12px; left: 12px; max-width: 100%; font-size: 13px; }
-  /* reveal: just show instantly on mobile — less jarring */
-  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
 @media (max-width: 380px) {

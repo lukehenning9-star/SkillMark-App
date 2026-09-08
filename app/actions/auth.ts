@@ -138,10 +138,23 @@ export async function requestPasswordReset(state: State, formData: FormData): Pr
     return { error: "Please enter a valid email address." };
   }
 
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const origin = `${proto}://${host}`;
+  // Build the reset-link origin from a trusted, server-configured value — never
+  // from the request Host / X-Forwarded-Host headers, which the client controls
+  // and could forge to point the reset link (and its token) at an attacker
+  // domain (host-header / reset poisoning). Set NEXT_PUBLIC_SITE_URL to the
+  // canonical app URL in the environment. The request-header path remains only
+  // as a last-resort fallback when the env var is unset (e.g. local dev);
+  // Supabase's Redirect-URL allowlist is the backstop in that case.
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
+  let origin: string;
+  if (configuredUrl) {
+    origin = configuredUrl;
+  } else {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    const proto = h.get("x-forwarded-proto") ?? "https";
+    origin = `${proto}://${host}`;
+  }
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email.trim(), {

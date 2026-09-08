@@ -27,7 +27,7 @@ A skills portfolio network for skilled tradespeople (electricians, plumbers, HVA
 
 ## CURRENT STATE / RECENT WORK (read this first)
 
-**Accent color is now BLUE `#1a56db`** (was teal/green `#0c6e74`). Hover `#1648c0`; dark-nav tint `#7eb3f8`; accent-light `#eff4ff`; accent-border `#93b8f8`.
+**Accent color is now DEEP BLUE `#1e40af`** (was `#1a56db`, earlier teal/green `#0c6e74`). Hover `#1e3a8a`; dark-nav tint `#7eb3f8`; accent-light `#eff4ff`; accent-border `#93a9e8`.
 
 **Built & shipped this cycle:**
 - **Dashboard feed** (`/dashboard` + `FeedClient.tsx`) — social feed of latest 60 projects; photo carousel, skill tags, author headers. Replaced the old redirect stub.
@@ -71,7 +71,7 @@ Used in `app/page.tsx` and in `/home/user/SkillMark/index.html`. Must stay exact
 ```css
 --color-navy: #0f1f3d
 --color-navy-mid: #1a3260
---color-accent: #1a56db        /* main blue */
+--color-accent: #1e40af        /* main blue */
 --color-sm-bg: #f5f4f1         /* page background */
 --color-border: #e4e2de
 --color-border2: #d0cec9
@@ -82,10 +82,10 @@ Use as Tailwind classes: `bg-accent`, `text-navy`, `border-border`, etc.
 
 ### Landing page — custom CSS (`landing.css`)
 ```css
---accent: #1a56db;  --accent-light: #eff4ff;  --accent-border: #93b8f8;
+--accent: #1e40af;  --accent-light: #eff4ff;  --accent-border: #93a9e8;
 --navy: #0f1f3d;    --navy-light: #2a4a8a;
 ```
-Hover: `#1648c0`. On dark navy backgrounds use `#7eb3f8` for tinted text/icons.
+Hover: `#1e3a8a`. On dark navy backgrounds use `#7eb3f8` for tinted text/icons.
 
 ---
 

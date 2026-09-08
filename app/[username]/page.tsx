@@ -86,8 +86,11 @@ export default async function PublicProfilePage({
   const isOwner = viewer?.id === profile.id;
 
   if (viewer && !isOwner) {
-    // Fire-and-forget; never block the page render on the counter.
-    void supabase.rpc("increment_profile_views", { target_profile_id: profile.id });
+    // Must be awaited: the supabase query builder is a lazy thenable — it only
+    // issues the HTTP request when awaited/`.then()`'d. A bare `void` never
+    // fires it, so the counter would never increment. It's a single cheap
+    // UPDATE, so awaiting it adds negligible latency to the render.
+    await supabase.rpc("increment_profile_views", { target_profile_id: profile.id });
   }
 
   let unreadCount = 0;

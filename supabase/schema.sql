@@ -31,13 +31,16 @@ create table if not exists profiles (
 
 alter table profiles enable row level security;
 
--- Username format: 3-30 chars from signup, or the 36-char uuid fallback set
--- by the signup trigger. Blocks oversized / malformed values written by any
--- other path.
-do $$ begin
-  alter table profiles add constraint profiles_username_format
-    check (char_length(username) between 3 and 36 and username ~ '^[a-z0-9_-]+$');
-exception when duplicate_object then null; end $$;
+-- Username format: 3-30 chars from signup, or the 37-char 'user-'+32hex
+-- fallback the signup trigger assigns on a username collision. The upper bound
+-- MUST cover that fallback (len('user-') + 32 = 37) — a tighter cap makes the
+-- fallback insert raise check_violation, which the trigger's unique_violation
+-- handler doesn't catch, aborting the whole signup. Bound at 41 for headroom.
+-- Drop-then-add (not a duplicate_object guard) so re-running actually widens an
+-- existing 36-char constraint instead of silently skipping it.
+alter table profiles drop constraint if exists profiles_username_format;
+alter table profiles add constraint profiles_username_format
+  check (char_length(username) between 3 and 41 and username ~ '^[a-z0-9_-]+$');
 
 do $$ begin
   alter table profiles add constraint profiles_full_name_len check (char_length(full_name) <= 100);
