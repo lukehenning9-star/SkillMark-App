@@ -112,29 +112,65 @@ export default async function DashboardPage() {
     <>
       <AppNav />
       <main className="min-h-screen bg-sm-bg">
-        <div className="max-w-[470px] mx-auto px-4 py-6">
-          {topCollaborators.length > 0 && (
-            <div className="bg-white border border-border rounded-xl p-4 mb-4">
-              <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">You work with most</p>
-              <div className="flex gap-4 overflow-x-auto">
-                {topCollaborators.map((c) => (
-                  <Link key={c.id} href={`/${c.username}`} className="flex flex-col items-center gap-1.5 w-14 shrink-0 group">
-                    <div className="w-11 h-11 rounded-full bg-navy-mid overflow-hidden flex items-center justify-center relative">
-                      {c.avatar_url ? (
-                        <Image src={c.avatar_url} alt={c.full_name || c.username} fill sizes="44px" className="object-cover" />
-                      ) : (
-                        <span className="text-sm font-bold text-white">{(c.full_name || c.username).charAt(0).toUpperCase()}</span>
-                      )}
-                    </div>
-                    <span className="text-[10px] text-navy font-medium text-center truncate w-full group-hover:underline">{c.full_name || c.username}</span>
-                    <span className="text-[9px] text-text-dim">{c.shared_count}×</span>
-                  </Link>
-                ))}
+        <div className="max-w-5xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8 lg:items-start">
+          {/* Feed column */}
+          <div className="w-full max-w-[560px] mx-auto lg:mx-0 lg:max-w-none">
+            {/* Mobile-only horizontal collaborators strip (sidebar covers desktop) */}
+            {topCollaborators.length > 0 && (
+              <div className="lg:hidden bg-white border border-border rounded-xl p-4 mb-4">
+                <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">You work with most</p>
+                <div className="flex gap-4 overflow-x-auto">
+                  {topCollaborators.map((c) => (
+                    <Link key={c.id} href={`/${c.username}`} className="flex flex-col items-center gap-1.5 w-14 shrink-0 group">
+                      <div className="w-11 h-11 rounded-full bg-navy-mid overflow-hidden flex items-center justify-center relative">
+                        {c.avatar_url ? (
+                          <Image src={c.avatar_url} alt={c.full_name || c.username} fill sizes="44px" className="object-cover" />
+                        ) : (
+                          <span className="text-sm font-bold text-white">{(c.full_name || c.username).charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-navy font-medium text-center truncate w-full group-hover:underline">{c.full_name || c.username}</span>
+                      <span className="text-[9px] text-text-dim">{c.shared_count}×</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            <h1 className="font-serif text-xl font-bold text-navy mb-4">Your Feed</h1>
+            <FeedClient projects={projects} />
+          </div>
+
+          {/* Desktop sidebar */}
+          <aside className="hidden lg:block space-y-4 lg:sticky lg:top-20">
+            {topCollaborators.length > 0 && (
+              <div className="bg-white border border-border rounded-xl p-4">
+                <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">You work with most</p>
+                <div className="space-y-2.5">
+                  {topCollaborators.map((c) => (
+                    <Link key={c.id} href={`/${c.username}`} className="flex items-center gap-2.5 group">
+                      <div className="w-9 h-9 rounded-full bg-navy-mid overflow-hidden flex items-center justify-center relative shrink-0">
+                        {c.avatar_url ? (
+                          <Image src={c.avatar_url} alt={c.full_name || c.username} fill sizes="36px" className="object-cover" />
+                        ) : (
+                          <span className="text-xs font-bold text-white">{(c.full_name || c.username).charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <span className="text-sm text-navy font-medium truncate flex-1 min-w-0 group-hover:underline">{c.full_name || c.username}</span>
+                      <span className="text-xs text-text-dim shrink-0">{c.shared_count}×</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="bg-white border border-border rounded-xl p-4">
+              <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">Grow your network</p>
+              <div className="space-y-1">
+                <Link href="/search" className="block text-sm text-navy hover:text-accent py-1.5">Find people to connect with →</Link>
+                <Link href="/connections" className="block text-sm text-navy hover:text-accent py-1.5">Manage connections →</Link>
+                <Link href="/projects/new" className="block text-sm text-navy hover:text-accent py-1.5">Add a project →</Link>
               </div>
             </div>
-          )}
-          <h1 className="font-serif text-xl font-bold text-navy mb-4">Your Feed</h1>
-          <FeedClient projects={projects} />
+          </aside>
         </div>
       </main>
     </>

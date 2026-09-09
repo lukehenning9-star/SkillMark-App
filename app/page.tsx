@@ -330,6 +330,7 @@ export default function LandingPage() {
             <li><a href="#signup">For Workers</a></li>
             <li><Link href="/privacy">Privacy</Link></li>
             <li><Link href="/terms">Terms</Link></li>
+            <li><Link href="/accessibility">Accessibility</Link></li>
           </ul>
         </div>
       </footer>
