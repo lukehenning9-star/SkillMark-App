@@ -128,3 +128,35 @@ export type FeedProject = Project & {
   liked_by_me: boolean
   from_connection: boolean
 }
+
+export type Subscription = {
+  profile_id: string
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  status: string | null
+  price_id: string | null
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  updated_at: string
+}
+
+export type ReferralStatus = "pending" | "rewarded" | "pending_review" | "rejected"
+
+export type Referral = {
+  id: string
+  referrer_id: string
+  referred_id: string
+  code_used: string | null
+  status: ReferralStatus
+  created_at: string
+  activated_at: string | null
+  rewarded_at: string | null
+}
+
+export type ReferralStats = {
+  code: string
+  pending: number
+  rewarded: number
+  review: number
+  monthsEarned: number
+}

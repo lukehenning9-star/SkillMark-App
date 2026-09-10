@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { isPremium, LIMITS } from "@/lib/premium";
 
 const STORAGE_URL_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/`;
 
@@ -55,6 +56,18 @@ export async function createProject(formData: FormData) {
 
   const fields = validateProjectFields(formData);
   if ("error" in fields) return fields;
+
+  // Free accounts are capped on project count; premium removes the cap.
+  const premium = await isPremium(supabase, user.id);
+  if (!premium) {
+    const { count } = await supabase
+      .from("projects")
+      .select("*", { count: "exact", head: true })
+      .eq("profile_id", user.id);
+    if ((count ?? 0) >= LIMITS.free.projects) {
+      return { error: `Free accounts can have up to ${LIMITS.free.projects} projects. Upgrade to premium for more.` };
+    }
+  }
 
   const { data, error } = await supabase
     .from("projects")
@@ -113,6 +126,9 @@ export async function saveProjectCoverPhoto(projectId: string, url: string) {
     .eq("profile_id", user.id);
 
   if (error) return { error: error.message };
+  // The uploader now has a project with a photo — they may have just become
+  // "active" for a referral reward. No-ops if not applicable.
+  await supabase.rpc("maybe_grant_referral_reward");
   return { success: true };
 }
 

@@ -8,6 +8,18 @@ export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const res = NextResponse.next();
 
+  // Capture a referral code from ?ref=CODE into a cookie; it's claimed once the
+  // referred person is authenticated (see claimReferral).
+  const ref = req.nextUrl.searchParams.get("ref");
+  if (ref && /^[a-z0-9]{4,20}$/i.test(ref)) {
+    res.cookies.set("sm_ref", ref.toLowerCase(), {
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+      sameSite: "lax",
+      httpOnly: true,
+    });
+  }
+
   const isProtected = protectedRoutes.some((r) => path.startsWith(r));
   const isAuthRoute = authRoutes.includes(path);
 

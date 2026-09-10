@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { isPremium, LIMITS } from "@/lib/premium";
 
 const STORAGE_URL_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/`;
 
@@ -15,6 +16,20 @@ export async function addGalleryPhoto(projectId: string, url: string, caption?: 
 
   const expected = `${STORAGE_URL_PREFIX}project-photos/${user.id}/${projectId}/gallery/`;
   if (!url.startsWith(expected)) return { error: "Invalid photo URL." };
+
+  // Gallery size is capped by the project owner's plan; premium raises it.
+  const { data: proj } = await supabase.from("projects").select("profile_id").eq("id", projectId).single();
+  if (!proj) return { error: "Project not found." };
+  const ownerPremium = await isPremium(supabase, proj.profile_id);
+  if (!ownerPremium) {
+    const { count } = await supabase
+      .from("project_photos")
+      .select("*", { count: "exact", head: true })
+      .eq("project_id", projectId);
+    if ((count ?? 0) >= LIMITS.free.galleryPhotos) {
+      return { error: `This project reached the ${LIMITS.free.galleryPhotos}-photo limit. The owner can upgrade for more.` };
+    }
+  }
 
   const trimmedCaption = caption?.trim().slice(0, 200) || null;
 

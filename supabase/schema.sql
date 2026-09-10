@@ -737,3 +737,170 @@ language sql stable security definer set search_path = public, pg_temp as $$
   limit lim;
 $$;
 grant execute on function top_collaborators(uuid, int) to anon, authenticated;
+
+
+-- ══════════════════════════════════════════════════════════════
+-- PREMIUM (billing) + REFERRALS (added)
+-- Entitlement = an active Stripe subscription OR a comped premium_until in the
+-- future. Referral rewards grant comped months via premium_until, so they work
+-- with no Stripe configured. Stripe subscription rows are written only by the
+-- webhook (service role, bypasses RLS); clients get SELECT.
+-- ══════════════════════════════════════════════════════════════
+
+-- Premium fields on profiles. Neither is in the client UPDATE grant above, so
+-- users cannot set their own premium/comped state — only the definer RPCs and
+-- the webhook (service role) can.
+alter table profiles add column if not exists premium_until timestamptz;
+alter table profiles add column if not exists referral_code text;
+create unique index if not exists idx_profiles_referral_code on profiles (referral_code);
+
+
+-- ── SUBSCRIPTIONS (Stripe-managed) ────────────────────────────
+create table if not exists subscriptions (
+  profile_id            uuid references profiles on delete cascade primary key,
+  stripe_customer_id    text,
+  stripe_subscription_id text,
+  status                text,           -- active, trialing, past_due, canceled, ...
+  price_id              text,
+  current_period_end    timestamptz,
+  cancel_at_period_end  bool default false,
+  updated_at            timestamptz default now()
+);
+
+alter table subscriptions enable row level security;
+
+drop policy if exists "Users can see own subscription" on subscriptions;
+create policy "Users can see own subscription"
+  on subscriptions for select to authenticated using (auth.uid() = profile_id);
+
+-- No client writes: the Stripe webhook upserts these with the service role.
+revoke insert, update, delete on table subscriptions from anon, authenticated;
+
+create index if not exists idx_subs_customer on subscriptions (stripe_customer_id);
+
+
+-- ── PREMIUM ENTITLEMENT CHECK ─────────────────────────────────
+-- True if the user has a live Stripe subscription OR a comped month that hasn't
+-- expired. Definer so it can read subscriptions regardless of the caller.
+create or replace function is_premium(p_profile uuid)
+returns boolean language sql stable security definer set search_path = public, pg_temp as $$
+  select
+    coalesce((select premium_until from profiles where id = p_profile), 'epoch'::timestamptz) > now()
+    or exists (
+      select 1 from subscriptions s
+      where s.profile_id = p_profile
+        and s.status in ('active', 'trialing')
+        and coalesce(s.current_period_end, 'epoch'::timestamptz) > now()
+    );
+$$;
+grant execute on function is_premium(uuid) to anon, authenticated;
+
+
+-- ── REFERRALS ─────────────────────────────────────────────────
+create table if not exists referrals (
+  id           uuid default gen_random_uuid() primary key,
+  referrer_id  uuid references profiles on delete cascade not null,
+  referred_id  uuid references profiles on delete cascade not null unique, -- one reward per referred person
+  code_used    text,
+  status       text not null default 'pending'
+                 check (status in ('pending', 'rewarded', 'pending_review', 'rejected')),
+  created_at   timestamptz default now(),
+  activated_at timestamptz,
+  rewarded_at  timestamptz,
+  constraint referrals_no_self check (referrer_id <> referred_id)
+);
+
+alter table referrals enable row level security;
+
+-- Both parties can see referral rows involving them; no client writes (RPCs only).
+drop policy if exists "See own referrals" on referrals;
+create policy "See own referrals"
+  on referrals for select to authenticated
+  using (auth.uid() = referrer_id or auth.uid() = referred_id);
+
+revoke insert, update, delete on table referrals from anon, authenticated;
+
+create index if not exists idx_referrals_referrer on referrals (referrer_id, status);
+
+-- Get (or lazily create) the calling user's referral code.
+create or replace function get_or_create_my_referral_code()
+returns text language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_code text; v_existing text;
+begin
+  if auth.uid() is null then raise exception 'Not authenticated'; end if;
+  select referral_code into v_existing from profiles where id = auth.uid();
+  if v_existing is not null then return v_existing; end if;
+  -- generate a short unique code, retry on collision
+  for i in 1..10 loop
+    v_code := lower(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
+    begin
+      update profiles set referral_code = v_code where id = auth.uid();
+      return v_code;
+    exception when unique_violation then
+      -- try again
+    end;
+  end loop;
+  raise exception 'Could not generate referral code';
+end; $$;
+
+-- Record that the calling (newly signed-up) user was referred via a code.
+-- No-ops safely if the code is invalid, self-referral, or a row already exists.
+create or replace function record_referral(p_code text)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_referrer uuid;
+begin
+  if auth.uid() is null or p_code is null then return; end if;
+  select id into v_referrer from profiles where referral_code = lower(btrim(p_code));
+  if v_referrer is null or v_referrer = auth.uid() then return; end if;
+  insert into referrals (referrer_id, referred_id, code_used, status)
+    values (v_referrer, auth.uid(), lower(btrim(p_code)), 'pending')
+  on conflict (referred_id) do nothing;
+end; $$;
+
+-- Extend a profile's comped premium by one month from whichever is later.
+create or replace function grant_free_month(p_profile uuid)
+returns void language sql security definer set search_path = public, pg_temp as $$
+  update profiles
+     set premium_until = greatest(coalesce(premium_until, now()), now()) + interval '1 month'
+   where id = p_profile;
+$$;
+
+-- Called after the referred user does something meaningful. If they now meet the
+-- "active" bar and a pending referral exists, grant the referrer a free month —
+-- unless the referrer already hit the monthly cap, in which case flag for review.
+create or replace function maybe_grant_referral_reward()
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_ref referrals%rowtype; v_active boolean; v_recent int; v_cap int := 5;
+begin
+  if auth.uid() is null then return; end if;
+  select * into v_ref from referrals where referred_id = auth.uid() and status = 'pending';
+  if not found then return; end if;
+
+  -- "active" = onboarding complete AND at least one project with a real photo.
+  select (p.onboarding_complete
+          and exists (select 1 from projects pr where pr.profile_id = auth.uid() and pr.cover_photo_url is not null))
+    into v_active
+    from profiles p where p.id = auth.uid();
+  if not coalesce(v_active, false) then return; end if;
+
+  -- Monthly cap: at most v_cap rewards granted to this referrer in the last 30 days.
+  select count(*) into v_recent
+    from referrals
+   where referrer_id = v_ref.referrer_id and status = 'rewarded'
+     and rewarded_at > now() - interval '30 days';
+
+  if v_recent >= v_cap then
+    update referrals set status = 'pending_review', activated_at = now() where id = v_ref.id;
+    return;
+  end if;
+
+  perform grant_free_month(v_ref.referrer_id);
+  update referrals set status = 'rewarded', activated_at = now(), rewarded_at = now() where id = v_ref.id;
+end; $$;
+
+revoke execute on function get_or_create_my_referral_code(), record_referral(text),
+  maybe_grant_referral_reward() from anon;
+grant execute on function get_or_create_my_referral_code(), record_referral(text),
+  maybe_grant_referral_reward() to authenticated;
+-- grant_free_month is internal only.
+revoke execute on function grant_free_month(uuid) from anon, authenticated;

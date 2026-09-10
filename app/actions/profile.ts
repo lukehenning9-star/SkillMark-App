@@ -159,6 +159,9 @@ export async function completeOnboarding() {
 
   if (error) return { error: error.message };
 
+  // Completing onboarding may satisfy the "active" bar for a referral reward.
+  await supabase.rpc("maybe_grant_referral_reward");
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("username")

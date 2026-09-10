@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import AppNav from "@/components/AppNav";
 import ProfileView from "./ProfileView";
+import { isPremium } from "@/lib/premium";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
 export async function generateMetadata({
@@ -151,6 +152,8 @@ export default async function PublicProfilePage({
       .filter((x): x is NonNullable<typeof x> => x !== null);
   }
 
+  const profileIsPremium = await isPremium(supabase, profile.id);
+
   return (
     <>
       <AppNav />
@@ -164,6 +167,7 @@ export default async function PublicProfilePage({
         connectionState={connectionState}
         viewerId={viewer?.id ?? null}
         topCollaborators={topCollaborators}
+        isPremiumProfile={profileIsPremium}
       />
     </>
   );

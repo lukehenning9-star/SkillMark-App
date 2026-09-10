@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X } from "lucide-react";
+import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
@@ -31,6 +31,7 @@ interface Props {
   connectionState?: ConnectionState;
   viewerId?: string | null;
   topCollaborators?: TopCollaboratorLite[];
+  isPremiumProfile?: boolean;
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
@@ -61,6 +62,7 @@ export default function ProfileView({
   connectionState = "none",
   viewerId = null,
   topCollaborators = [],
+  isPremiumProfile = false,
 }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -298,8 +300,13 @@ export default function ProfileView({
 
         {/* Identity */}
         <div className="mb-4">
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold text-navy leading-tight tracking-tight">
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold text-navy leading-tight tracking-tight flex items-center gap-2 flex-wrap">
             {profile.full_name ?? profile.username}
+            {isPremiumProfile && (
+              <span title="Premium member" className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent/10 border border-accent-border px-2 py-0.5 rounded-full align-middle">
+                <BadgeCheck size={13} /> Premium
+              </span>
+            )}
           </h1>
           <p className="text-text-dim text-sm mt-0.5">@{profile.username}</p>
           {profile.headline && (

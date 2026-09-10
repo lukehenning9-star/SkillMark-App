@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import AppNav from "@/components/AppNav";
+import ReferralClaimer from "@/components/ReferralClaimer";
 import FeedClient, { type FeedProject } from "./FeedClient";
 
 // How many recent projects to score, and how many to show.
@@ -111,6 +112,7 @@ export default async function DashboardPage() {
   return (
     <>
       <AppNav />
+      <ReferralClaimer />
       <main className="min-h-screen bg-sm-bg">
         <div className="max-w-5xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8 lg:items-start">
           {/* Feed column */}
@@ -168,6 +170,14 @@ export default async function DashboardPage() {
                 <Link href="/search" className="block text-sm text-navy hover:text-accent py-1.5">Find people to connect with →</Link>
                 <Link href="/connections" className="block text-sm text-navy hover:text-accent py-1.5">Manage connections →</Link>
                 <Link href="/projects/new" className="block text-sm text-navy hover:text-accent py-1.5">Add a project →</Link>
+              </div>
+            </div>
+            <div className="bg-accent/5 border border-accent-border rounded-xl p-4">
+              <p className="text-sm font-semibold text-navy mb-1">Invite &amp; earn</p>
+              <p className="text-xs text-text-mid mb-2">Get a free month of Premium for every friend who joins and posts work.</p>
+              <div className="space-y-1">
+                <Link href="/referrals" className="block text-sm font-semibold text-accent hover:underline py-1">Get your invite link →</Link>
+                <Link href="/premium" className="block text-sm text-navy hover:text-accent py-1">What&apos;s Premium? →</Link>
               </div>
             </div>
           </aside>
