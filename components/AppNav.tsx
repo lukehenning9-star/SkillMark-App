@@ -13,7 +13,7 @@ export default async function AppNav() {
   if (!user) {
     return (
       <header className="sticky top-0 z-40 bg-white border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link href="/" className="font-serif text-xl font-bold text-navy shrink-0">
             Skill<span className="text-accent">Mark</span>
           </Link>
@@ -57,7 +57,7 @@ export default async function AppNav() {
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/dashboard" className="font-serif text-xl font-bold text-navy shrink-0">
           Skill<span className="text-accent">Mark</span>
