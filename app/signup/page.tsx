@@ -189,7 +189,12 @@ export default function SignupPage() {
                 {pending ? "Creating account…" : "Create Account →"}
               </button>
 
-              <p className="text-center text-[11px] text-text-dim">Free forever. No credit card required.</p>
+              <p className="text-center text-[11px] text-text-dim">
+                By creating an account, you agree to our{" "}
+                <Link href="/terms" className="text-accent hover:underline">Terms</Link> and{" "}
+                <Link href="/privacy" className="text-accent hover:underline">Privacy Policy</Link>.
+                Free forever — no credit card required.
+              </p>
             </form>
           </div>
         </div>

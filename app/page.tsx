@@ -110,13 +110,7 @@ export default function LandingPage() {
           </Link>
         </p>
         <div className="lp-hero-proof">
-          <div className="lp-proof-avatars">
-            <div className="lp-proof-avatar" style={{ background: "#1e40af" }}>MR</div>
-            <div className="lp-proof-avatar" style={{ background: "#059669" }}>DJ</div>
-            <div className="lp-proof-avatar" style={{ background: "#7c3aed" }}>TC</div>
-            <div className="lp-proof-avatar" style={{ background: "#b45309" }}>RP</div>
-          </div>
-          &nbsp;Join tradespeople and contractors already on the waitlist
+          Free to join — be one of the first tradespeople on SkillMark.
         </div>
       </section>
 
@@ -336,6 +330,8 @@ export default function LandingPage() {
             <li><a href="#signup">For Workers</a></li>
             <li><Link href="/privacy">Privacy</Link></li>
             <li><Link href="/terms">Terms</Link></li>
+            <li><Link href="/cookies">Cookies</Link></li>
+            <li><Link href="/refund">Refunds</Link></li>
             <li><Link href="/accessibility">Accessibility</Link></li>
           </ul>
         </div>
