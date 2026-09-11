@@ -196,6 +196,9 @@ create policy "Work experience is publicly readable"
 -- Split the old FOR ALL policy: UPDATE needs WITH CHECK so a row cannot be
 -- re-parented onto another user's profile.
 drop policy if exists "Users can manage own work experience" on work_experience;
+drop policy if exists "Users can insert own work experience" on work_experience;
+drop policy if exists "Users can update own work experience" on work_experience;
+drop policy if exists "Users can delete own work experience" on work_experience;
 create policy "Users can insert own work experience"
   on work_experience for insert to authenticated with check (auth.uid() = profile_id);
 create policy "Users can update own work experience"
@@ -247,6 +250,9 @@ create policy "Projects are publicly readable"
   on projects for select using (true);
 
 drop policy if exists "Users can manage own projects" on projects;
+drop policy if exists "Users can insert own projects" on projects;
+drop policy if exists "Users can update own projects" on projects;
+drop policy if exists "Users can delete own projects" on projects;
 create policy "Users can insert own projects"
   on projects for insert to authenticated with check (auth.uid() = profile_id);
 create policy "Users can update own projects"
@@ -276,6 +282,9 @@ create policy "Project photos are publicly readable"
   on project_photos for select using (true);
 
 drop policy if exists "Users can manage own project photos" on project_photos;
+drop policy if exists "Users can insert own project photos" on project_photos;
+drop policy if exists "Users can update own project photos" on project_photos;
+drop policy if exists "Users can delete own project photos" on project_photos;
 create policy "Users can insert own project photos"
   on project_photos for insert to authenticated with check (
     auth.uid() = (select profile_id from projects where id = project_id)
@@ -314,6 +323,9 @@ create policy "Certifications are publicly readable"
   on certifications for select using (true);
 
 drop policy if exists "Users can manage own certifications" on certifications;
+drop policy if exists "Users can insert own certifications" on certifications;
+drop policy if exists "Users can update own certifications" on certifications;
+drop policy if exists "Users can delete own certifications" on certifications;
 create policy "Users can insert own certifications"
   on certifications for insert to authenticated with check (auth.uid() = profile_id);
 create policy "Users can update own certifications"
