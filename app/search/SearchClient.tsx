@@ -64,7 +64,7 @@ export default function SearchClient() {
   }, [runSearch]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
         <h1 className="font-serif text-2xl font-bold text-navy">Find Trade Workers</h1>
         <p className="text-text-dim text-sm mt-1">

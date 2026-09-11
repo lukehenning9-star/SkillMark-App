@@ -13,7 +13,7 @@ export default async function AppNav() {
   if (!user) {
     return (
       <header className="sticky top-0 z-40 bg-white border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link href="/" className="font-serif text-xl font-bold text-navy shrink-0">
             Skill<span className="text-accent">Mark</span>
           </Link>
@@ -57,7 +57,7 @@ export default async function AppNav() {
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/dashboard" className="font-serif text-xl font-bold text-navy shrink-0">
           Skill<span className="text-accent">Mark</span>
@@ -93,6 +93,13 @@ export default async function AppNav() {
             <FolderPlus size={14} />
             Add Project
           </Link>
+          <Link
+            href={`/${profile.username}`}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+          >
+            <User size={14} />
+            My Profile
+          </Link>
         </nav>
 
         {/* Right side */}
@@ -125,14 +132,6 @@ export default async function AppNav() {
               </span>
             )}
           </div>
-
-          <Link
-            href={`/${profile.username}`}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
-          >
-            <User size={14} />
-            My Profile
-          </Link>
 
           <UserMenuDropdown
             username={profile.username}
