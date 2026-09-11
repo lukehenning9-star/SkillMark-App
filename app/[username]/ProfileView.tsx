@@ -219,7 +219,7 @@ export default function ProfileView({
         )}
       </div>
 
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         {/* Avatar + actions row */}
         <div className="relative -mt-16 sm:-mt-24 mb-4 flex items-end justify-between gap-4">
           <div className="relative shrink-0">

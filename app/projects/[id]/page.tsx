@@ -153,7 +153,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     <>
       <AppNav />
       <main className="min-h-screen bg-sm-bg">
-        <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="mb-6 flex items-center justify-between">
             <Link href={profile ? `/${profile.username}` : "/dashboard"} className="text-sm text-text-dim hover:text-navy flex items-center gap-1.5">
               <ChevronLeft size={14} /> Back to Profile

@@ -114,7 +114,7 @@ export default async function DashboardPage() {
       <AppNav />
       <ReferralClaimer />
       <main className="min-h-screen bg-sm-bg">
-        <div className="max-w-5xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8 lg:items-start">
+        <div className="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8 lg:items-start">
           {/* Feed column */}
           <div className="w-full max-w-[560px] mx-auto lg:mx-0 lg:max-w-none">
             {/* Mobile-only horizontal collaborators strip (sidebar covers desktop) */}
