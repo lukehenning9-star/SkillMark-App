@@ -32,8 +32,8 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   const username = typeof formData.get("username") === "string" ? (formData.get("username") as string).toLowerCase().trim() : "";
   const password = typeof formData.get("password") === "string" ? (formData.get("password") as string) : "";
   const confirmPassword = typeof formData.get("confirm_password") === "string" ? (formData.get("confirm_password") as string) : "";
-  const rawRole = formData.get("role");
-  const role = rawRole === "worker" || rawRole === "contractor" ? rawRole : "worker";
+  const rawType = formData.get("account_type");
+  const accountType = rawType === "company" ? "company" : "worker";
 
   if (!email || !email.includes("@") || email.length > 254) {
     return { error: "Please enter a valid email address." };
@@ -64,7 +64,7 @@ export async function signup(state: State, formData: FormData): Promise<State> {
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { username, role } },
+    options: { data: { username, account_type: accountType } },
   });
 
   if (error) return { error: error.message };

@@ -22,9 +22,9 @@ const levelLabel: Record<string, string> = {
   master: "Master",
 };
 
-export default function SearchClient() {
+export default function SearchClient({ initialTrade = "" }: { initialTrade?: string }) {
   const [query, setQuery] = useState("");
-  const [trade, setTrade] = useState("");
+  const [trade, setTrade] = useState(initialTrade);
   const [level, setLevel] = useState("");
   const [state, setState] = useState("");
   const [unionStatus, setUnionStatus] = useState("");
@@ -41,6 +41,7 @@ export default function SearchClient() {
       .from("profiles")
       .select("id, username, full_name, avatar_url, trade, experience_level, years_experience, city, state, is_available, union_status")
       .eq("onboarding_complete", true)
+      .eq("account_type", "worker")
       .order("created_at", { ascending: false })
       .limit(50);
 

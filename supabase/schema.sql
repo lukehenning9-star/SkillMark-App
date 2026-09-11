@@ -71,11 +71,14 @@ create policy "Users can update own profile"
 -- Column-level lockdown: clients must NOT be able to set username (bypasses
 -- signup validation), profile_views, or verified_project_count directly.
 -- profile_views is incremented only via the SECURITY DEFINER function below.
+-- account_type is intentionally NOT grantable: it's set once at signup by the
+-- handle_new_user trigger and must not be flippable by the client afterward.
 revoke update on table profiles from anon, authenticated;
 grant update (
   full_name, headline, bio, avatar_url, banner_url, trade,
   experience_level, years_experience, city, state, is_available,
-  union_status, dark_mode_preference, onboarding_complete
+  union_status, website, company_size, hiring_trades,
+  dark_mode_preference, onboarding_complete
 ) on profiles to authenticated;
 
 -- Case-insensitive username uniqueness ("Marcus" vs "marcus").
@@ -87,6 +90,15 @@ alter table profiles add column if not exists union_status text
   check (union_status in ('Union Member', 'Non-Union', 'Open to Both'));
 alter table profiles add column if not exists headline text
   check (char_length(headline) <= 120);
+
+-- Account type (worker vs company/business) + company-only fields.
+alter table profiles add column if not exists account_type text not null default 'worker'
+  check (account_type in ('worker', 'company'));
+alter table profiles add column if not exists website text
+  check (char_length(website) <= 200);
+alter table profiles add column if not exists company_size text
+  check (company_size in ('1-10', '11-50', '51-200', '201-500', '500+'));
+alter table profiles add column if not exists hiring_trades text[] not null default '{}';
 
 
 -- ── PROFILE VIEW COUNTER ──────────────────────────────────────
@@ -141,22 +153,30 @@ language plpgsql
 security definer
 set search_path = public, pg_temp
 as $$
+declare
+  -- Worker unless signup explicitly asked for a company account.
+  acct text := case
+    when new.raw_user_meta_data->>'account_type' = 'company' then 'company'
+    else 'worker'
+  end;
 begin
   begin
-    insert into public.profiles (id, username, full_name)
+    insert into public.profiles (id, username, full_name, account_type)
     values (
       new.id,
       coalesce(new.raw_user_meta_data->>'username', new.id::text),
-      coalesce(new.raw_user_meta_data->>'full_name', '')
+      coalesce(new.raw_user_meta_data->>'full_name', ''),
+      acct
     );
   exception when unique_violation then
     -- Username taken in a race between the availability check and signup:
     -- fall back to a unique placeholder instead of aborting the signup.
-    insert into public.profiles (id, username, full_name)
+    insert into public.profiles (id, username, full_name, account_type)
     values (
       new.id,
       'user-' || replace(new.id::text, '-', ''),
-      coalesce(new.raw_user_meta_data->>'full_name', '')
+      coalesce(new.raw_user_meta_data->>'full_name', ''),
+      acct
     );
   end;
   return new;

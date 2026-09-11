@@ -7,9 +7,14 @@ export type Message = {
   created_at: string
 }
 
+export type AccountType = "worker" | "company"
+
+export type CompanySize = "1-10" | "11-50" | "51-200" | "201-500" | "500+"
+
 export type Profile = {
   id: string
   username: string
+  account_type: AccountType
   full_name: string | null
   headline: string | null
   bio: string | null
@@ -22,6 +27,10 @@ export type Profile = {
   state: string | null
   is_available: boolean
   union_status: "Union Member" | "Non-Union" | "Open to Both" | null
+  // Company-account fields (null / empty for worker accounts)
+  website: string | null
+  company_size: CompanySize | null
+  hiring_trades: string[]
   profile_views: number
   verified_project_count: number
   dark_mode_preference: boolean

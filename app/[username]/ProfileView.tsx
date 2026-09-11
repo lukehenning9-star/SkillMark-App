@@ -4,12 +4,13 @@ import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck, Eye, Lock } from "lucide-react";
+import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck, Eye, Lock, Building2, Globe, Users } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
-import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
+import { US_STATES, TRADES, UNION_STATUS_OPTIONS, COMPANY_SIZES } from "@/lib/constants";
 import AvatarCropModal from "@/components/AvatarCropModal";
 import AutocompleteInput from "@/components/AutocompleteInput";
+import SkillTagInput from "@/components/SkillTagInput";
 import ConnectButton, { type ConnectionState } from "@/components/ConnectButton";
 import ProfileQRButton from "@/components/ProfileQRButton";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
@@ -112,9 +113,24 @@ export default function ProfileView({
   const [bio, setBio] = useState(profile.bio ?? "");
   const [isAvailable, setIsAvailable] = useState(profile.is_available);
   const [tradeVal, setTradeVal] = useState(profile.trade ?? "");
+  const [website, setWebsite] = useState(profile.website ?? "");
+  const [companySize, setCompanySize] = useState(profile.company_size ?? "");
+  const [hiringTrades, setHiringTrades] = useState<string[]>(profile.hiring_trades ?? []);
 
-  const profileIsComplete =
-    !!(avatarUrl && profile.bio && profile.trade && (profile.city || profile.state) && projects.length > 0);
+  const isCompany = profile.account_type === "company";
+
+  // Company pages don't require a project to count as "complete".
+  const profileIsComplete = isCompany
+    ? !!(avatarUrl && profile.bio && profile.trade && (profile.city || profile.state))
+    : !!(avatarUrl && profile.bio && profile.trade && (profile.city || profile.state) && projects.length > 0);
+
+  // Website as a safe, clickable href (assume https when no scheme given).
+  const websiteHref = profile.website
+    ? /^https?:\/\//i.test(profile.website)
+      ? profile.website
+      : `https://${profile.website}`
+    : null;
+  const websiteLabel = profile.website?.replace(/^https?:\/\//i, "").replace(/\/$/, "") ?? null;
 
   const clearCropSrc = useCallback(() => {
     setCropSrc((prev) => {
@@ -201,18 +217,30 @@ export default function ProfileView({
     startTransition(async () => {
       // null (not undefined) so emptied fields are actually cleared —
       // supabase-js drops undefined keys from the update payload.
-      const result = await saveProfileStep({
+      const common = {
         full_name: (fd.get("full_name") as string).trim() || undefined,
         headline: (fd.get("headline") as string).trim() || null,
         trade: tradeVal.trim() || null,
-        experience_level: (fd.get("experience_level") as Profile["experience_level"]) || null,
-        years_experience: Number(fd.get("years_experience")) || 0,
         city: (fd.get("city") as string).trim() || null,
         state: (fd.get("state") as string) || null,
         bio: bio.trim() || null,
         is_available: isAvailable,
-        union_status: (fd.get("union_status") as string) || null,
-      });
+      };
+      const result = await saveProfileStep(
+        isCompany
+          ? {
+              ...common,
+              website: website.trim() || null,
+              company_size: companySize || null,
+              hiring_trades: hiringTrades,
+            }
+          : {
+              ...common,
+              experience_level: (fd.get("experience_level") as Profile["experience_level"]) || null,
+              years_experience: Number(fd.get("years_experience")) || 0,
+              union_status: (fd.get("union_status") as string) || null,
+            }
+      );
       if (result?.error) {
         setSaveError(result.error);
       } else {
@@ -340,6 +368,11 @@ export default function ProfileView({
         <div className="mb-4">
           <h1 className="font-serif text-4xl sm:text-5xl font-bold text-navy leading-tight tracking-tight flex items-center gap-2 flex-wrap">
             {profile.full_name ?? profile.username}
+            {isCompany && (
+              <span title="Company account" className="inline-flex items-center gap-1 text-[11px] font-semibold text-navy bg-navy/5 border border-border2 px-2 py-0.5 rounded-full align-middle">
+                <Building2 size={12} /> Company
+              </span>
+            )}
             {isPremiumProfile && (
               <span title="Premium member" className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent/10 border border-accent-border px-2 py-0.5 rounded-full align-middle">
                 <BadgeCheck size={13} /> Premium
@@ -354,20 +387,28 @@ export default function ProfileView({
 
         {/* Badges */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {(profile.trade || profile.years_experience > 0) && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-border text-navy px-2.5 py-1 rounded-full">
-              <Wrench size={11} />
-              {[
-                profile.experience_level ? expLabel[profile.experience_level] : null,
-                profile.trade,
-                profile.years_experience > 0 ? `· ${profile.years_experience} yr${profile.years_experience !== 1 ? "s" : ""}` : null,
-              ].filter(Boolean).join(" ")}
-            </span>
-          )}
+          {isCompany
+            ? profile.trade && (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-border text-navy px-2.5 py-1 rounded-full">
+                  <Building2 size={11} />
+                  {profile.trade}
+                  {profile.company_size ? ` · ${profile.company_size} people` : ""}
+                </span>
+              )
+            : (profile.trade || profile.years_experience > 0) && (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-border text-navy px-2.5 py-1 rounded-full">
+                  <Wrench size={11} />
+                  {[
+                    profile.experience_level ? expLabel[profile.experience_level] : null,
+                    profile.trade,
+                    profile.years_experience > 0 ? `· ${profile.years_experience} yr${profile.years_experience !== 1 ? "s" : ""}` : null,
+                  ].filter(Boolean).join(" ")}
+                </span>
+              )}
           {profile.is_available && (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-              Open to Work
+              {isCompany ? "Actively Hiring" : "Open to Work"}
             </span>
           )}
         </div>
@@ -384,16 +425,16 @@ export default function ProfileView({
             >
               add{" "}
               {[
-                !avatarUrl && "a photo",
-                !profile.bio && "a bio",
-                !profile.trade && "your trade",
+                !avatarUrl && (isCompany ? "a logo" : "a photo"),
+                !profile.bio && (isCompany ? "an about section" : "a bio"),
+                !profile.trade && (isCompany ? "your industry" : "your trade"),
                 !profile.city && !profile.state && "location",
-                projects.length === 0 && "a project",
+                !isCompany && projects.length === 0 && "a project",
               ]
                 .filter(Boolean)
                 .join(", ")}
             </button>{" "}
-            to attract contractors.
+            {isCompany ? "to attract skilled workers." : "to attract contractors."}
           </p>
         )}
 
@@ -435,21 +476,42 @@ export default function ProfileView({
                   )}
                   {profile.trade && (
                     <div className="flex items-center gap-2 text-sm text-text-mid">
-                      <Wrench size={14} className="text-text-dim shrink-0" />
+                      {isCompany ? <Building2 size={14} className="text-text-dim shrink-0" /> : <Wrench size={14} className="text-text-dim shrink-0" />}
                       {profile.trade}
                     </div>
                   )}
-                  {profile.years_experience > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-text-mid">
-                      <Clock size={14} className="text-text-dim shrink-0" />
-                      {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} of experience
-                    </div>
-                  )}
-                  {profile.union_status && (
-                    <div className="flex items-center gap-2 text-sm text-text-mid">
-                      <Award size={14} className="text-text-dim shrink-0" />
-                      {profile.union_status}
-                    </div>
+                  {isCompany ? (
+                    <>
+                      {profile.company_size && (
+                        <div className="flex items-center gap-2 text-sm text-text-mid">
+                          <Users size={14} className="text-text-dim shrink-0" />
+                          {profile.company_size} people
+                        </div>
+                      )}
+                      {websiteHref && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Globe size={14} className="text-text-dim shrink-0" />
+                          <a href={websiteHref} target="_blank" rel="noopener noreferrer nofollow" className="text-accent hover:underline truncate">
+                            {websiteLabel}
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {profile.years_experience > 0 && (
+                        <div className="flex items-center gap-2 text-sm text-text-mid">
+                          <Clock size={14} className="text-text-dim shrink-0" />
+                          {profile.years_experience} year{profile.years_experience !== 1 ? "s" : ""} of experience
+                        </div>
+                      )}
+                      {profile.union_status && (
+                        <div className="flex items-center gap-2 text-sm text-text-mid">
+                          <Award size={14} className="text-text-dim shrink-0" />
+                          {profile.union_status}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -551,6 +613,26 @@ export default function ProfileView({
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+            {isCompany && profile.hiring_trades.length > 0 && (
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Hiring for</h2>
+                  <div className="h-px bg-border flex-1" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {profile.hiring_trades.map((t) => (
+                    <Link
+                      key={t}
+                      href={`/search?trade=${encodeURIComponent(t)}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium bg-sm-bg border border-border text-navy px-3 py-1.5 rounded-full hover:border-accent hover:text-accent transition-colors"
+                    >
+                      <Wrench size={12} />
+                      {t}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
             {topCollaborators.length > 0 && (
@@ -724,19 +806,19 @@ export default function ProfileView({
               </div>
 
               <div>
-                <label className={labelClass}>Full Name</label>
-                <input name="full_name" type="text" defaultValue={profile.full_name ?? ""} placeholder="Marcus Rivera" required className={inputClass} />
+                <label className={labelClass}>{isCompany ? "Company Name" : "Full Name"}</label>
+                <input name="full_name" type="text" defaultValue={profile.full_name ?? ""} placeholder={isCompany ? "Waco Electric Co." : "Marcus Rivera"} required className={inputClass} />
               </div>
 
               <div>
-                <label className={labelClass}>Headline</label>
-                <input name="headline" type="text" defaultValue={profile.headline ?? ""} placeholder="Master Electrician · 12 years commercial" maxLength={120} className={inputClass} />
+                <label className={labelClass}>{isCompany ? "Tagline" : "Headline"}</label>
+                <input name="headline" type="text" defaultValue={profile.headline ?? ""} placeholder={isCompany ? "Commercial electrical contractor · Central TX" : "Master Electrician · 12 years commercial"} maxLength={120} className={inputClass} />
                 <p className="text-[11px] text-text-dim mt-1">Shows below your name · 120 chars max</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelClass}>Trade</label>
+                  <label className={labelClass}>{isCompany ? "Industry / Primary Trade" : "Trade"}</label>
                   <AutocompleteInput
                     value={tradeVal}
                     onChange={setTradeVal}
@@ -745,21 +827,38 @@ export default function ProfileView({
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label className={labelClass}>Experience Level</label>
-                  <select name="experience_level" defaultValue={profile.experience_level ?? ""} className={inputClass}>
-                    <option value="">Select level...</option>
-                    <option value="apprentice">Apprentice</option>
-                    <option value="journeyman">Journeyman</option>
-                    <option value="master">Master</option>
-                  </select>
-                </div>
+                {isCompany ? (
+                  <div>
+                    <label className={labelClass}>Company Size</label>
+                    <select value={companySize} onChange={(e) => setCompanySize(e.target.value)} className={inputClass}>
+                      <option value="">Select size...</option>
+                      {COMPANY_SIZES.map((s) => <option key={s} value={s}>{s} people</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className={labelClass}>Experience Level</label>
+                    <select name="experience_level" defaultValue={profile.experience_level ?? ""} className={inputClass}>
+                      <option value="">Select level...</option>
+                      <option value="apprentice">Apprentice</option>
+                      <option value="journeyman">Journeyman</option>
+                      <option value="master">Master</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className={labelClass}>Years of Experience</label>
-                <input name="years_experience" type="number" min={0} max={60} defaultValue={profile.years_experience} className={inputClass} />
-              </div>
+              {isCompany ? (
+                <div>
+                  <label className={labelClass}>Website</label>
+                  <input value={website} onChange={(e) => setWebsite(e.target.value)} type="text" placeholder="wacoelectric.com" maxLength={200} className={inputClass} />
+                </div>
+              ) : (
+                <div>
+                  <label className={labelClass}>Years of Experience</label>
+                  <input name="years_experience" type="number" min={0} max={60} defaultValue={profile.years_experience} className={inputClass} />
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -777,7 +876,7 @@ export default function ProfileView({
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className={`${labelClass} mb-0`}>Bio</label>
+                  <label className={`${labelClass} mb-0`}>{isCompany ? "About" : "Bio"}</label>
                   <span className="text-[11px] text-text-dim font-mono">{bio.length}/300</span>
                 </div>
                 <textarea
@@ -785,23 +884,35 @@ export default function ProfileView({
                   maxLength={300}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  placeholder="Journeyman electrician with 8 years in commercial and residential work..."
+                  placeholder={isCompany ? "What your company does, the jobs you run, and what you look for in the crews you hire..." : "Journeyman electrician with 8 years in commercial and residential work..."}
                   className={`${inputClass} resize-none`}
                 />
               </div>
 
-              <div>
-                <label className={labelClass}>Union Status</label>
-                <select name="union_status" defaultValue={profile.union_status ?? ""} className={inputClass}>
-                  <option value="">Not specified</option>
-                  {UNION_STATUS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
-                </select>
-              </div>
+              {isCompany ? (
+                <div>
+                  <label className={labelClass}>Trades You Hire For</label>
+                  <SkillTagInput
+                    value={hiringTrades}
+                    onChange={setHiringTrades}
+                    suggestions={TRADES}
+                    placeholder="Add trades and press Enter…"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className={labelClass}>Union Status</label>
+                  <select name="union_status" defaultValue={profile.union_status ?? ""} className={inputClass}>
+                    <option value="">Not specified</option>
+                    {UNION_STATUS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              )}
 
               <div className="flex items-center justify-between p-4 bg-sm-bg rounded-xl border border-border">
                 <div>
-                  <p className="text-sm font-semibold text-navy">Open to Work</p>
-                  <p className="text-xs text-text-dim mt-0.5">Show contractors you&apos;re available</p>
+                  <p className="text-sm font-semibold text-navy">{isCompany ? "Actively Hiring" : "Open to Work"}</p>
+                  <p className="text-xs text-text-dim mt-0.5">{isCompany ? "Show workers you're hiring" : "Show contractors you're available"}</p>
                 </div>
                 <button
                   type="button"

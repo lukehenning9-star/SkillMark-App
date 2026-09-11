@@ -26,7 +26,8 @@ const labelClass =
 
 export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, undefined);
-  const [role, setRole] = useState<"worker" | "contractor">("worker");
+  const [accountType, setAccountType] = useState<"worker" | "company">("worker");
+  const isCompany = accountType === "company";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [username, setUsername] = useState("");
@@ -85,29 +86,34 @@ export default function SignupPage() {
 
         <div className="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
           <div className="grid grid-cols-2 border-b border-border">
-            {(["worker", "contractor"] as const).map((r) => (
+            {(["worker", "company"] as const).map((r) => (
               <button
                 key={r}
                 type="button"
-                onClick={() => setRole(r)}
+                onClick={() => setAccountType(r)}
                 className={`py-3.5 text-sm font-semibold transition-colors cursor-pointer ${
-                  role === r
+                  accountType === r
                     ? "bg-white text-navy border-b-2 border-accent"
                     : "bg-sm-bg text-text-dim hover:text-navy"
                 }`}
               >
-                {r === "worker" ? "I Work in the Trades" : "I Hire Trade Workers"}
+                {r === "worker" ? "I Work in the Trades" : "I'm a Company"}
               </button>
             ))}
           </div>
 
           <div className="p-8">
             <form action={action} className="space-y-4">
-              <input type="hidden" name="role" value={role} />
+              <input type="hidden" name="account_type" value={accountType} />
+              {isCompany && (
+                <p className="text-xs text-text-mid bg-accent/5 border border-accent-border rounded-md px-3 py-2">
+                  Company account — build a business page and reach out to tradespeople directly. You&apos;ll set up your company profile next.
+                </p>
+              )}
 
               <div>
                 <label className={labelClass}>Email Address</label>
-                <input name="email" type="email" placeholder="marcus@email.com" required className={inputClass} />
+                <input name="email" type="email" placeholder={isCompany ? "hiring@company.com" : "marcus@email.com"} required className={inputClass} />
               </div>
 
               <div>
@@ -116,7 +122,7 @@ export default function SignupPage() {
                   <input
                     name="username"
                     type="text"
-                    placeholder="marcus_rivera"
+                    placeholder={isCompany ? "waco_electric_co" : "marcus_rivera"}
                     required
                     value={username}
                     onChange={(e) =>

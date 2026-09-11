@@ -13,10 +13,14 @@ type ProfileUpdate = {
   bio?: string | null;
   is_available?: boolean;
   union_status?: string | null;
+  website?: string | null;
+  company_size?: string | null;
+  hiring_trades?: string[];
 };
 
 const VALID_UNION_STATUSES = ["Union Member", "Non-Union", "Open to Both"] as const;
 const VALID_EXPERIENCE_LEVELS = ["apprentice", "journeyman", "master"] as const;
+const VALID_COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "500+"] as const;
 
 const STORAGE_URL_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/`;
 
@@ -49,6 +53,17 @@ export async function saveProfileStep(data: ProfileUpdate) {
   if (data.experience_level != null && !(VALID_EXPERIENCE_LEVELS as readonly string[]).includes(data.experience_level)) {
     return { error: "Invalid experience level." };
   }
+  if (data.website != null && data.website.length > 200) return { error: "Website must be 200 characters or less." };
+  if (data.company_size != null && !(VALID_COMPANY_SIZES as readonly string[]).includes(data.company_size)) {
+    return { error: "Invalid company size." };
+  }
+  if (data.hiring_trades !== undefined) {
+    if (!Array.isArray(data.hiring_trades)) return { error: "Invalid hiring trades." };
+    if (data.hiring_trades.length > 20) return { error: "Please list 20 trades or fewer." };
+    if (data.hiring_trades.some((t) => typeof t !== "string" || t.length > 50)) {
+      return { error: "Each trade must be 50 characters or less." };
+    }
+  }
 
   // Whitelist columns explicitly — server action arguments are attacker-
   // controlled JSON, and passing the raw object to .update() would let a
@@ -64,6 +79,15 @@ export async function saveProfileStep(data: ProfileUpdate) {
   if (data.bio !== undefined) update.bio = data.bio;
   if (data.is_available !== undefined) update.is_available = data.is_available;
   if (data.union_status !== undefined) update.union_status = data.union_status;
+  if (data.website !== undefined) update.website = data.website ? data.website.trim() : null;
+  if (data.company_size !== undefined) update.company_size = data.company_size;
+  if (data.hiring_trades !== undefined) {
+    // Trim, drop blanks, de-dupe while preserving order.
+    const seen = new Set<string>();
+    update.hiring_trades = data.hiring_trades
+      .map((t) => t.trim())
+      .filter((t) => t && !seen.has(t.toLowerCase()) && seen.add(t.toLowerCase()));
+  }
   if (Object.keys(update).length === 0) return { success: true };
 
   const { error } = await supabase
