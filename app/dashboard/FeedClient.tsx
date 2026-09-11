@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, BadgeCheck } from "lucide-react";
 import { toggleLike } from "@/app/actions/social";
 
 export type FeedProject = {
@@ -27,6 +27,7 @@ export type FeedProject = {
   comment_count: number;
   liked_by_me: boolean;
   from_connection: boolean;
+  is_premium: boolean;
 };
 
 function EngagementBar({ project }: { project: FeedProject }) {
@@ -176,8 +177,9 @@ function FeedCard({ project }: { project: FeedProject }) {
           </div>
         </Link>
         <div className="min-w-0 flex-1">
-          <Link href={`/${author.username}`} className="text-sm font-semibold text-navy hover:underline truncate block">
-            {displayName}
+          <Link href={`/${author.username}`} className="text-sm font-semibold text-navy hover:underline truncate flex items-center gap-1">
+            <span className="truncate">{displayName}</span>
+            {project.is_premium && <BadgeCheck size={13} className="text-accent shrink-0" aria-label="Premium member" />}
           </Link>
           <p className="text-xs text-text-dim truncate">
             {[author.trade, timeAgo(project.created_at)].filter(Boolean).join(" · ")}

@@ -96,13 +96,51 @@ export default async function PublicProfilePage({
   }
 
   let unreadCount = 0;
+  // Premium perk: "who viewed your profile". RLS only lets the owner read their
+  // own view log, so this is always owner-scoped.
+  let recentViewers: {
+    id: string;
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    trade: string | null;
+    last_viewed_at: string;
+  }[] = [];
+  let viewerCount = 0;
   if (isOwner) {
-    const { count } = await supabase
-      .from("messages")
-      .select("*", { count: "exact", head: true })
-      .eq("recipient_id", profile.id)
-      .is("read_at", null);
+    const [{ count }, { data: vlog }, { count: vcount }] = await Promise.all([
+      supabase
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("recipient_id", profile.id)
+        .is("read_at", null),
+      supabase
+        .from("profile_views_log")
+        .select("viewer_id, last_viewed_at")
+        .eq("viewed_id", profile.id)
+        .order("last_viewed_at", { ascending: false })
+        .limit(12),
+      supabase
+        .from("profile_views_log")
+        .select("*", { count: "exact", head: true })
+        .eq("viewed_id", profile.id),
+    ]);
     unreadCount = count ?? 0;
+    viewerCount = vcount ?? 0;
+    if (vlog && vlog.length) {
+      const viewerIds = vlog.map((v) => v.viewer_id);
+      const { data: vp } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, avatar_url, trade")
+        .in("id", viewerIds);
+      const vmap = new Map((vp ?? []).map((p) => [p.id, p]));
+      recentViewers = vlog
+        .map((v) => {
+          const p = vmap.get(v.viewer_id);
+          return p ? { ...p, last_viewed_at: v.last_viewed_at as string } : null;
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+    }
   }
 
   // Projects this person is an accepted collaborator on show on their profile too.
@@ -177,6 +215,8 @@ export default async function PublicProfilePage({
         topCollaborators={topCollaborators}
         isPremiumProfile={profileIsPremium}
         profileUrl={profileUrl}
+        recentViewers={recentViewers}
+        viewerCount={viewerCount}
       />
     </>
   );

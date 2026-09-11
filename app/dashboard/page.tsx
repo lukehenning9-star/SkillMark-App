@@ -57,6 +57,16 @@ export default async function DashboardPage() {
     for (const l of myLikes ?? []) likedByMe.add(l.project_id);
   }
 
+  // Premium authors get a small feed boost + a badge.
+  const premiumAuthors = new Set<string>();
+  if (candidates.length) {
+    const authorIds = Array.from(new Set(candidates.map((p) => p.profile_id)));
+    const { data: pa } = await supabase.rpc("premium_among", { ids: authorIds });
+    for (const row of (pa ?? []) as (string | { id?: string })[]) {
+      premiumAuthors.add(typeof row === "string" ? row : row.id ?? "");
+    }
+  }
+
   const now = Date.now();
   const scored = candidates.map((p) => {
     const author = (Array.isArray(p.profiles) ? p.profiles[0] : p.profiles) as FeedProject["profiles"];
@@ -64,13 +74,15 @@ export default async function DashboardPage() {
     const comment_count = embeddedCount(p.comments);
     const from_connection = connectionIds.has(p.profile_id);
 
+    const author_premium = premiumAuthors.has(p.profile_id);
     const ageDays = (now - new Date(p.created_at).getTime()) / 86_400_000;
     const recency = Math.max(0, 4 - ageDays * 0.5);
     const popularity = like_count * 1 + comment_count * 1.5;
     const affinity = from_connection ? 3 : 0;
+    const premiumBoost = author_premium ? 2 : 0;
     // Small deterministic jitter keeps discovery from being identical every load.
     const jitter = (parseInt(p.id.slice(0, 4), 16) % 100) / 200; // 0–0.5
-    const score = affinity + popularity + recency + jitter;
+    const score = affinity + popularity + recency + jitter + premiumBoost;
 
     const item: FeedProject = {
       id: p.id,
@@ -87,6 +99,7 @@ export default async function DashboardPage() {
       comment_count,
       liked_by_me: likedByMe.has(p.id),
       from_connection,
+      is_premium: author_premium,
     };
     return { item, score };
   });

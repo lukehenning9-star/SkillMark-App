@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck } from "lucide-react";
+import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck, Eye, Lock } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
@@ -22,6 +22,29 @@ type TopCollaboratorLite = {
   shared_count: number;
 };
 
+type RecentViewer = {
+  id: string;
+  username: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  trade: string | null;
+  last_viewed_at: string;
+};
+
+function viewedAgo(dateStr: string) {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 interface Props {
   profile: Profile;
   projects: Project[];
@@ -34,6 +57,8 @@ interface Props {
   topCollaborators?: TopCollaboratorLite[];
   isPremiumProfile?: boolean;
   profileUrl?: string;
+  recentViewers?: RecentViewer[];
+  viewerCount?: number;
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
@@ -66,6 +91,8 @@ export default function ProfileView({
   topCollaborators = [],
   isPremiumProfile = false,
   profileUrl,
+  recentViewers = [],
+  viewerCount = 0,
 }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -457,6 +484,75 @@ export default function ProfileView({
 
           {/* Main column */}
           <div className="md:col-span-2 space-y-7">
+            {/* Premium perk: who viewed your profile (owner-only) */}
+            {isOwner && viewerCount > 0 && (
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
+                  <h2 className="text-xs font-semibold text-navy whitespace-nowrap flex items-center gap-1.5">
+                    <Eye size={13} className="text-accent" />
+                    Who viewed you
+                  </h2>
+                  <div className="h-px bg-border flex-1" />
+                  <span className="shrink-0 text-xs text-text-dim">
+                    {viewerCount} viewer{viewerCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {isPremiumProfile ? (
+                  <ul className="space-y-3.5">
+                    {recentViewers.map((v) => (
+                      <li key={v.id}>
+                        <Link href={`/${v.username}`} className="flex items-center gap-3 group">
+                          <div className="w-10 h-10 rounded-full bg-navy-mid overflow-hidden flex items-center justify-center relative shrink-0">
+                            {v.avatar_url ? (
+                              <Image src={v.avatar_url} alt={v.full_name || v.username} fill sizes="40px" className="object-cover" />
+                            ) : (
+                              <span className="text-sm font-bold text-white">{(v.full_name || v.username).charAt(0).toUpperCase()}</span>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-navy truncate group-hover:underline">{v.full_name || v.username}</p>
+                            <p className="text-xs text-text-dim truncate">{v.trade || `@${v.username}`}</p>
+                          </div>
+                          <span className="text-[11px] text-text-dim shrink-0">{viewedAgo(v.last_viewed_at)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="relative">
+                    {/* Blurred teaser rows */}
+                    <ul className="space-y-3.5 select-none pointer-events-none blur-[5px]" aria-hidden="true">
+                      {Array.from({ length: Math.min(viewerCount, 3) }).map((_, i) => (
+                        <li key={i} className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-navy-mid shrink-0" />
+                          <div className="min-w-0 flex-1 space-y-1.5">
+                            <div className="h-3 bg-border2 rounded w-32" />
+                            <div className="h-2.5 bg-border rounded w-20" />
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                      <div className="w-9 h-9 rounded-full bg-accent/10 border border-accent-border flex items-center justify-center mb-2">
+                        <Lock size={15} className="text-accent" />
+                      </div>
+                      <p className="text-sm font-semibold text-navy">
+                        {viewerCount} {viewerCount === 1 ? "person has" : "people have"} viewed your profile
+                      </p>
+                      <p className="text-xs text-text-dim mt-0.5 mb-3">Upgrade to Premium to see exactly who.</p>
+                      <Link
+                        href="/premium"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-accent px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+                      >
+                        <BadgeCheck size={14} />
+                        Unlock with Premium
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             {topCollaborators.length > 0 && (
               <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
                 <div className="flex items-center gap-3 mb-5">

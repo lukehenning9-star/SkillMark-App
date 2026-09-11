@@ -94,12 +94,19 @@ alter table profiles add column if not exists headline text
 -- client-updatable. Callers can only increment by 1, never set a value.
 create or replace function increment_profile_views(target_profile_id uuid)
 returns void
-language sql
+language plpgsql
 security definer
 set search_path = public, pg_temp
 as $$
-  update profiles set profile_views = profile_views + 1
-  where id = target_profile_id and id <> auth.uid();
+begin
+  if auth.uid() is null or auth.uid() = target_profile_id then return; end if;
+  update profiles set profile_views = profile_views + 1 where id = target_profile_id;
+  -- Record the viewer for the "who viewed you" premium feature (one row per
+  -- viewer→viewed pair, refreshed to the latest visit).
+  insert into profile_views_log (viewer_id, viewed_id)
+  values (auth.uid(), target_profile_id)
+  on conflict (viewer_id, viewed_id) do update set last_viewed_at = now();
+end;
 $$;
 
 revoke execute on function increment_profile_views(uuid) from anon;
@@ -1019,3 +1026,45 @@ begin
 end; $$;
 drop trigger if exists trg_notify_comment on project_comments;
 create trigger trg_notify_comment after insert on project_comments for each row execute procedure notify_comment();
+
+
+-- ══════════════════════════════════════════════════════════════
+-- PREMIUM PERKS: feed/search boost + "who viewed you" (added)
+-- ══════════════════════════════════════════════════════════════
+
+-- Which of the given profile ids are premium (Stripe active OR comped month).
+-- Definer so it can read subscriptions (which are otherwise owner-only). Used to
+-- boost premium members in the feed and search, and to badge them.
+create or replace function premium_among(ids uuid[])
+returns setof uuid language sql stable security definer set search_path = public, pg_temp as $$
+  select p.id from profiles p
+  where p.id = any(ids)
+    and (
+      coalesce(p.premium_until, 'epoch'::timestamptz) > now()
+      or exists (
+        select 1 from subscriptions s
+        where s.profile_id = p.id and s.status in ('active','trialing')
+          and coalesce(s.current_period_end, 'epoch'::timestamptz) > now()
+      )
+    );
+$$;
+grant execute on function premium_among(uuid[]) to anon, authenticated;
+
+-- Profile view log: one row per viewer→viewed pair, refreshed each visit.
+create table if not exists profile_views_log (
+  viewer_id      uuid references profiles on delete cascade not null,
+  viewed_id      uuid references profiles on delete cascade not null,
+  last_viewed_at timestamptz default now(),
+  primary key (viewer_id, viewed_id)
+);
+
+alter table profile_views_log enable row level security;
+
+-- Only the person who was viewed can read their own visitor list (gated to
+-- premium in the UI). Rows are written only by increment_profile_views (definer).
+drop policy if exists "See who viewed me" on profile_views_log;
+create policy "See who viewed me" on profile_views_log for select to authenticated
+  using (auth.uid() = viewed_id);
+revoke insert, update, delete on table profile_views_log from anon, authenticated;
+
+create index if not exists idx_pvl_viewed on profile_views_log (viewed_id, last_viewed_at desc);

@@ -4,13 +4,14 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { BadgeCheck } from "lucide-react";
 import { TRADES, US_STATES, UNION_STATUS_OPTIONS } from "@/lib/constants";
 import type { Profile } from "@/lib/types";
 
 type SearchProfile = Pick<
   Profile,
   "id" | "username" | "full_name" | "avatar_url" | "trade" | "experience_level" | "years_experience" | "city" | "state" | "is_available" | "union_status"
->;
+> & { is_premium?: boolean };
 
 const selectClass =
   "bg-sm-bg border border-border rounded-md px-3 py-2 text-sm text-navy focus:outline-none focus:border-accent transition-all";
@@ -54,7 +55,22 @@ export default function SearchClient() {
 
     const { data } = await q;
     if (seq !== searchSeq.current) return; // stale — a newer search superseded this one
-    setResults((data ?? []) as SearchProfile[]);
+    let rows = (data ?? []) as SearchProfile[];
+
+    // Premium members are boosted to the top of results + badged.
+    if (rows.length) {
+      const { data: pa } = await supabase.rpc("premium_among", { ids: rows.map((r) => r.id) });
+      if (seq !== searchSeq.current) return;
+      const premium = new Set<string>();
+      for (const row of (pa ?? []) as (string | { id?: string })[]) {
+        premium.add(typeof row === "string" ? row : row.id ?? "");
+      }
+      rows = rows
+        .map((r) => ({ ...r, is_premium: premium.has(r.id) }))
+        .sort((a, b) => Number(b.is_premium) - Number(a.is_premium));
+    }
+
+    setResults(rows);
     setLoading(false);
   }, [query, trade, level, state, unionStatus, availableOnly]);
 
@@ -168,8 +184,9 @@ export default function SearchClient() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
-                      {profile.full_name ?? profile.username}
+                    <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors flex items-center gap-1">
+                      <span className="truncate">{profile.full_name ?? profile.username}</span>
+                      {profile.is_premium && <BadgeCheck size={13} className="text-accent shrink-0" aria-label="Premium member" />}
                     </p>
                     <p className="text-xs text-text-dim truncate">
                       {profile.trade
