@@ -73,13 +73,6 @@ export default async function AppNav() {
             Feed
           </Link>
           <Link
-            href={`/${profile.username}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
-          >
-            <User size={14} />
-            My Profile
-          </Link>
-          <Link
             href="/search"
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
           >
@@ -132,6 +125,14 @@ export default async function AppNav() {
               </span>
             )}
           </div>
+
+          <Link
+            href={`/${profile.username}`}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+          >
+            <User size={14} />
+            My Profile
+          </Link>
 
           <UserMenuDropdown
             username={profile.username}
