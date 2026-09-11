@@ -199,13 +199,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-5">
-              <div className="bg-white border border-border rounded-xl p-6">
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
                 <h1 className="font-serif text-2xl font-bold text-navy leading-tight mb-3">{project.title}</h1>
                 {project.description && <p className="text-sm text-text-mid leading-relaxed">{project.description}</p>}
               </div>
 
               {project.specific_skills?.length > 0 && (
-                <div className="bg-white border border-border rounded-xl p-5">
+                <div className="bg-white border border-border rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Skills</h2>
                     <div className="h-px bg-border flex-1" />
@@ -232,7 +232,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
             <div className="space-y-4">
               {/* Contributors */}
-              <div className="bg-white border border-border rounded-xl p-4">
+              <div className="bg-white border border-border rounded-xl p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Users size={13} className="text-text-dim" />
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">
@@ -278,7 +278,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 />
               )}
 
-              <div className="bg-white border border-border rounded-xl p-4 space-y-3">
+              <div className="bg-white border border-border rounded-xl p-5 space-y-4">
                 <div className="flex items-center gap-3 mb-1">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Details</h2>
                   <div className="h-px bg-border flex-1" />

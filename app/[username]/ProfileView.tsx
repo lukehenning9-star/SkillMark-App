@@ -387,7 +387,7 @@ export default function ProfileView({
 
         <div className="grid md:grid-cols-3 gap-6 pb-12">
           {/* Sidebar */}
-          <div className="md:col-span-1 space-y-5">
+          <div className="md:col-span-1 space-y-6">
             {(profile.bio || profile.city || profile.state || profile.trade || isOwner) && (
               <div>
                 <div className="flex items-center gap-3 mb-3">
@@ -399,7 +399,7 @@ export default function ProfileView({
                 ) : isOwner ? (
                   <p className="text-xs text-text-dim mb-3">Add a bio to tell contractors about yourself.</p>
                 ) : null}
-                <div className="space-y-2.5">
+                <div className="space-y-3.5">
                   {(profile.city || profile.state) && (
                     <div className="flex items-center gap-2 text-sm text-text-mid">
                       <MapPin size={14} className="text-text-dim shrink-0" />
@@ -429,12 +429,12 @@ export default function ProfileView({
             )}
 
             {certifications.length > 0 && (
-              <div className="bg-white border border-border rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Certifications</h2>
                   <div className="h-px bg-border flex-1" />
                 </div>
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {certifications.map((cert) => (
                     <li key={cert.id} className="flex items-start gap-2">
                       <Award size={14} className="text-emerald-600 shrink-0 mt-0.5" />
@@ -456,10 +456,10 @@ export default function ProfileView({
           </div>
 
           {/* Main column */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-7">
             {topCollaborators.length > 0 && (
-              <div className="bg-white border border-border rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Works with most</h2>
                   <div className="h-px bg-border flex-1" />
                 </div>
@@ -481,8 +481,8 @@ export default function ProfileView({
               </div>
             )}
             {(projects.length > 0 || isOwner) && (
-              <div className="bg-white border border-border rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Projects</h2>
                   <div className="h-px bg-border flex-1" />
                   {isOwner && projects.length > 0 && (
@@ -528,14 +528,14 @@ export default function ProfileView({
             )}
 
             {workExperience.length > 0 && (
-              <div className="bg-white border border-border rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white border border-border rounded-xl p-6 sm:p-7">
+                <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">Work Experience</h2>
                   <div className="h-px bg-border flex-1" />
                 </div>
                 <ul className="relative border-l-2 border-border ml-2 space-y-0">
                   {workExperience.map((job) => (
-                    <li key={job.id} className="relative pl-6 pb-6 last:pb-0">
+                    <li key={job.id} className="relative pl-6 pb-7 last:pb-0">
                       <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${job.is_current ? "border-accent" : "border-border2"}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${job.is_current ? "bg-accent" : "bg-border2"}`} />
                       </div>
