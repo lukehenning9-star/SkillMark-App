@@ -86,7 +86,7 @@ export default async function ReferralsPage() {
             <ol className="space-y-2 text-sm text-text-mid list-decimal pl-5">
               <li>Share your link with people in the trades.</li>
               <li>They sign up, complete their profile, and post a project with a photo.</li>
-              <li>You automatically get a free month of Premium — up to 5 per month.</li>
+              <li>You automatically get a free month of Premium, up to 5 per month.</li>
             </ol>
             <p className="text-[11px] text-text-dim mt-3">
               Self-referrals and duplicate/fake accounts don&apos;t qualify.

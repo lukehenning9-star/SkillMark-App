@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </p>
           <p className={p}>
             SkillMark is a professional portfolio network for people in the skilled trades. Much of
-            the Service is <strong>public by design</strong> — your profile and the work you post are
+            the Service is <strong>public by design</strong>, so your profile and the work you post are
             meant to be found by contractors and peers. Please keep that in mind when deciding what to
             share.
           </p>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
             <li className={li}>To display your public profile, projects, and contributions to other users.</li>
             <li className={li}>To deliver messages, connection requests, and collaboration invitations.</li>
             <li className={li}>To rank and personalize your feed.</li>
-            <li className={li}>To secure the Service — authentication, abuse prevention, and rate limiting.</li>
+            <li className={li}>To secure the Service, including authentication, abuse prevention, and rate limiting.</li>
             <li className={li}>To respond to you and, where you&apos;ve given it, to contact you about SkillMark.</li>
             <li className={li}>To comply with law and enforce our Terms.</li>
           </ul>
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
 
           <h2 className={h2}>5. Cookies</h2>
           <p className={p}>
-            We use only <strong>strictly necessary cookies</strong> — the session cookies that keep
+            We use only <strong>strictly necessary cookies</strong>, the session cookies that keep
             you logged in. We do not use advertising or analytics tracking cookies. Because these
             cookies are essential to the Service, they do not require consent under applicable law.
             If we introduce analytics in the future, we will update this Policy and provide any
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
             required by law. We will not discriminate against you for exercising your rights.
           </p>
           <ul className="list-disc pl-5 mb-3">
-            <li className={li}><strong>California (CCPA/CPRA):</strong> to know, access, correct, and delete your personal information, and to opt out of &quot;sale&quot; or &quot;sharing&quot; — note we do not sell or share personal information as those terms are defined.</li>
+            <li className={li}><strong>California (CCPA/CPRA):</strong> to know, access, correct, and delete your personal information, and to opt out of &quot;sale&quot; or &quot;sharing&quot;. We do not sell or share personal information as those terms are defined.</li>
             <li className={li}><strong>Texas (TDPSA):</strong> to confirm, access, correct, delete, and obtain a portable copy of your personal data, to opt out of targeted advertising and sale (we do neither), and to appeal a decision.</li>
             <li className={li}><strong>EU/UK (GDPR):</strong> to access, rectify, erase, restrict, port, and object to processing, and to lodge a complaint with your local data protection authority.</li>
           </ul>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
           <p className={p}>
             We protect data with authenticated sessions, database row-level security, transport
             encryption (HTTPS), rate limiting, and least-privilege access. No method of transmission
-            or storage is perfectly secure — please use a strong, unique password and keep it
+            or storage is perfectly secure, so please use a strong, unique password and keep it
             confidential.
           </p>
 

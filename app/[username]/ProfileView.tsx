@@ -417,13 +417,13 @@ export default function ProfileView({
         {isOwner && !profileIsComplete && (
           <p className="text-xs text-text-dim mb-4 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-            Profile incomplete —{" "}
+            Profile incomplete.{" "}
             <button
               type="button"
               onClick={() => setEditOpen(true)}
               className="text-navy underline underline-offset-2 hover:no-underline"
             >
-              add{" "}
+              Add{" "}
               {[
                 !avatarUrl && (isCompany ? "a logo" : "a photo"),
                 !profile.bio && (isCompany ? "an about section" : "a bio"),

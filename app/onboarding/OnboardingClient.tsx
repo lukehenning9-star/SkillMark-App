@@ -157,7 +157,7 @@ export default function OnboardingClient() {
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                   </svg>
                 </div>
-                <p className="text-xs text-text-dim">Profile photo &mdash; add after setup</p>
+                <p className="text-xs text-text-dim">Add a profile photo after setup</p>
               </div>
               <div>
                 <label className={labelClass}>Full Name</label>
@@ -192,7 +192,7 @@ export default function OnboardingClient() {
           {step === 3 && (
             <div className="bg-white border border-border rounded-xl shadow-sm p-8">
               <h1 className="font-serif text-2xl font-bold text-navy mb-1">What&apos;s your experience level?</h1>
-              <p className="text-text-dim text-sm mb-6">Be honest &mdash; contractors respect tradespeople at every level.</p>
+              <p className="text-text-dim text-sm mb-6">Be honest. Contractors respect tradespeople at every level.</p>
               <div className="space-y-3">
                 {LEVELS.map(({ value, label, description }) => (
                   <button
@@ -275,7 +275,7 @@ export default function OnboardingClient() {
             <div className="bg-white border border-border rounded-xl shadow-sm p-8 space-y-5">
               <div>
                 <h1 className="font-serif text-2xl font-bold text-navy mb-1">Add your first job</h1>
-                <p className="text-text-dim text-sm">Optional &mdash; but profiles with work history get significantly more contractor attention.</p>
+                <p className="text-text-dim text-sm">Optional, but profiles with work history get a lot more contractor attention.</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

@@ -58,7 +58,7 @@ export default function NewProjectForm() {
 
           <div>
             <label className={labelClass}>Project Title</label>
-            <input name="title" type="text" placeholder="200A Panel Upgrade — residential" required className={inputClass} />
+            <input name="title" type="text" placeholder="200A Residential Panel Upgrade" required className={inputClass} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -97,7 +97,7 @@ export default function NewProjectForm() {
 
         <div className="bg-white border border-border rounded-xl p-6">
           <h2 className="font-semibold text-navy text-sm mb-1">Skills Used</h2>
-          <p className="text-xs text-text-dim mb-3">Type to search or add your own — press Enter to add.</p>
+          <p className="text-xs text-text-dim mb-3">Type to search or add your own, then press Enter.</p>
           <SkillTagInput
             value={selectedSkills}
             onChange={setSelectedSkills}

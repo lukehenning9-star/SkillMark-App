@@ -9,7 +9,7 @@ import { STRIPE_ENABLED, PREMIUM_PRICE_LABEL } from "@/lib/stripe";
 export const metadata = { title: "Premium" };
 
 const FEATURES = [
-  { icon: Search, title: "Boosted in search & feed", body: "Show up higher when contractors search and browse — get found first." },
+  { icon: Search, title: "Boosted in search & feed", body: "Show up higher when contractors search and browse, so you get found first." },
   { icon: BadgeCheck, title: "Premium badge", body: "A badge on your profile that signals you're serious about your trade." },
   { icon: Eye, title: "Profile view insights", body: "See how much attention your profile is getting." },
   { icon: Images, title: "Higher limits", body: "Add far more projects and photos to show the full range of your work." },

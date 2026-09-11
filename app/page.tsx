@@ -97,11 +97,11 @@ export default function LandingPage() {
         </div>
         <h1>The skills network<br />for the <em>trades.</em></h1>
         <p className="lp-hero-sub">
-          SkillMark connects skilled tradespeople with the contractors who need them —
+          SkillMark connects skilled tradespeople with the contractors who need them,
           through <strong>real job photos and proven work</strong>, not resumes.
         </p>
         <div className="lp-hero-actions">
-          <Link href="/signup" className="lp-btn lp-btn-navy-lg">Build Your Profile — Free</Link>
+          <Link href="/signup" className="lp-btn lp-btn-navy-lg">Build Your Free Profile</Link>
           <Link href="/search" className="lp-btn lp-btn-outline-lg">Browse the Site →</Link>
         </div>
         <p style={{ marginTop: 14, fontSize: 13 }}>
@@ -110,7 +110,7 @@ export default function LandingPage() {
           </Link>
         </p>
         <div className="lp-hero-proof">
-          Free to join — be one of the first tradespeople on SkillMark.
+          Free to join. Be one of the first tradespeople on SkillMark.
         </div>
       </section>
 
@@ -141,7 +141,7 @@ export default function LandingPage() {
         <div className="lp-container">
           <div className="lp-why-label reveal">// Why Join a Trade</div>
           <h2 className="lp-why-title reveal reveal-d1">The smartest career move<br />nobody&apos;s <em>talking about.</em></h2>
-          <p className="lp-why-sub reveal reveal-d2">Trade careers offer exceptional pay, zero student debt, and real job security — and the opportunity is bigger than ever.</p>
+          <p className="lp-why-sub reveal reveal-d2">Trade careers offer exceptional pay, zero student debt, and real job security, and the opportunity is bigger than ever.</p>
 
           <div className="lp-why-grid">
             <div className="lp-why-card reveal">
@@ -151,7 +151,7 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3>Earn while you learn</h3>
-              <p>Apprentices earn a real wage from day one — starting at 40–50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned <strong>$150,000+ in wages.</strong></p>
+              <p>Apprentices earn a real wage from day one, starting at 40 to 50% of journeyman pay and rising every year. By the time a college student graduates, a trade apprentice has already earned <strong>$150,000+ in wages.</strong></p>
             </div>
             <div className="lp-why-card reveal reveal-d1">
               <div className="lp-why-card-icon">
@@ -169,7 +169,7 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3>AI-proof careers</h3>
-              <p>Electricians, plumbers, and HVAC techs can&apos;t be outsourced or automated. With <strong>499,000 unfilled trade jobs</strong> in America right now — and that number growing — qualified tradespeople are in demand everywhere.</p>
+              <p>Electricians, plumbers, and HVAC techs can&apos;t be outsourced or automated. There are <strong>499,000 unfilled trade jobs</strong> in America right now, and that number keeps growing. Qualified tradespeople are in demand everywhere.</p>
             </div>
           </div>
 
@@ -206,7 +206,7 @@ export default function LandingPage() {
       <section className="lp-how-section lp-section" id="how">
         <div className="lp-container">
           <div className="lp-section-label reveal">// How It Works</div>
-          <h2 className="lp-section-title reveal reveal-d1">Hire — and get hired —<br />based on proof.</h2>
+          <h2 className="lp-section-title reveal reveal-d1">Hire and get hired<br />based on proof.</h2>
           <p className="lp-section-sub reveal reveal-d2">No more gut-feel hiring. Just real evidence of what someone can actually do on a job site.</p>
           <div className="lp-steps-grid">
             <div className="lp-step-card reveal">
@@ -217,17 +217,17 @@ export default function LandingPage() {
             <div className="lp-step-card reveal reveal-d1">
               <div className="lp-step-num">02</div>
               <h3>Upload Your Work</h3>
-              <p>Photograph real jobs — panel installs, conduit runs, HVAC units, plumbing rough-ins. Every photo shows contractors what you can actually do.</p>
+              <p>Photograph real jobs like panel installs, conduit runs, HVAC units, and plumbing rough-ins. Every photo shows contractors what you can actually do.</p>
             </div>
             <div className="lp-step-card reveal reveal-d2">
               <div className="lp-step-num">03</div>
               <h3>Grow Your Portfolio</h3>
-              <p>Every job you document builds your track record. Skills, certifications, and work history — all in one place that&apos;s yours for life.</p>
+              <p>Every job you document builds your track record. Skills, certifications, and work history, all in one place that&apos;s yours for life.</p>
             </div>
             <div className="lp-step-card reveal reveal-d3">
               <div className="lp-step-num">04</div>
               <h3>Connect &amp; Collaborate</h3>
-              <p>Connect with other professionals and companies, team up on projects, and build a network around real work — not resumes.</p>
+              <p>Connect with other professionals and companies, team up on projects, and build a network around real work instead of resumes.</p>
             </div>
           </div>
         </div>
@@ -243,13 +243,13 @@ export default function LandingPage() {
             </div>
             <div className="reveal reveal-d1">
               <p className="lp-mission-body">
-                There&apos;s a generation of skilled tradespeople who built careers with their hands — with no portable record of the work they did. Their reputation lived in a foreman&apos;s phone contact or a handshake that didn&apos;t transfer when they moved on.
+                A whole generation of skilled tradespeople built careers with their hands and never had a portable record of the work they did. Their reputation lived in a foreman&apos;s phone or a handshake, and it didn&apos;t transfer when they moved on.
               </p>
               <p className="lp-mission-body">
-                At the same time, contractors across America are turning down projects because they can&apos;t find qualified professionals. Not because those professionals don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
+                Meanwhile contractors across America are turning down projects because they can&apos;t find qualified professionals. The professionals are out there. There just hasn&apos;t been a modern, reliable way to find them and trust them quickly.
               </p>
               <p className="lp-mission-closing">
-                The trades are the backbone of America. SkillMark gives that backbone a professional digital identity — portable, permanent, and entirely yours.
+                The trades are the backbone of America. SkillMark gives that backbone a professional digital identity that&apos;s portable, permanent, and entirely yours.
               </p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function LandingPage() {
           <div className="lp-signup-header reveal">
             <span className="lp-section-label">// Join SkillMark</span>
             <h2 className="lp-section-title">Free for everyone.<br />Built for the trades.</h2>
-            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Build a career profile that travels with you — job to job, city to city.</p>
+            <p className="lp-section-sub" style={{ margin: "0 auto" }}>Build a career profile that travels with you, job to job and city to city.</p>
           </div>
           <div className="lp-signup-grid">
             <div className="lp-signup-card worker reveal reveal-d1">

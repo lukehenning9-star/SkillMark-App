@@ -116,7 +116,7 @@ export default function CompanyOnboardingClient() {
                     <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/>
                   </svg>
                 </div>
-                <p className="text-xs text-text-dim">Company logo &mdash; add after setup</p>
+                <p className="text-xs text-text-dim">Add a company logo after setup</p>
               </div>
               <div>
                 <label className={labelClass}>Company Name</label>
@@ -170,7 +170,7 @@ export default function CompanyOnboardingClient() {
             <div className="bg-white border border-border rounded-xl shadow-sm p-8 space-y-5">
               <div>
                 <h1 className="font-serif text-2xl font-bold text-navy mb-1">Tell professionals about you</h1>
-                <p className="text-text-dim text-sm">All optional &mdash; but a fuller page gets more interest from tradespeople.</p>
+                <p className="text-text-dim text-sm">All optional, but a fuller page gets more interest from tradespeople.</p>
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">

@@ -107,7 +107,7 @@ function PhotoCarousel({ project }: { project: FeedProject }) {
     <div className="relative aspect-video bg-sm-bg">
       <Image
         src={current.url}
-        alt={`${project.title} — ${current.label}`}
+        alt={`${project.title} (${current.label})`}
         fill
         sizes="(max-width: 640px) 100vw, 470px"
         className="object-cover"

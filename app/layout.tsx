@@ -16,21 +16,21 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "SkillMark — The Skills Network for the Trades",
-    template: "%s — SkillMark",
+    default: "SkillMark | The Skills Network for the Trades",
+    template: "%s | SkillMark",
   },
   description:
     "SkillMark connects skilled tradespeople with contractors through real job photos and proven work, not resumes.",
   openGraph: {
     siteName: "SkillMark",
     type: "website",
-    title: "SkillMark — The Skills Network for the Trades",
+    title: "SkillMark | The Skills Network for the Trades",
     description:
       "SkillMark connects skilled tradespeople with contractors through real job photos and proven work, not resumes.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SkillMark — The Skills Network for the Trades",
+    title: "SkillMark | The Skills Network for the Trades",
     description:
       "SkillMark connects skilled tradespeople with contractors through real job photos and proven work, not resumes.",
   },

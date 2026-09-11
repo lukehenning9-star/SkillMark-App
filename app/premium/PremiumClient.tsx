@@ -60,7 +60,7 @@ export default function PremiumClient({
       </button>
       {!enabled && (
         <p className="text-[11px] text-text-dim mt-2 text-center">
-          Card payments aren&apos;t switched on yet — you can still earn free Premium months by inviting people.
+          Card payments aren&apos;t switched on yet, but you can still earn free Premium months by inviting people.
         </p>
       )}
       {error && <p className="text-xs text-red-600 mt-2 text-center">{error}</p>}

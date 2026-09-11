@@ -27,7 +27,7 @@ export default function CookiePolicyPage() {
 
           <h2 className={h2}>What cookies we use</h2>
           <p className={p}>
-            We use only <strong>strictly necessary cookies</strong> — the session cookies our
+            We use only <strong>strictly necessary cookies</strong>, the session cookies our
             authentication provider (Supabase) sets to keep you securely signed in as you move
             between pages. Without them, core features like logging in wouldn&apos;t work.
           </p>

@@ -34,7 +34,7 @@ export default function TermsPage() {
           <h2 className={h2}>Your content</h2>
           <p className={p}>
             You own the photos and content you upload. By posting, you grant SkillMark a license to
-            display that content on the platform — that&apos;s what makes your public profile work.
+            display that content on the platform, which is what makes your public profile work.
             Only upload photos you took or have the right to share, and don&apos;t include other
             people&apos;s personal information without their permission.
           </p>
@@ -50,14 +50,14 @@ export default function TermsPage() {
           <p className={p}>
             SkillMark connects trade professionals and companies but is not a party to any hiring decision,
             employment agreement, or work arrangement made between users. We don&apos;t verify or
-            guarantee any user&apos;s qualifications, licensing, or work quality — do your own
+            guarantee any user&apos;s qualifications, licensing, or work quality, so do your own
             diligence.
           </p>
 
           <h2 className={h2}>Service changes</h2>
           <p className={p}>
             SkillMark is provided &quot;as is.&quot; We may change, suspend, or discontinue features
-            as the product evolves, and we may update these terms — material changes will be posted
+            as the product evolves, and we may update these terms, with any material changes posted
             here.
           </p>
 

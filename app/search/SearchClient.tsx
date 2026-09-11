@@ -85,7 +85,7 @@ export default function SearchClient({ initialTrade = "" }: { initialTrade?: str
       <div className="mb-6">
         <h1 className="font-serif text-2xl font-bold text-navy">Find Trade Professionals</h1>
         <p className="text-text-dim text-sm mt-1">
-          Search the network by trade, skill, and location — connect and collaborate on projects.
+          Search the network by trade, skill, and location. Connect and collaborate on projects.
         </p>
       </div>
 

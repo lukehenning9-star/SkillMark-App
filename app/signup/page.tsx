@@ -108,7 +108,7 @@ export default function SignupPage() {
               <input type="hidden" name="account_type" value={accountType} />
               {isCompany && (
                 <p className="text-xs text-text-mid bg-accent/5 border border-accent-border rounded-md px-3 py-2">
-                  Company account — build a business page and reach out to tradespeople directly. You&apos;ll set up your company profile next.
+                  Company account. Build a business page and reach out to tradespeople directly. You&apos;ll set up your company profile next.
                 </p>
               )}
 
@@ -200,7 +200,7 @@ export default function SignupPage() {
                 By creating an account, you agree to our{" "}
                 <Link href="/terms" className="text-accent hover:underline">Terms</Link> and{" "}
                 <Link href="/privacy" className="text-accent hover:underline">Privacy Policy</Link>.
-                Free forever — no credit card required.
+                Free forever. No credit card required.
               </p>
             </form>
           </div>

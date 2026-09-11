@@ -197,7 +197,7 @@ export default function EditProjectForm({ project }: { project: Project }) {
           <p className="text-xs text-red-600 px-4 py-2 border-t border-red-100 bg-red-50">{photoError}</p>
         )}
         <p className="text-xs text-text-dim px-4 py-2 border-t border-border bg-sm-bg">
-          Cover photo — shown on your profile grid and as the project thumbnail
+          Cover photo, shown on your profile grid and as the project thumbnail
         </p>
       </div>
 
@@ -323,7 +323,7 @@ export default function EditProjectForm({ project }: { project: Project }) {
 
         <div className="bg-white border border-border rounded-xl p-6">
           <h2 className="font-semibold text-navy text-sm mb-1">Skills Used</h2>
-          <p className="text-xs text-text-dim mb-3">Type to search or add your own — press Enter to add.</p>
+          <p className="text-xs text-text-dim mb-3">Type to search or add your own, then press Enter.</p>
           <SkillTagInput
             value={selectedSkills}
             onChange={setSelectedSkills}

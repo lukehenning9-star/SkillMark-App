@@ -14,13 +14,13 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 6,
+          borderRadius: "50%",
         }}
       >
         <span
           style={{
             color: "#ffffff",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 800,
             letterSpacing: "-0.5px",
             fontFamily: "sans-serif",

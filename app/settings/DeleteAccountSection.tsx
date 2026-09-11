@@ -28,7 +28,7 @@ export default function DeleteAccountSection() {
     <div className="bg-white border border-red-200 rounded-xl p-6">
       <h2 className="font-semibold text-red-700 text-sm">Danger Zone</h2>
       <p className="text-xs text-text-dim mt-1 mb-4">
-        Permanently delete your account and all of your data — profile, projects,
+        Permanently delete your account and all of your data: profile, projects,
         photos, work history, certifications, and messages. This cannot be undone.
       </p>
 
