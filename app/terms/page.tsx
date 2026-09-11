@@ -48,7 +48,7 @@ export default function TermsPage() {
 
           <h2 className={h2}>No employment relationship</h2>
           <p className={p}>
-            SkillMark connects workers and contractors but is not a party to any hiring decision,
+            SkillMark connects trade professionals and companies but is not a party to any hiring decision,
             employment agreement, or work arrangement made between users. We don&apos;t verify or
             guarantee any user&apos;s qualifications, licensing, or work quality — do your own
             diligence.

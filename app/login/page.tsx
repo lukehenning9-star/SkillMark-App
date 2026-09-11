@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { Search } from "lucide-react";
 import { login } from "@/app/actions/auth";
 
 const inputClass =
@@ -106,11 +107,19 @@ export default function LoginPage() {
             Sign up free
           </Link>
         </p>
-        <p className="text-center text-sm mt-3">
-          <Link href="/search" className="text-text-dim hover:text-navy underline">
-            or browse the site as a guest →
-          </Link>
-        </p>
+
+        <div className="flex items-center gap-3 my-5">
+          <div className="h-px bg-border flex-1" />
+          <span className="text-[11px] uppercase tracking-wide text-text-dim">or</span>
+          <div className="h-px bg-border flex-1" />
+        </div>
+        <Link
+          href="/search"
+          className="flex items-center justify-center gap-2 w-full border border-border bg-white text-navy text-sm font-semibold py-2.5 rounded-md hover:border-border2 hover:bg-sm-bg transition-colors"
+        >
+          <Search size={15} />
+          Browse as a guest
+        </Link>
       </div>
     </main>
   );

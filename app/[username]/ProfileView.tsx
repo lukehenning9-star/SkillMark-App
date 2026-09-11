@@ -434,7 +434,7 @@ export default function ProfileView({
                 .filter(Boolean)
                 .join(", ")}
             </button>{" "}
-            {isCompany ? "to attract skilled workers." : "to attract contractors."}
+            {isCompany ? "to attract skilled professionals." : "to attract contractors."}
           </p>
         )}
 
@@ -912,7 +912,7 @@ export default function ProfileView({
               <div className="flex items-center justify-between p-4 bg-sm-bg rounded-xl border border-border">
                 <div>
                   <p className="text-sm font-semibold text-navy">{isCompany ? "Actively Hiring" : "Open to Work"}</p>
-                  <p className="text-xs text-text-dim mt-0.5">{isCompany ? "Show workers you're hiring" : "Show contractors you're available"}</p>
+                  <p className="text-xs text-text-dim mt-0.5">{isCompany ? "Show professionals you're hiring" : "Show contractors you're available"}</p>
                 </div>
                 <button
                   type="button"

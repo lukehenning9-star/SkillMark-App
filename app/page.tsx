@@ -123,7 +123,7 @@ export default function LandingPage() {
           </div>
           <div className="lp-stat-bar-item reveal reveal-d1">
             <div className="lp-stat-bar-num">92%</div>
-            <div className="lp-stat-bar-label">Of contractors can&apos;t find qualified workers</div>
+            <div className="lp-stat-bar-label">Of contractors can&apos;t find qualified professionals</div>
           </div>
           <div className="lp-stat-bar-item reveal reveal-d2">
             <div className="lp-stat-bar-num">$67K+</div>
@@ -212,7 +212,7 @@ export default function LandingPage() {
             <div className="lp-step-card reveal">
               <div className="lp-step-num">01</div>
               <h3>Build Your Profile</h3>
-              <p>Sign up free as a worker or contractor. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
+              <p>Sign up free as a professional or a company. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
             </div>
             <div className="lp-step-card reveal reveal-d1">
               <div className="lp-step-num">02</div>
@@ -226,8 +226,8 @@ export default function LandingPage() {
             </div>
             <div className="lp-step-card reveal reveal-d3">
               <div className="lp-step-num">04</div>
-              <h3>Connect Directly</h3>
-              <p>Contractors search profiles by trade and location. Workers get found by employers who can see exactly what they&apos;re qualified to do.</p>
+              <h3>Connect &amp; Collaborate</h3>
+              <p>Connect with other professionals and companies, team up on projects, and build a network around real work — not resumes.</p>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function LandingPage() {
                 There&apos;s a generation of skilled tradespeople who built careers with their hands — with no portable record of the work they did. Their reputation lived in a foreman&apos;s phone contact or a handshake that didn&apos;t transfer when they moved on.
               </p>
               <p className="lp-mission-body">
-                At the same time, contractors across America are turning down projects because they can&apos;t find qualified workers. Not because those workers don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
+                At the same time, contractors across America are turning down projects because they can&apos;t find qualified professionals. Not because those professionals don&apos;t exist — but because there&apos;s no modern, reliable way to find and trust them quickly.
               </p>
               <p className="lp-mission-closing">
                 The trades are the backbone of America. SkillMark gives that backbone a professional digital identity — portable, permanent, and entirely yours.
@@ -327,7 +327,7 @@ export default function LandingPage() {
           <ul className="lp-footer-links">
             <li><a href="#why">Why Trades</a></li>
             <li><a href="#how">How It Works</a></li>
-            <li><a href="#signup">For Workers</a></li>
+            <li><a href="#signup">For Professionals</a></li>
             <li><Link href="/privacy">Privacy</Link></li>
             <li><Link href="/terms">Terms</Link></li>
             <li><Link href="/cookies">Cookies</Link></li>

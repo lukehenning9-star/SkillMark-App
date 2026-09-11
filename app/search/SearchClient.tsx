@@ -83,9 +83,9 @@ export default function SearchClient({ initialTrade = "" }: { initialTrade?: str
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-bold text-navy">Find Trade Workers</h1>
+        <h1 className="font-serif text-2xl font-bold text-navy">Find Trade Professionals</h1>
         <p className="text-text-dim text-sm mt-1">
-          Search trade professionals by name, skill, location, and availability.
+          Search the network by trade, skill, and location — connect and collaborate on projects.
         </p>
       </div>
 
@@ -159,13 +159,13 @@ export default function SearchClient({ initialTrade = "" }: { initialTrade?: str
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
           </div>
-          <p className="font-semibold text-navy text-sm">No workers found</p>
+          <p className="font-semibold text-navy text-sm">No professionals found</p>
           <p className="text-xs text-text-dim mt-1">Try adjusting your search or filters.</p>
         </div>
       ) : (
         <>
           <p className="text-xs text-text-dim mb-3 font-medium uppercase tracking-wide">
-            {results.length} worker{results.length !== 1 ? "s" : ""} found
+            {results.length} professional{results.length !== 1 ? "s" : ""} found
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {results.map((profile) => (

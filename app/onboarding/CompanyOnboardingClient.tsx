@@ -137,7 +137,7 @@ export default function CompanyOnboardingClient() {
             <div className="bg-white border border-border rounded-xl shadow-sm p-8 space-y-5">
               <div>
                 <h1 className="font-serif text-2xl font-bold text-navy mb-1">What do you do, and where?</h1>
-                <p className="text-text-dim text-sm">Your primary trade and location help the right workers find you.</p>
+                <p className="text-text-dim text-sm">Your primary trade and location help the right professionals find you.</p>
               </div>
               <div>
                 <label className={labelClass}>Primary Trade / Industry</label>
@@ -169,7 +169,7 @@ export default function CompanyOnboardingClient() {
           {step === 3 && (
             <div className="bg-white border border-border rounded-xl shadow-sm p-8 space-y-5">
               <div>
-                <h1 className="font-serif text-2xl font-bold text-navy mb-1">Tell workers about you</h1>
+                <h1 className="font-serif text-2xl font-bold text-navy mb-1">Tell professionals about you</h1>
                 <p className="text-text-dim text-sm">All optional &mdash; but a fuller page gets more interest from tradespeople.</p>
               </div>
               <div>
@@ -210,7 +210,7 @@ export default function CompanyOnboardingClient() {
               <div className="flex items-center justify-between p-4 bg-sm-bg rounded-xl border border-border">
                 <div>
                   <p className="text-sm font-semibold text-navy">Actively hiring</p>
-                  <p className="text-xs text-text-dim mt-0.5">Show a badge so workers know you&apos;re looking</p>
+                  <p className="text-xs text-text-dim mt-0.5">Show a badge so professionals know you&apos;re looking</p>
                 </div>
                 <button
                   type="button"

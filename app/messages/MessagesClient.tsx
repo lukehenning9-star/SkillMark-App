@@ -419,7 +419,7 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
                 {searchQuery ? "No results" : "No messages yet"}
               </p>
               <p className="text-xs text-text-dim mt-1">
-                {searchQuery ? "Try a different name" : "Start a conversation with a trade worker"}
+                {searchQuery ? "Try a different name" : "Start a conversation with a trade professional"}
               </p>
             </div>
           ) : (
@@ -614,7 +614,7 @@ export default function MessagesClient({ currentUser, initialPartner }: Props) {
             </div>
             <p className="text-sm font-semibold text-navy">Your messages</p>
             <p className="text-xs text-text-dim mt-1 max-w-xs">
-              Select a conversation or start a new one to connect with trade workers.
+              Select a conversation or start a new one to connect with trade professionals.
             </p>
             <button
               onClick={() => setShowModal(true)}

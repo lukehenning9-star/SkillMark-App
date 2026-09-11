@@ -236,7 +236,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <div className="flex items-center gap-2 mb-3">
                   <Users size={13} className="text-text-dim" />
                   <h2 className="text-xs font-semibold text-navy whitespace-nowrap">
-                    {contributors.length > 1 ? "Contributors" : "Worker"}
+                    {contributors.length > 1 ? "Contributors" : "Contributor"}
                   </h2>
                   <div className="h-px bg-border flex-1" />
                 </div>
