@@ -68,6 +68,17 @@ create policy "Users can update own profile"
   on profiles for update to authenticated
   using (auth.uid() = id) with check (auth.uid() = id);
 
+-- Account type (worker vs company/business) + company-only fields. These must
+-- be added BEFORE the grant below, which references them by name (the grant
+-- fails on an existing database if the columns don't exist yet).
+alter table profiles add column if not exists account_type text not null default 'worker'
+  check (account_type in ('worker', 'company'));
+alter table profiles add column if not exists website text
+  check (char_length(website) <= 200);
+alter table profiles add column if not exists company_size text
+  check (company_size in ('1-10', '11-50', '51-200', '201-500', '500+'));
+alter table profiles add column if not exists hiring_trades text[] not null default '{}';
+
 -- Column-level lockdown: clients must NOT be able to set username (bypasses
 -- signup validation), profile_views, or verified_project_count directly.
 -- profile_views is incremented only via the SECURITY DEFINER function below.
@@ -90,15 +101,6 @@ alter table profiles add column if not exists union_status text
   check (union_status in ('Union Member', 'Non-Union', 'Open to Both'));
 alter table profiles add column if not exists headline text
   check (char_length(headline) <= 120);
-
--- Account type (worker vs company/business) + company-only fields.
-alter table profiles add column if not exists account_type text not null default 'worker'
-  check (account_type in ('worker', 'company'));
-alter table profiles add column if not exists website text
-  check (char_length(website) <= 200);
-alter table profiles add column if not exists company_size text
-  check (company_size in ('1-10', '11-50', '51-200', '201-500', '500+'));
-alter table profiles add column if not exists hiring_trades text[] not null default '{}';
 
 
 -- ── PROFILE VIEW COUNTER ──────────────────────────────────────
