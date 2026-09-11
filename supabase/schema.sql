@@ -430,6 +430,7 @@ create policy "Users can see own notifications"
 -- should be written with the service role, which bypasses RLS and needs no
 -- policy. Clients may only create notifications for themselves.
 drop policy if exists "System can insert notifications" on notifications;
+drop policy if exists "Users can insert own notifications" on notifications;
 create policy "Users can insert own notifications"
   on notifications for insert to authenticated with check (auth.uid() = profile_id);
 
