@@ -1,13 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import SearchClient from "./SearchClient";
 
+// Public: guests can search and view profiles without an account.
 export default async function SearchPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
   return (
     <>
       <AppNav />

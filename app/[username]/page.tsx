@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import AppNav from "@/components/AppNav";
 import ProfileView from "./ProfileView";
@@ -154,6 +155,13 @@ export default async function PublicProfilePage({
 
   const profileIsPremium = await isPremium(supabase, profile.id);
 
+  // Public URL the QR code encodes (?src=qr lets us tell scans apart later).
+  const h = await headers();
+  const originBase =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
+    `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+  const profileUrl = `${originBase}/${profile.username}?src=qr`;
+
   return (
     <>
       <AppNav />
@@ -168,6 +176,7 @@ export default async function PublicProfilePage({
         viewerId={viewer?.id ?? null}
         topCollaborators={topCollaborators}
         isPremiumProfile={profileIsPremium}
+        profileUrl={profileUrl}
       />
     </>
   );

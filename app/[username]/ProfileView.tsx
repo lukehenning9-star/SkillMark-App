@@ -11,6 +11,7 @@ import { US_STATES, TRADES, UNION_STATUS_OPTIONS } from "@/lib/constants";
 import AvatarCropModal from "@/components/AvatarCropModal";
 import AutocompleteInput from "@/components/AutocompleteInput";
 import ConnectButton, { type ConnectionState } from "@/components/ConnectButton";
+import ProfileQRButton from "@/components/ProfileQRButton";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
 type TopCollaboratorLite = {
@@ -32,6 +33,7 @@ interface Props {
   viewerId?: string | null;
   topCollaborators?: TopCollaboratorLite[];
   isPremiumProfile?: boolean;
+  profileUrl?: string;
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
@@ -63,6 +65,7 @@ export default function ProfileView({
   viewerId = null,
   topCollaborators = [],
   isPremiumProfile = false,
+  profileUrl,
 }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -278,9 +281,9 @@ export default function ProfileView({
                   Edit Profile
                 </button>
               </>
-            ) : (
+            ) : viewerId ? (
               <>
-                {viewerId && <ConnectButton targetId={profile.id} initialState={connectionState} />}
+                <ConnectButton targetId={profile.id} initialState={connectionState} />
                 <Link
                   href={`/messages?to=${profile.username}`}
                   className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors"
@@ -288,7 +291,15 @@ export default function ProfileView({
                   Send Message
                 </Link>
               </>
+            ) : (
+              <Link
+                href="/signup"
+                className="text-sm font-semibold text-white bg-accent px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+              >
+                Sign up to connect
+              </Link>
             )}
+            {profileUrl && <ProfileQRButton url={profileUrl} username={profile.username} />}
           </div>
         </div>
 

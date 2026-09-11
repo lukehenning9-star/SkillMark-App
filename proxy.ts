@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const protectedRoutes = ["/dashboard", "/onboarding", "/projects", "/settings", "/messages", "/search"];
+// Guests may browse profiles, projects, and search — sign-up is required only to
+// DO things. So we protect the action surfaces (dashboard, onboarding, settings,
+// messages, creating a project, editing a project), not viewing.
+const protectedRoutes = ["/dashboard", "/onboarding", "/settings", "/messages", "/projects/new"];
+const editProjectPattern = /^\/projects\/[^/]+\/edit(\/|$)/;
 const authRoutes = ["/login", "/signup"];
 
 export default async function proxy(req: NextRequest) {
@@ -20,7 +24,7 @@ export default async function proxy(req: NextRequest) {
     });
   }
 
-  const isProtected = protectedRoutes.some((r) => path.startsWith(r));
+  const isProtected = protectedRoutes.some((r) => path.startsWith(r)) || editProjectPattern.test(path);
   const isAuthRoute = authRoutes.includes(path);
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {

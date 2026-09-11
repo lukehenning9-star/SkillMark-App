@@ -9,7 +9,36 @@ export default async function AppNav() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  // Guests get a lightweight header so they can keep browsing + find the way in.
+  if (!user) {
+    return (
+      <header className="sticky top-0 z-40 bg-white border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <Link href="/" className="font-serif text-xl font-bold text-navy shrink-0">
+            Skill<span className="text-accent">Mark</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/search"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+            >
+              <Search size={14} />
+              <span className="hidden sm:inline">Search</span>
+            </Link>
+            <Link href="/login" className="text-sm font-semibold text-navy px-3 py-1.5 rounded-md hover:bg-sm-bg transition-colors">
+              Log in
+            </Link>
+            <Link
+              href="/signup"
+              className="text-sm font-semibold text-white bg-accent px-4 py-1.5 rounded-md hover:bg-[#1e3a8a] transition-colors"
+            >
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
