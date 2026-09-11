@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, User, Search, FolderPlus, MessageSquare, Users } from "lucide-react";
+import { Home, User, Search, FolderPlus, MessageSquare, Users, Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import UserMenuDropdown from "./UserMenuDropdown";
 import MobileBottomNav from "./MobileBottomNav";
@@ -48,12 +48,12 @@ export default async function AppNav() {
 
   if (!profile) return null;
 
-  const { count: unreadCount } = await supabase
-    .from("messages")
-    .select("*", { count: "exact", head: true })
-    .eq("recipient_id", user.id)
-    .is("read_at", null);
+  const [{ count: unreadCount }, { count: notifUnread }] = await Promise.all([
+    supabase.from("messages").select("*", { count: "exact", head: true }).eq("recipient_id", user.id).is("read_at", null),
+    supabase.from("notifications").select("*", { count: "exact", head: true }).eq("profile_id", user.id).eq("read", false),
+  ]);
   const msgCount = unreadCount ?? 0;
+  const notifCount = notifUnread ?? 0;
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border">
@@ -104,6 +104,20 @@ export default async function AppNav() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          <div className="relative">
+            <Link
+              href="/notifications"
+              aria-label="Notifications"
+              className="w-9 h-9 flex items-center justify-center text-text-dim hover:text-navy hover:bg-sm-bg rounded-md transition-colors"
+            >
+              <Bell size={18} />
+            </Link>
+            {notifCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 pointer-events-none">
+                {notifCount > 9 ? "9+" : notifCount}
+              </span>
+            )}
+          </div>
           <div className="relative">
             <Link
               href="/messages"

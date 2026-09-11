@@ -198,6 +198,11 @@ export default function SignupPage() {
           Already have an account?{" "}
           <Link href="/login" className="text-accent font-semibold hover:underline">Log in</Link>
         </p>
+        <p className="text-center text-sm mt-3">
+          <Link href="/search" className="text-text-dim hover:text-navy underline">
+            or browse the site as a guest →
+          </Link>
+        </p>
       </div>
     </main>
   );

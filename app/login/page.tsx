@@ -106,6 +106,11 @@ export default function LoginPage() {
             Sign up free
           </Link>
         </p>
+        <p className="text-center text-sm mt-3">
+          <Link href="/search" className="text-text-dim hover:text-navy underline">
+            or browse the site as a guest →
+          </Link>
+        </p>
       </div>
     </main>
   );

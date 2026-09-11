@@ -160,3 +160,14 @@ export type ReferralStats = {
   review: number
   monthsEarned: number
 }
+
+export type Notification = {
+  id: string
+  profile_id: string
+  type: string
+  title: string
+  body: string | null
+  read: boolean
+  link: string | null
+  created_at: string
+}

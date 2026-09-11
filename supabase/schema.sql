@@ -909,6 +909,9 @@ begin
 
   perform grant_free_month(v_ref.referrer_id);
   update referrals set status = 'rewarded', activated_at = now(), rewarded_at = now() where id = v_ref.id;
+  insert into notifications (profile_id, type, title, body, link)
+  values (v_ref.referrer_id, 'referral_reward', 'You earned a free month of Premium',
+    'A referral just became active.', '/premium');
 end; $$;
 
 revoke execute on function get_or_create_my_referral_code(), record_referral(text),
@@ -917,3 +920,102 @@ grant execute on function get_or_create_my_referral_code(), record_referral(text
   maybe_grant_referral_reward() to authenticated;
 -- grant_free_month is internal only.
 revoke execute on function grant_free_month(uuid) from anon, authenticated;
+
+
+-- ══════════════════════════════════════════════════════════════
+-- NOTIFICATIONS: auto-generate on social events (added)
+-- Triggers run SECURITY DEFINER so they can write a notification row for the
+-- TARGET user (past the "own rows only" insert policy). type is free text now.
+-- ══════════════════════════════════════════════════════════════
+
+alter table notifications drop constraint if exists notifications_type_check;
+
+create or replace function _display_name(p uuid)
+returns text language sql stable security definer set search_path = public, pg_temp as $$
+  select coalesce(nullif(full_name, ''), username, 'Someone') from profiles where id = p;
+$$;
+
+-- Connections: request -> notify addressee; accepted -> notify requester.
+create or replace function notify_connection()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if TG_OP = 'INSERT' then
+    insert into notifications (profile_id, type, title, body, link)
+    values (NEW.addressee_id, 'connection_request',
+      _display_name(NEW.requester_id) || ' wants to connect', null, '/connections');
+  elsif TG_OP = 'UPDATE' and NEW.status = 'accepted' and OLD.status <> 'accepted' then
+    insert into notifications (profile_id, type, title, body, link)
+    values (NEW.requester_id, 'connection_accepted',
+      _display_name(NEW.addressee_id) || ' accepted your connection', null,
+      '/' || (select username from profiles where id = NEW.addressee_id));
+  end if;
+  return NEW;
+end; $$;
+drop trigger if exists trg_notify_connection on connections;
+create trigger trg_notify_connection after insert or update on connections
+  for each row execute procedure notify_connection();
+
+-- Collaborators: invite/request -> notify the other party; accepted -> notify.
+create or replace function notify_collaborator()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid; v_title text;
+begin
+  select p.profile_id, p.title into v_owner, v_title from projects p where p.id = NEW.project_id;
+  if TG_OP = 'INSERT' then
+    if NEW.status = 'invited' then
+      insert into notifications (profile_id, type, title, body, link)
+      values (NEW.profile_id, 'project_invite',
+        _display_name(v_owner) || ' invited you to collaborate', v_title, '/projects/' || NEW.project_id);
+    elsif NEW.status = 'requested' then
+      insert into notifications (profile_id, type, title, body, link)
+      values (v_owner, 'join_request',
+        _display_name(NEW.profile_id) || ' asked to join your project', v_title, '/projects/' || NEW.project_id);
+    end if;
+  elsif TG_OP = 'UPDATE' and NEW.status = 'accepted' and OLD.status <> 'accepted' then
+    if OLD.status = 'invited' then
+      insert into notifications (profile_id, type, title, body, link)
+      values (v_owner, 'join_approved',
+        _display_name(NEW.profile_id) || ' joined your project', v_title, '/projects/' || NEW.project_id);
+    elsif OLD.status = 'requested' then
+      insert into notifications (profile_id, type, title, body, link)
+      values (NEW.profile_id, 'join_approved',
+        'You joined ' || coalesce(v_title, 'a project'), null, '/projects/' || NEW.project_id);
+    end if;
+  end if;
+  return NEW;
+end; $$;
+drop trigger if exists trg_notify_collaborator on project_collaborators;
+create trigger trg_notify_collaborator after insert or update on project_collaborators
+  for each row execute procedure notify_collaborator();
+
+-- Likes -> notify the project owner (not on your own like).
+create or replace function notify_like()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid; v_title text;
+begin
+  select p.profile_id, p.title into v_owner, v_title from projects p where p.id = NEW.project_id;
+  if v_owner is not null and v_owner <> NEW.profile_id then
+    insert into notifications (profile_id, type, title, body, link)
+    values (v_owner, 'project_liked', _display_name(NEW.profile_id) || ' liked your project',
+      v_title, '/projects/' || NEW.project_id);
+  end if;
+  return NEW;
+end; $$;
+drop trigger if exists trg_notify_like on project_likes;
+create trigger trg_notify_like after insert on project_likes for each row execute procedure notify_like();
+
+-- Comments -> notify the project owner (not on your own comment).
+create or replace function notify_comment()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_owner uuid; v_title text;
+begin
+  select p.profile_id, p.title into v_owner, v_title from projects p where p.id = NEW.project_id;
+  if v_owner is not null and v_owner <> NEW.profile_id then
+    insert into notifications (profile_id, type, title, body, link)
+    values (v_owner, 'project_comment', _display_name(NEW.profile_id) || ' commented on your project',
+      left(NEW.content, 120), '/projects/' || NEW.project_id);
+  end if;
+  return NEW;
+end; $$;
+drop trigger if exists trg_notify_comment on project_comments;
+create trigger trg_notify_comment after insert on project_comments for each row execute procedure notify_comment();

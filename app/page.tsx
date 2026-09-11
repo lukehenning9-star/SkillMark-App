@@ -82,6 +82,7 @@ export default function LandingPage() {
         <div className="lp-nav-inner">
           <Link className="lp-nav-logo" href="/">Skill<span>Mark</span></Link>
           <div className="lp-nav-right">
+            <Link href="/search" className="lp-btn lp-btn-ghost">Browse</Link>
             <Link href="/login" className="lp-btn lp-btn-ghost">Log In</Link>
             <Link href="/signup" className="lp-btn lp-btn-navy">Join Free →</Link>
           </div>
@@ -101,8 +102,13 @@ export default function LandingPage() {
         </p>
         <div className="lp-hero-actions">
           <Link href="/signup" className="lp-btn lp-btn-navy-lg">Build Your Profile — Free</Link>
-          <a href="#how" className="lp-btn lp-btn-outline-lg">See How It Works</a>
+          <Link href="/search" className="lp-btn lp-btn-outline-lg">Browse the Site →</Link>
         </div>
+        <p style={{ marginTop: 14, fontSize: 13 }}>
+          <Link href="/search" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>
+            or explore tradespeople without signing up
+          </Link>
+        </p>
         <div className="lp-hero-proof">
           <div className="lp-proof-avatars">
             <div className="lp-proof-avatar" style={{ background: "#1e40af" }}>MR</div>
