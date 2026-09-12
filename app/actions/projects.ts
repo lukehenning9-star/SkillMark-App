@@ -74,22 +74,26 @@ export async function createProject(formData: FormData) {
     }
   }
 
-  const { data, error } = await supabase
+  const base = {
+    profile_id: user.id,
+    title: fields.title,
+    description: fields.description,
+    trade_category: fields.tradeCategory,
+    location: fields.location,
+    completed_date: fields.completedDate,
+    specific_skills: fields.specificSkills,
+  };
+  let { data, error } = await supabase
     .from("projects")
-    .insert({
-      profile_id: user.id,
-      title: fields.title,
-      description: fields.description,
-      trade_category: fields.tradeCategory,
-      location: fields.location,
-      completed_date: fields.completedDate,
-      specific_skills: fields.specificSkills,
-      post_to_feed: fields.postToFeed,
-    })
+    .insert({ ...base, post_to_feed: fields.postToFeed })
     .select("id")
     .single();
+  // Fallback if the post_to_feed column hasn't been added yet (schema not re-run).
+  if (error && /post_to_feed/.test(error.message)) {
+    ({ data, error } = await supabase.from("projects").insert(base).select("id").single());
+  }
 
-  if (error) return { error: error.message };
+  if (error || !data) return { error: error?.message ?? "Could not create project." };
   return { id: data.id };
 }
 
@@ -101,19 +105,23 @@ export async function updateProject(projectId: string, formData: FormData) {
   const fields = validateProjectFields(formData);
   if ("error" in fields) return fields;
 
-  const { error } = await supabase
+  const base = {
+    title: fields.title,
+    description: fields.description,
+    trade_category: fields.tradeCategory,
+    location: fields.location,
+    completed_date: fields.completedDate,
+    specific_skills: fields.specificSkills,
+  };
+  let { error } = await supabase
     .from("projects")
-    .update({
-      title: fields.title,
-      description: fields.description,
-      trade_category: fields.tradeCategory,
-      location: fields.location,
-      completed_date: fields.completedDate,
-      specific_skills: fields.specificSkills,
-      post_to_feed: fields.postToFeed,
-    })
+    .update({ ...base, post_to_feed: fields.postToFeed })
     .eq("id", projectId)
     .eq("profile_id", user.id);
+  // Fallback if the post_to_feed column hasn't been added yet (schema not re-run).
+  if (error && /post_to_feed/.test(error.message)) {
+    ({ error } = await supabase.from("projects").update(base).eq("id", projectId).eq("profile_id", user.id));
+  }
 
   if (error) return { error: error.message };
   return { success: true };

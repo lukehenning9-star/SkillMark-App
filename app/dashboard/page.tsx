@@ -34,17 +34,26 @@ export default async function DashboardPage() {
   }
 
   // 2) Recent candidate projects (feed-shared only) with author + counts.
-  const { data: raw } = await supabase
+  const projectSelect =
+    `id, title, description, cover_photo_url, before_photo_url, after_photo_url,
+     specific_skills, trade_category, created_at, profile_id,
+     profiles(id, username, full_name, avatar_url, trade),
+     likes:project_likes(count), comments:project_comments(count)`;
+  let { data: raw, error: feedError } = await supabase
     .from("projects")
-    .select(
-      `id, title, description, cover_photo_url, before_photo_url, after_photo_url,
-       specific_skills, trade_category, created_at, profile_id,
-       profiles(id, username, full_name, avatar_url, trade),
-       likes:project_likes(count), comments:project_comments(count)`
-    )
+    .select(projectSelect)
     .eq("post_to_feed", true)
     .order("created_at", { ascending: false })
     .limit(CANDIDATE_POOL);
+  // Fallback for databases where the post_to_feed column hasn't been added yet
+  // (schema not re-run) — show all recent projects rather than erroring.
+  if (feedError) {
+    ({ data: raw } = await supabase
+      .from("projects")
+      .select(projectSelect)
+      .order("created_at", { ascending: false })
+      .limit(CANDIDATE_POOL));
+  }
 
   const candidates = (raw ?? []).filter((p) => p.profiles);
 
