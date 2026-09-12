@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import AppNav from "@/components/AppNav";
@@ -19,19 +18,22 @@ function embeddedCount(v: unknown): number {
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  // The feed is public: guests can browse projects. Only DOING things
+  // (posting, liking, connecting) requires an account.
 
   // 1) Who this viewer is connected to (accepted, either direction).
-  const { data: conns } = await supabase
-    .from("connections")
-    .select("requester_id, addressee_id")
-    .eq("status", "accepted");
   const connectionIds = new Set<string>();
-  for (const c of conns ?? []) {
-    connectionIds.add(c.requester_id === user.id ? c.addressee_id : c.requester_id);
+  if (user) {
+    const { data: conns } = await supabase
+      .from("connections")
+      .select("requester_id, addressee_id")
+      .eq("status", "accepted");
+    for (const c of conns ?? []) {
+      connectionIds.add(c.requester_id === user.id ? c.addressee_id : c.requester_id);
+    }
   }
 
-  // 2) Recent candidate projects with author + like/comment counts.
+  // 2) Recent candidate projects (feed-shared only) with author + counts.
   const { data: raw } = await supabase
     .from("projects")
     .select(
@@ -40,6 +42,7 @@ export default async function DashboardPage() {
        profiles(id, username, full_name, avatar_url, trade),
        likes:project_likes(count), comments:project_comments(count)`
     )
+    .eq("post_to_feed", true)
     .order("created_at", { ascending: false })
     .limit(CANDIDATE_POOL);
 
@@ -48,7 +51,7 @@ export default async function DashboardPage() {
   // 3) Which of these the viewer already liked.
   const ids = candidates.map((p) => p.id);
   const likedByMe = new Set<string>();
-  if (ids.length) {
+  if (user && ids.length) {
     const { data: myLikes } = await supabase
       .from("project_likes")
       .select("project_id")
@@ -107,8 +110,10 @@ export default async function DashboardPage() {
   scored.sort((a, b) => b.score - a.score);
   const projects = scored.slice(0, FEED_SIZE).map((s) => s.item);
 
-  // Private "people you work with most" strip.
-  const { data: topRaw } = await supabase.rpc("top_collaborators", { target: user.id, lim: 6 });
+  // Private "people you work with most" strip (signed-in only).
+  const { data: topRaw } = user
+    ? await supabase.rpc("top_collaborators", { target: user.id, lim: 6 })
+    : { data: null };
   let topCollaborators: { id: string; username: string; full_name: string | null; avatar_url: string | null; shared_count: number }[] = [];
   if (Array.isArray(topRaw) && topRaw.length) {
     const ids = topRaw.map((t: { profile_id: string }) => t.profile_id);
@@ -151,8 +156,14 @@ export default async function DashboardPage() {
                 </div>
               </div>
             )}
-            <h1 className="font-serif text-xl font-bold text-navy mb-4">Your Feed</h1>
-            <FeedClient projects={projects} />
+            <h1 className="font-serif text-xl font-bold text-navy mb-4">{user ? "Your Feed" : "Latest Projects"}</h1>
+            {!user && (
+              <div className="bg-accent/5 border border-accent-border rounded-xl p-4 mb-4 flex items-center justify-between gap-3">
+                <p className="text-sm text-text-mid">Browsing as a guest. Sign up to post work, like, and connect.</p>
+                <Link href="/signup" className="shrink-0 text-sm font-semibold text-white bg-accent px-3.5 py-2 rounded-md hover:opacity-90 transition-opacity">Join Free</Link>
+              </div>
+            )}
+            <FeedClient projects={projects} canInteract={!!user} />
           </div>
 
           {/* Desktop sidebar */}
@@ -177,22 +188,35 @@ export default async function DashboardPage() {
                 </div>
               </div>
             )}
-            <div className="bg-white border border-border rounded-xl p-4">
-              <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">Grow your network</p>
-              <div className="space-y-1">
-                <Link href="/search" className="block text-sm text-navy hover:text-accent py-1.5">Find people to connect with →</Link>
-                <Link href="/connections" className="block text-sm text-navy hover:text-accent py-1.5">Manage connections →</Link>
-                <Link href="/projects/new" className="block text-sm text-navy hover:text-accent py-1.5">Add a project →</Link>
+            {user ? (
+              <>
+                <div className="bg-white border border-border rounded-xl p-4">
+                  <p className="text-xs font-semibold text-text-dim uppercase tracking-wide mb-3">Grow your network</p>
+                  <div className="space-y-1">
+                    <Link href="/search" className="block text-sm text-navy hover:text-accent py-1.5">Find people to connect with →</Link>
+                    <Link href="/connections" className="block text-sm text-navy hover:text-accent py-1.5">Manage connections →</Link>
+                    <Link href="/projects/new" className="block text-sm text-navy hover:text-accent py-1.5">Add a project →</Link>
+                  </div>
+                </div>
+                <div className="bg-accent/5 border border-accent-border rounded-xl p-4">
+                  <p className="text-sm font-semibold text-navy mb-1">Invite &amp; earn</p>
+                  <p className="text-xs text-text-mid mb-2">Get a free month of Premium for every friend who joins and posts work.</p>
+                  <div className="space-y-1">
+                    <Link href="/referrals" className="block text-sm font-semibold text-accent hover:underline py-1">Get your invite link →</Link>
+                    <Link href="/premium" className="block text-sm text-navy hover:text-accent py-1">What&apos;s Premium? →</Link>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="bg-accent/5 border border-accent-border rounded-xl p-4">
+                <p className="text-sm font-semibold text-navy mb-1">Join SkillMark</p>
+                <p className="text-xs text-text-mid mb-3">Build a profile, post your work, and connect with the trades. Free to join.</p>
+                <div className="space-y-1">
+                  <Link href="/signup" className="block text-sm font-semibold text-accent hover:underline py-1">Create your free profile →</Link>
+                  <Link href="/search" className="block text-sm text-navy hover:text-accent py-1">Find tradespeople →</Link>
+                </div>
               </div>
-            </div>
-            <div className="bg-accent/5 border border-accent-border rounded-xl p-4">
-              <p className="text-sm font-semibold text-navy mb-1">Invite &amp; earn</p>
-              <p className="text-xs text-text-mid mb-2">Get a free month of Premium for every friend who joins and posts work.</p>
-              <div className="space-y-1">
-                <Link href="/referrals" className="block text-sm font-semibold text-accent hover:underline py-1">Get your invite link →</Link>
-                <Link href="/premium" className="block text-sm text-navy hover:text-accent py-1">What&apos;s Premium? →</Link>
-              </div>
-            </div>
+            )}
           </aside>
         </div>
       </main>

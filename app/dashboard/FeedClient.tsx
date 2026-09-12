@@ -30,10 +30,30 @@ export type FeedProject = {
   is_premium: boolean;
 };
 
-function EngagementBar({ project }: { project: FeedProject }) {
+function EngagementBar({ project, canInteract }: { project: FeedProject; canInteract: boolean }) {
   const [liked, setLiked] = useState(project.liked_by_me);
   const [count, setCount] = useState(project.like_count);
   const [, startTransition] = useTransition();
+
+  // Guests can see counts but must sign up to like.
+  if (!canInteract) {
+    return (
+      <div className="flex items-center gap-5 px-4 py-2.5 border-t border-border">
+        <Link href="/signup" aria-label="Sign up to like" className="inline-flex items-center gap-1.5 text-sm text-text-dim hover:text-navy transition-colors">
+          <Heart size={17} />
+          {count > 0 && <span>{count}</span>}
+        </Link>
+        <Link
+          href={`/projects/${project.id}#comments`}
+          aria-label="Comments"
+          className="inline-flex items-center gap-1.5 text-sm text-text-dim hover:text-navy transition-colors"
+        >
+          <MessageCircle size={17} />
+          {project.comment_count > 0 && <span>{project.comment_count}</span>}
+        </Link>
+      </div>
+    );
+  }
 
   function onLike() {
     // optimistic
@@ -156,7 +176,7 @@ function PhotoCarousel({ project }: { project: FeedProject }) {
   );
 }
 
-function FeedCard({ project }: { project: FeedProject }) {
+function FeedCard({ project, canInteract }: { project: FeedProject; canInteract: boolean }) {
   const author = project.profiles;
   if (!author) return null;
   const displayName = author.full_name || author.username;
@@ -228,12 +248,12 @@ function FeedCard({ project }: { project: FeedProject }) {
         </Link>
       </div>
 
-      <EngagementBar project={project} />
+      <EngagementBar project={project} canInteract={canInteract} />
     </article>
   );
 }
 
-export default function FeedClient({ projects }: { projects: FeedProject[] }) {
+export default function FeedClient({ projects, canInteract = true }: { projects: FeedProject[]; canInteract?: boolean }) {
   if (projects.length === 0) {
     return (
       <div className="bg-white border border-border rounded-xl p-10 text-center">
@@ -255,7 +275,7 @@ export default function FeedClient({ projects }: { projects: FeedProject[] }) {
   return (
     <div className="space-y-4">
       {projects.map((p) => (
-        <FeedCard key={p.id} project={p} />
+        <FeedCard key={p.id} project={p} canInteract={canInteract} />
       ))}
     </div>
   );

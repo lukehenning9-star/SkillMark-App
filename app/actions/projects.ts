@@ -39,6 +39,10 @@ function validateProjectFields(formData: FormData) {
   const rawDate = (formData.get("completed_date") as string | null) || null;
   const completedDate = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : null;
 
+  // Opt-out toggle: projects post to the public feed by default; only "false"
+  // keeps a project off the feed (it still shows on the owner's profile).
+  const postToFeed = formData.get("post_to_feed") !== "false";
+
   return {
     title,
     description,
@@ -46,6 +50,7 @@ function validateProjectFields(formData: FormData) {
     specificSkills,
     tradeCategory: rawTradeCategory,
     completedDate,
+    postToFeed,
   };
 }
 
@@ -79,6 +84,7 @@ export async function createProject(formData: FormData) {
       location: fields.location,
       completed_date: fields.completedDate,
       specific_skills: fields.specificSkills,
+      post_to_feed: fields.postToFeed,
     })
     .select("id")
     .single();
@@ -104,6 +110,7 @@ export async function updateProject(projectId: string, formData: FormData) {
       location: fields.location,
       completed_date: fields.completedDate,
       specific_skills: fields.specificSkills,
+      post_to_feed: fields.postToFeed,
     })
     .eq("id", projectId)
     .eq("profile_id", user.id);

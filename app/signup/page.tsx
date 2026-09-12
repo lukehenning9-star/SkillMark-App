@@ -217,11 +217,11 @@ export default function SignupPage() {
           <div className="h-px bg-border flex-1" />
         </div>
         <Link
-          href="/search"
+          href="/dashboard"
           className="flex items-center justify-center gap-2 w-full border border-border bg-white text-navy text-sm font-semibold py-2.5 rounded-md hover:border-border2 hover:bg-sm-bg transition-colors"
         >
           <Search size={15} />
-          Browse as a guest
+          Browse the feed
         </Link>
       </div>
     </main>

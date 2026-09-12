@@ -82,8 +82,8 @@ export default function LandingPage() {
         <div className="lp-nav-inner">
           <Link className="lp-nav-logo" href="/">Skill<span>Mark</span></Link>
           <div className="lp-nav-right">
-            <Link href="/search" className="lp-btn lp-btn-ghost">Browse</Link>
-            <Link href="/login" className="lp-btn lp-btn-ghost">Log In</Link>
+            <Link href="/dashboard" className="lp-btn lp-btn-ghost lp-nav-ghost-hide">Browse</Link>
+            <Link href="/login" className="lp-btn lp-btn-ghost lp-nav-ghost-hide">Log In</Link>
             <Link href="/signup" className="lp-btn lp-btn-navy">Join Free →</Link>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function LandingPage() {
         </p>
         <div className="lp-hero-actions">
           <Link href="/signup" className="lp-btn lp-btn-navy-lg">Build Your Free Profile</Link>
-          <Link href="/search" className="lp-btn lp-btn-outline-lg">Browse the Site →</Link>
+          <Link href="/dashboard" className="lp-btn lp-btn-outline-lg">Browse the Feed →</Link>
         </div>
         <p style={{ marginTop: 14, fontSize: 13 }}>
           <Link href="/search" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>
@@ -123,7 +123,7 @@ export default function LandingPage() {
           </div>
           <div className="lp-stat-bar-item reveal reveal-d1">
             <div className="lp-stat-bar-num">92%</div>
-            <div className="lp-stat-bar-label">Of contractors can&apos;t find qualified professionals</div>
+            <div className="lp-stat-bar-label">Of contractors can&apos;t find qualified tradespeople</div>
           </div>
           <div className="lp-stat-bar-item reveal reveal-d2">
             <div className="lp-stat-bar-num">$67K+</div>
@@ -212,7 +212,7 @@ export default function LandingPage() {
             <div className="lp-step-card reveal">
               <div className="lp-step-num">01</div>
               <h3>Build Your Profile</h3>
-              <p>Sign up free as a professional or a company. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
+              <p>Sign up free as a tradesperson or a company. Add your trade, location, and experience. Your profile travels with you for your entire career.</p>
             </div>
             <div className="lp-step-card reveal reveal-d1">
               <div className="lp-step-num">02</div>
@@ -227,7 +227,7 @@ export default function LandingPage() {
             <div className="lp-step-card reveal reveal-d3">
               <div className="lp-step-num">04</div>
               <h3>Connect &amp; Collaborate</h3>
-              <p>Connect with other professionals and companies, team up on projects, and build a network around real work instead of resumes.</p>
+              <p>Connect with other tradespeople and companies, team up on projects, and build a network around real work instead of resumes.</p>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function LandingPage() {
                 A whole generation of skilled tradespeople built careers with their hands and never had a portable record of the work they did. Their reputation lived in a foreman&apos;s phone or a handshake, and it didn&apos;t transfer when they moved on.
               </p>
               <p className="lp-mission-body">
-                Meanwhile contractors across America are turning down projects because they can&apos;t find qualified professionals. The professionals are out there. There just hasn&apos;t been a modern, reliable way to find them and trust them quickly.
+                Meanwhile contractors across America are turning down projects because they can&apos;t find qualified tradespeople. They&apos;re out there. There just hasn&apos;t been a modern, reliable way to find them and trust them quickly.
               </p>
               <p className="lp-mission-closing">
                 The trades are the backbone of America. SkillMark gives that backbone a professional digital identity that&apos;s portable, permanent, and entirely yours.
@@ -327,7 +327,7 @@ export default function LandingPage() {
           <ul className="lp-footer-links">
             <li><a href="#why">Why Trades</a></li>
             <li><a href="#how">How It Works</a></li>
-            <li><a href="#signup">For Professionals</a></li>
+            <li><a href="#signup">For Tradespeople</a></li>
             <li><Link href="/privacy">Privacy</Link></li>
             <li><Link href="/terms">Terms</Link></li>
             <li><Link href="/cookies">Cookies</Link></li>

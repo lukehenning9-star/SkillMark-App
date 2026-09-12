@@ -20,7 +20,7 @@ export default function NotFound() {
             href="/search"
             className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors"
           >
-            Find Professionals
+            Find Tradespeople
           </Link>
         </div>
       </div>

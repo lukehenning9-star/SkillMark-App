@@ -62,6 +62,7 @@ export type Project = {
   cover_photo_url: string | null
   before_photo_url: string | null
   after_photo_url: string | null
+  post_to_feed: boolean
   created_at: string
 }
 

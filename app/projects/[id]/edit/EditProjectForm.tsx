@@ -21,6 +21,7 @@ export default function EditProjectForm({ project }: { project: Project }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [selectedSkills, setSelectedSkills] = useState<string[]>(project.specific_skills ?? []);
+  const [postToFeed, setPostToFeed] = useState(project.post_to_feed ?? true);
   const [coverUrl, setCoverUrl] = useState<string | null>(project.cover_photo_url);
   const [beforeUrl, setBeforeUrl] = useState<string | null>(project.before_photo_url ?? null);
   const [afterUrl, setAfterUrl] = useState<string | null>(project.after_photo_url ?? null);
@@ -329,6 +330,24 @@ export default function EditProjectForm({ project }: { project: Project }) {
             onChange={setSelectedSkills}
             suggestions={PROJECT_SKILLS}
           />
+        </div>
+
+        <div className="bg-white border border-border rounded-xl p-6">
+          <input type="hidden" name="post_to_feed" value={postToFeed ? "true" : "false"} />
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-navy text-sm">Share to the feed</h2>
+              <p className="text-xs text-text-dim mt-0.5">Show this project in the public feed. It always stays on your profile either way.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPostToFeed((v) => !v)}
+              aria-pressed={postToFeed}
+              className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer shrink-0 ${postToFeed ? "bg-accent" : "bg-border2"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${postToFeed ? "translate-x-5" : ""}`} />
+            </button>
+          </div>
         </div>
 
         {error && (

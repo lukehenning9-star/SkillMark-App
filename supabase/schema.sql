@@ -263,6 +263,10 @@ create table if not exists projects (
 
 alter table projects enable row level security;
 
+-- Opt-out feed visibility: projects appear in the public feed by default; the
+-- owner can keep one off the feed (it still shows on their profile).
+alter table projects add column if not exists post_to_feed boolean not null default true;
+
 do $$ begin
   alter table projects add constraint projects_title_len check (char_length(title) <= 200);
 exception when duplicate_object then null; end $$;

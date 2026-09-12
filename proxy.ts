@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-// Guests may browse profiles, projects, and search — sign-up is required only to
-// DO things. So we protect the action surfaces (dashboard, onboarding, settings,
-// messages, creating a project, editing a project), not viewing.
-const protectedRoutes = ["/dashboard", "/onboarding", "/settings", "/messages", "/projects/new"];
+// Guests may browse profiles, projects, the feed, and search — sign-up is
+// required only to DO things. So we protect the action surfaces (onboarding,
+// settings, messages, creating a project, editing a project), not viewing.
+// The feed (/dashboard) is public.
+const protectedRoutes = ["/onboarding", "/settings", "/messages", "/projects/new"];
 const editProjectPattern = /^\/projects\/[^/]+\/edit(\/|$)/;
 const authRoutes = ["/login", "/signup"];
 
