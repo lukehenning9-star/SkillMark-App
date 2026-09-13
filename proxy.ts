@@ -62,6 +62,11 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  // Signed-in users skip the marketing landing and go straight to the feed.
+  if (path === "/" && user) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   return res;
 }
 
