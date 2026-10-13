@@ -160,6 +160,7 @@ export default async function PublicProfilePage({
 
   // Viewer's connection state to this profile (drives the Connect button).
   let connectionState: "none" | "pending_out" | "pending_in" | "connected" = "none";
+  let viewerHasBlocked = false;
   if (viewer && !isOwner) {
     const { data: edges } = await supabase
       .from("connections")
@@ -174,6 +175,14 @@ export default async function PublicProfilePage({
       else if (edge.requester_id === viewer.id) connectionState = "pending_out";
       else connectionState = "pending_in";
     }
+
+    const { data: block } = await supabase
+      .from("blocked_users")
+      .select("blocked_id")
+      .eq("blocker_id", viewer.id)
+      .eq("blocked_id", profile.id)
+      .maybeSingle();
+    viewerHasBlocked = !!block;
   }
 
   // Frequent collaborators (public "works with most" strip).
@@ -217,6 +226,7 @@ export default async function PublicProfilePage({
         profileUrl={profileUrl}
         recentViewers={recentViewers}
         viewerCount={viewerCount}
+        isBlocked={viewerHasBlocked}
       />
     </>
   );

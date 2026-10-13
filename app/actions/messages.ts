@@ -23,7 +23,10 @@ export async function sendMessage(recipientId: string, content: string) {
     .select()
     .single();
 
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.message.includes("blocked")) return { error: "You can't message this person." };
+    return { error: error.message };
+  }
   return { message: data };
 }
 

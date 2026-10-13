@@ -1094,3 +1094,49 @@ create policy "See who viewed me" on profile_views_log for select to authenticat
 revoke insert, update, delete on table profile_views_log from anon, authenticated;
 
 create index if not exists idx_pvl_viewed on profile_views_log (viewed_id, last_viewed_at desc);
+
+
+-- ── USER BLOCKING ─────────────────────────────────────────────
+-- A user can block another; blocking disables messaging between the two.
+create table if not exists blocked_users (
+  blocker_id uuid references profiles on delete cascade not null,
+  blocked_id uuid references profiles on delete cascade not null,
+  created_at timestamptz default now(),
+  primary key (blocker_id, blocked_id)
+);
+alter table blocked_users enable row level security;
+
+-- Each user sees and manages only their own block list. Nobody can read who
+-- has blocked them (so blocking stays invisible to the blocked user).
+drop policy if exists "Manage own blocks" on blocked_users;
+create policy "Manage own blocks" on blocked_users for all to authenticated
+  using (auth.uid() = blocker_id) with check (auth.uid() = blocker_id);
+
+create index if not exists idx_blocked_users_blocker on blocked_users (blocker_id);
+create index if not exists idx_blocked_users_blocked on blocked_users (blocked_id);
+
+-- Enforce blocking on messaging: reject an insert if either side has blocked
+-- the other. Runs as definer so it can check both directions without exposing
+-- who blocked whom to the client.
+create or replace function enforce_message_block()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if exists (
+    select 1 from blocked_users
+    where (blocker_id = new.sender_id and blocked_id = new.recipient_id)
+       or (blocker_id = new.recipient_id and blocked_id = new.sender_id)
+  ) then
+    raise exception 'blocked: messaging is not available between these users';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists messages_block_check on messages;
+create trigger messages_block_check
+  before insert on messages
+  for each row execute function enforce_message_block();

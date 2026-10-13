@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { updateProject, saveProjectCoverPhoto, saveProjectBeforePhoto, saveProjectAfterPhoto } from "@/app/actions/projects";
+import { compressImage } from "@/lib/image";
 import { getProjectPhotoUploadUrl, getProjectBeforePhotoUploadUrl, getProjectAfterPhotoUploadUrl } from "@/app/actions/upload";
 import { PROJECT_SKILLS, TRADES } from "@/lib/constants";
 import SkillTagInput from "@/components/SkillTagInput";
@@ -44,15 +45,12 @@ export default function EditProjectForm({ project }: { project: Project }) {
       setPhotoError("Please select an image file.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setPhotoError("Image must be 5MB or smaller.");
-      return;
-    }
 
     setPhotoError(null);
     setPhotoUploading(true);
 
     try {
+      const upload = await compressImage(file);
       const result = await getProjectPhotoUploadUrl(project.id);
       if (!result || "error" in result) {
         setPhotoError(result?.error ?? "Could not get upload URL.");
@@ -61,8 +59,8 @@ export default function EditProjectForm({ project }: { project: Project }) {
 
       const uploadRes = await fetch(result.signedUrl, {
         method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
+        body: upload,
+        headers: { "Content-Type": upload.type },
       });
 
       if (!uploadRes.ok) {
@@ -89,13 +87,13 @@ export default function EditProjectForm({ project }: { project: Project }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) { setBeforeError("Please select an image file."); return; }
-    if (file.size > 5 * 1024 * 1024) { setBeforeError("Image must be 5MB or smaller."); return; }
     setBeforeError(null);
     setBeforeUploading(true);
     try {
+      const upload = await compressImage(file);
       const result = await getProjectBeforePhotoUploadUrl(project.id);
       if (!result || "error" in result) { setBeforeError(result?.error ?? "Could not get upload URL."); return; }
-      const uploadRes = await fetch(result.signedUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+      const uploadRes = await fetch(result.signedUrl, { method: "PUT", body: upload, headers: { "Content-Type": upload.type } });
       if (!uploadRes.ok) { setBeforeError("Upload failed. Please try again."); return; }
       const saveResult = await saveProjectBeforePhoto(project.id, result.publicUrl);
       if (saveResult?.error) { setBeforeError(saveResult.error); return; }
@@ -108,13 +106,13 @@ export default function EditProjectForm({ project }: { project: Project }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) { setAfterError("Please select an image file."); return; }
-    if (file.size > 5 * 1024 * 1024) { setAfterError("Image must be 5MB or smaller."); return; }
     setAfterError(null);
     setAfterUploading(true);
     try {
+      const upload = await compressImage(file);
       const result = await getProjectAfterPhotoUploadUrl(project.id);
       if (!result || "error" in result) { setAfterError(result?.error ?? "Could not get upload URL."); return; }
-      const uploadRes = await fetch(result.signedUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+      const uploadRes = await fetch(result.signedUrl, { method: "PUT", body: upload, headers: { "Content-Type": upload.type } });
       if (!uploadRes.ok) { setAfterError("Upload failed. Please try again."); return; }
       const saveResult = await saveProjectAfterPhoto(project.id, result.publicUrl);
       if (saveResult?.error) { setAfterError(saveResult.error); return; }

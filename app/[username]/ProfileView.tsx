@@ -7,6 +7,8 @@ import Link from "next/link";
 import { MapPin, Wrench, Clock, Award, Plus, Pencil, Camera, X, BadgeCheck, Eye, Lock, Building2, Globe, Users } from "lucide-react";
 import { saveProfileStep, saveAvatarUrl, saveBannerUrl } from "@/app/actions/profile";
 import { getAvatarUploadUrl, getBannerUploadUrl } from "@/app/actions/upload";
+import { blockUser, unblockUser } from "@/app/actions/block";
+import { compressImage } from "@/lib/image";
 import { US_STATES, TRADES, UNION_STATUS_OPTIONS, COMPANY_SIZES } from "@/lib/constants";
 import AvatarCropModal from "@/components/AvatarCropModal";
 import AutocompleteInput from "@/components/AutocompleteInput";
@@ -60,6 +62,7 @@ interface Props {
   profileUrl?: string;
   recentViewers?: RecentViewer[];
   viewerCount?: number;
+  isBlocked?: boolean;
 }
 
 function formatDateRange(start: string, end: string | null, isCurrent: boolean) {
@@ -94,11 +97,29 @@ export default function ProfileView({
   profileUrl,
   recentViewers = [],
   viewerCount = 0,
+  isBlocked = false,
 }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [blockPending, startBlockTransition] = useTransition();
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  function handleBlock() {
+    if (!window.confirm(`Block @${profile.username}? They won't be able to message you.`)) return;
+    startBlockTransition(async () => {
+      const res = await blockUser(profile.id);
+      if (res?.error) setUploadError(res.error);
+      else router.refresh();
+    });
+  }
+  function handleUnblock() {
+    startBlockTransition(async () => {
+      const res = await unblockUser(profile.id);
+      if (res?.error) setUploadError(res.error);
+      else router.refresh();
+    });
+  }
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
   const [bannerUrl, setBannerUrl] = useState<string | null>(profile.banner_url);
@@ -162,7 +183,7 @@ export default function ProfileView({
         }
         const res = await fetch(urlResult.signedUrl, {
           method: "PUT",
-          body: blob,
+          body: await compressImage(blob, { maxDim: 512 }),
           headers: { "Content-Type": "image/jpeg" },
         });
         if (!res.ok) { setUploadError("Photo upload failed. Please try again."); return; }
@@ -190,10 +211,11 @@ export default function ProfileView({
           setUploadError(urlResult?.error ?? "Could not get upload URL.");
           return;
         }
+        const bannerBlob = await compressImage(file);
         const res = await fetch(urlResult.signedUrl, {
           method: "PUT",
-          body: file,
-          headers: { "Content-Type": file.type },
+          body: bannerBlob,
+          headers: { "Content-Type": bannerBlob.type || "image/jpeg" },
         });
         if (!res.ok) { setUploadError("Banner upload failed. Please try again."); return; }
         const saveResult = await saveBannerUrl(urlResult.publicUrl);
@@ -337,15 +359,38 @@ export default function ProfileView({
                 </button>
               </>
             ) : viewerId ? (
-              <>
-                <ConnectButton targetId={profile.id} initialState={connectionState} />
-                <Link
-                  href={`/messages?to=${profile.username}`}
-                  className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors"
-                >
-                  Send Message
-                </Link>
-              </>
+              isBlocked ? (
+                <div className="flex items-center gap-2 pb-1">
+                  <span className="text-sm text-text-dim">You blocked this person</span>
+                  <button
+                    type="button"
+                    onClick={handleUnblock}
+                    disabled={blockPending}
+                    className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors disabled:opacity-50"
+                  >
+                    {blockPending ? "…" : "Unblock"}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <ConnectButton targetId={profile.id} initialState={connectionState} />
+                  <Link
+                    href={`/messages?to=${profile.username}`}
+                    className="text-sm font-semibold text-navy border border-border bg-white px-4 py-2 rounded-md hover:border-border2 transition-colors"
+                  >
+                    Send Message
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleBlock}
+                    disabled={blockPending}
+                    title="Block this person"
+                    className="text-sm font-semibold text-text-dim border border-border bg-white px-3 py-2 rounded-md hover:text-red-600 hover:border-red-300 transition-colors disabled:opacity-50"
+                  >
+                    Block
+                  </button>
+                </>
+              )
             ) : (
               <Link
                 href="/signup"
