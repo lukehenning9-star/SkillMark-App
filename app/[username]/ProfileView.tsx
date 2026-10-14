@@ -15,6 +15,7 @@ import AutocompleteInput from "@/components/AutocompleteInput";
 import SkillTagInput from "@/components/SkillTagInput";
 import ConnectButton, { type ConnectionState } from "@/components/ConnectButton";
 import ProfileQRButton from "@/components/ProfileQRButton";
+import ShareButton from "@/components/ShareButton";
 import type { Profile, WorkExperience, Project, Certification } from "@/lib/types";
 
 type TopCollaboratorLite = {
@@ -399,6 +400,7 @@ export default function ProfileView({
                 Sign up to connect
               </Link>
             )}
+            {profileUrl && <ShareButton url={profileUrl} name={profile.full_name ?? profile.username} />}
             {profileUrl && <ProfileQRButton url={profileUrl} username={profile.username} />}
           </div>
         </div>
